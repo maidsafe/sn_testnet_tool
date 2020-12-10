@@ -8,7 +8,7 @@ create_elder_droplets
 create_adult_droplets
 echo "Droplets created"
 register_hosts
-download_vault_binary_on_nodes
+download_node_binary_on_nodes
 deploy_elders
 deploy_adults
 churn
