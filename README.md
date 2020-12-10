@@ -5,3 +5,7 @@ Adults nodes are killed and restarted at random intervals creating network churn
 
 ## Instructions
 
+```
+export $DIGITAL_OCEAN_TOKEN=<api-token>
+./start-testnet
+```
