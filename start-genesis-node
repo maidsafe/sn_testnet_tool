@@ -1,0 +1,37 @@
+#!/bin/bash
+
+## This script copies the node binary to a remote machine and starts a genesis node.
+## It prints out the required connection information.
+
+# Required arguments
+
+# IP address of the remote machine
+ip=$1
+
+export RUST_LOG=safe=trace,quic_p2p=trace,routing=debug
+export RUST_BACKTRACE=1
+
+if [ -d "node_data" ]; then
+    rm -rf node_data/*;
+else
+    mkdir node_data
+fi
+
+if [ -d "~/.config/sn_node" ]; then 
+    rm -rf ~/.config/sn_node/*;
+else
+    mkdir ~/.config/sn_node
+fi
+
+echo "" > ~/.config/sn_node/node_connection_info.config
+chmod +x sn_node
+./sn_node --first --ip ${ip} --root-dir "node_data" &> node_data/node.stdout &
+sleep 5;
+
+hcc="$(cat ~/.config/sn_node/node_connection_info.config)";
+
+if [[ ${hcc} == "" ]]; then
+    printf 'Genesis node did not print its connection info or printed it in an unrecognised format\n.';
+    exit 1;
+fi
+echo $hcc

@@ -1,15 +1,15 @@
 #!/bin/bash
 
-function download_vault_binary_on_nodes {
-    vault_version="0.25.1"
-    vault_url="https://github.com/lionel1704/safe_vault/releases/download/${vault_version}/safe_vault"
+function download_node_binary_on_nodes {
+    node_version="latest"
+    node_url="https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-${node_version}-x86_64-unknown-linux-musl.tar.gz"
     
     for ip in $(<elders-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${vault_url}" 1>"logs/$ip.log" 2>&1 &
+        ssh -o "BatchMode yes" root@${ip} "wget ${node_url}" 1>"logs/$ip.log" 2>&1 &
     done
 
     for ip in $(<adults-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${vault_url}" 1>"logs/$ip.log" 2>&1 &
+        ssh -o "BatchMode yes" root@${ip} "wget ${node_url}" 1>"logs/$ip.log" 2>&1 &
     done
     wait
 }
@@ -20,13 +20,13 @@ function deploy_elders {
     for ip in $(<elders-ip-list xargs -r); do
         elder_nodes+=(${ip})
     done
-    ssh root@${elder_nodes[0]} "bash -s" < start-genesis-vault ${elder_nodes[0]} > connection_info
-    cp connection_info ~/.config/safe_vault/vault_connection_info.config
+    ssh root@${elder_nodes[0]} "bash -s" < start-genesis-node ${elder_nodes[0]} > connection_info
+    cp connection_info ~/.config/sn_node/node_connection_info.config
     hcc=$(cat connection_info)
     #Convert it into an array
     hcc="[${hcc}]";
 
-    echo "Genesis vault running with connection info: ${hcc}"
+    echo "Genesis node running with connection info: ${hcc}"
 
     ip_list_len=${#elder_nodes[@]}
     for (( i = 1; i < ip_list_len; i++ )); do
@@ -36,7 +36,7 @@ function deploy_elders {
             printf '%d ' ${j};
             sleep 1;
         done
-        ssh root@${elder_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "vault_data"
+        ssh root@${elder_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node_data"
     done
 }
 
@@ -62,9 +62,9 @@ function deploy_adults {
             printf '%d ' ${j};
             sleep 1;
         done
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "vault-1-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data"
         sleep 5
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "vault-2-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data"
     done
 }
 
@@ -82,11 +82,11 @@ function churn {
         sleep ${time[t]}
         i=$((RANDOM % 10))
         echo "Churning Adults at node ${i}"
-        ssh root@${adult_nodes[i]} 'pkill safe_vault && rm -rf vault*'
+        ssh root@${adult_nodes[i]} 'pkill sn_node && rm -rf node*'
         echo "Sleep 15m"
         sleep 15m
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "vault-1-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data"
         sleep 5
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "vault-2-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data"
     done
 }
