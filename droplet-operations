@@ -1,0 +1,71 @@
+#!/bin/bash
+
+function create_elder_droplets {
+        for i in {1..7}; do
+        ./doctl compute droplet create safe-testnet-elder-${i} \
+                                --size s-4vcpu-8gb \
+                                --image ubuntu-18-04-x64 \
+                                --region lon1 \
+                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781] \
+                                --wait
+        done
+
+        ./doctl compute droplet list 'safe-testnet-elder-*' --format "PublicIPv4" --no-header > elders-ip-list
+}
+
+function create_adult_droplets {
+        for i in {1..10}; do
+        ./doctl compute droplet create safe-testnet-adult-${i} \
+                                --size s-4vcpu-8gb \
+                                --image ubuntu-18-04-x64 \
+                                --region lon1 \
+                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781] \
+                                --wait
+        done
+
+        ./doctl compute droplet list 'safe-testnet-adult-*' --format "PublicIPv4" --no-header > adults-ip-list
+}
+
+function setup_doctl {
+        if [[ -z "${DIGITAL_OCEAN_TOKEN}" ]]; then
+                if [ ! -f ~/.config/doctl/config.yaml ]; then
+                        echo "Not authorised with Digital Ocean"
+                        echo "Set the DIGITAL_OCEAN_TOKEN env variable"
+                        return 1
+                fi
+        fi
+        version="1.46.0"
+        url="https://github.com/digitalocean/doctl/releases/download/v${version}/doctl-${version}-linux-amd64.tar.gz"
+        wget ${url}
+        tar xf "doctl-${version}-linux-amd64.tar.gz"
+        ./doctl auth init --access-token $DIGITAL_OCEAN_TOKEN
+}
+
+function destroy_all_droplets {
+        for i in {1..7}; do
+                ./doctl compute droplet delete safe-testnet-elder-$i -f
+        done
+
+        for i in {1..10}; do
+                ./doctl compute droplet delete safe-testnet-adult-$i -f
+        done
+}
+
+function register_hosts {
+        while read -r ip
+        do
+                ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
+        done < elders-ip-list
+
+        while read -r ip
+        do
+                ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
+        done < adults-ip-list
+}
+
+function clear_safe_data {
+        for ip in $(<elders-ip-list xargs -r); do
+                ssh -o "BatchMode yes" root@${ip} "pkill safe_vault && rm -rf vault_data*" 1>"logs/$ip.log" 2>&1 &
+        done
+        wait
+}

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+## This script copies the vault binary to a remote machine and starts a genesis vault.
+## It prints out the required connection information.
+
+# Required arguments
+
+# IP address of the remote machine
+ip=$1
+
+export RUST_LOG=safe=trace,quic_p2p=trace,routing=debug
+export RUST_BACKTRACE=1
+
+if [ -d "vault_data" ]; then
+    rm -rf vault_data/*;
+else
+    mkdir vault_data
+fi
+
+if [ -d "~/.config/safe_vault" ]; then 
+    rm -rf ~/.config/safe_vault/*;
+else
+    mkdir ~/.config/safe_vault
+fi
+
+echo "" > ~/.config/safe_vault/vault_connection_info.config
+chmod +x safe_vault
+./safe_vault --first --ip ${ip} --root-dir "vault_data" &> vault_data/vault.stdout &
+sleep 5;
+
+hcc="$(cat ~/.config/safe_vault/vault_connection_info.config)";
+
+if [[ ${hcc} == "" ]]; then
+    printf 'Genesis vault did not print its connection info or printed it in an unrecognised format\n.';
+    exit 1;
+fi
+echo $hcc

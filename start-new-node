@@ -1,0 +1,24 @@
+#!/bin/bash
+
+## This script starts a vault on a remote machine to join an existing section.
+## It requires the connection information to be passed to it.
+
+# Required arguments
+
+# Hard coded contacts
+hcc=$1
+# Vault data path
+data_path=$2
+
+if [ -d "$data_path" ]; then 
+    rm -rf $data_path/*;
+else
+    mkdir ${data_path}
+fi
+
+
+export RUST_LOG=safe=trace,quic_p2p=trace,routing=debug
+export RUST_BACKTRACE=1
+
+chmod +x safe_vault
+./safe_vault --root-dir ${data_path} --hard-coded-contacts ${hcc} &> ${data_path}/vault.stdout &
