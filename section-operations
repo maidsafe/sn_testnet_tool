@@ -5,11 +5,11 @@ function download_node_binary_on_nodes {
     node_url="https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-${node_version}-x86_64-unknown-linux-musl.tar.gz"
     
     for ip in $(<elders-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${node_url}" 1>"logs/$ip.log" 2>&1 &
+        ssh -o "BatchMode yes" root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
     done
 
     for ip in $(<adults-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${node_url}" 1>"logs/$ip.log" 2>&1 &
+        ssh -o "BatchMode yes" root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
     done
     wait
 }

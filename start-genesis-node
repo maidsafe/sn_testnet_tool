@@ -8,7 +8,7 @@
 # IP address of the remote machine
 ip=$1
 
-export RUST_LOG=safe=trace,quic_p2p=trace,routing=debug
+export RUST_LOG=sn_node=trace
 export RUST_BACKTRACE=1
 
 if [ -d "node_data" ]; then
@@ -18,17 +18,17 @@ else
 fi
 
 if [ -d "~/.config/sn_node" ]; then 
-    rm -rf ~/.config/sn_node/*;
+    rm -rf ~/.safe/node/*;
 else
-    mkdir ~/.config/sn_node
+    mkdir -p ~/.safe/node
 fi
 
-echo "" > ~/.config/sn_node/node_connection_info.config
+echo "" > ~/.safe/node/node_connection_info.config
 chmod +x sn_node
-./sn_node --first --ip ${ip} --root-dir "node_data" &> node_data/node.stdout &
+./sn_node --first --ip ${ip} --root-dir "node_data" -vvvvv &> node_data/node.stdout &
 sleep 5;
 
-hcc="$(cat ~/.config/sn_node/node_connection_info.config)";
+hcc="$(cat ~/.safe/node/node_connection_info.config)";
 
 if [[ ${hcc} == "" ]]; then
     printf 'Genesis node did not print its connection info or printed it in an unrecognised format\n.';

@@ -65,7 +65,11 @@ function register_hosts {
 
 function clear_safe_data {
         for ip in $(<elders-ip-list xargs -r); do
-                ssh -o "BatchMode yes" root@${ip} "pkill sn_node && rm -rf node_data*" 1>"logs/$ip.log" 2>&1 &
+                ssh -o "BatchMode yes" root@${ip} "pkill sn_node; rm -rf node_data; rm sn_node*" 1>"logs/$ip.log" 2>&1 &
+        done
+        wait
+        for ip in $(<adults-ip-list xargs -r); do
+                ssh -o "BatchMode yes" root@${ip} "pkill sn_node; rm -rf node_data; rm sn_node*" 1>"logs/$ip.log" 2>&1 &
         done
         wait
 }

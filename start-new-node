@@ -13,12 +13,12 @@ data_path=$2
 if [ -d "$data_path" ]; then 
     rm -rf $data_path/*;
 else
-    mkdir ${data_path}
+    mkdir -p ${data_path}
 fi
 
 
-export RUST_LOG=safe=trace,quic_p2p=trace,routing=debug
+export RUST_LOG=sn_node=trace
 export RUST_BACKTRACE=1
 
 chmod +x sn_node
-./sn_node --root-dir ${data_path} --hard-coded-contacts ${hcc} &> ${data_path}/node.stdout &
+./sn_node --root-dir ${data_path} --hard-coded-contacts ${hcc} -vvvvv &> ${data_path}/node.stdout &
