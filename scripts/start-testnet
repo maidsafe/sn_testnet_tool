@@ -1,11 +1,18 @@
 #!/bin/bash
 
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+
 NODE_COUNT=${1:-11}
 ELDER_COUNT=5
 adult_count=$(($NODE_COUNT-$ELDER_COUNT))
 
-source ./droplet-operations
-source ./section-operations
+source ../src/droplet-operations
+source ../src/section-operations
 
 setup_doctl
 create_elder_droplets
