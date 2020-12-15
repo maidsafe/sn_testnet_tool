@@ -14,7 +14,8 @@ function create_elder_droplets {
 }
 
 function create_adult_droplets {
-        for i in {1..6}; do
+        ADULT_COUNT=${1:-6}    
+        for i in {1..$ADULT_COUNT}; do
         ./doctl compute droplet create safe-testnet-adult-${i} \
                                 --size s-4vcpu-8gb \
                                 --image ubuntu-18-04-x64 \
@@ -42,11 +43,17 @@ function setup_doctl {
 }
 
 function destroy_all_droplets {
+
+        NODE_COUNT=${1:-11}
+        ELDER_COUNT=5
+        adult_count=$(($NODE_COUNT-$ELDER_COUNT))
+
         for i in {1..5}; do
                 ./doctl compute droplet delete safe-testnet-elder-$i -f
         done
+        
 
-        for i in {1..6}; do
+        for i in {1..$adult_count}; do
                 ./doctl compute droplet delete safe-testnet-adult-$i -f
         done
 }
