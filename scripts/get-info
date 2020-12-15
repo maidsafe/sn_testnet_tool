@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+
+#  NOTE: this requires ripgrep with perl compat (the -P), this may need a custom build of ripgrep via: "cargo build --release --features 'pcre2'"
+
+# wc -l counts lines from the ripgrep output
+# -o is only print out the matching text
+# -U is multiline, --multiline-dotall is needed for "." to actually match across lines
+# -N is dont print line numbers
+VILLAGE=$(rg "Becoming Adult|Becoming Elder" logs/* -c | wc -l)
+
+CURRENT_ELDER_COUNT=$(rg -P "Becoming Elder(?!.*Becoming Adult)" logs/* -o -UN --multiline-dotall | wc -l)
+CURRENT_ADULT_COUNT=$(rg -P "Becoming Adult(?!.*Becoming Elder)" logs/* -o -UN --multiline-dotall | wc -l)
+
+
+# SPLITS_OCCURED_COUNT=$(rg "Split occured" logs/*)
+# SPLITS_OCCURED_COUNT=$(rg "Split occured" logs/*):-0  
+
+
+# PREFIX=$(rg "New prefix is:" logs/* -o)
+SECTION_ELDER_CHANGES_COUNT=$(rg "New event received from the Network: EldersChanged" logs/* -o -N | wc -l)
+
+echo "beeop"
+
+echo "Total nodes: $VILLAGE"
+echo "--------------"
+echo "# Elders: $CURRENT_ELDER_COUNT"
+echo "# Adults: $CURRENT_ADULT_COUNT"
+echo "--------------"
+# echo "Total number of splits seen: $SPLITS_OCCURED_COUNT"
+echo "Total number of Elder Membership changes seen: $SECTION_ELDER_CHANGES_COUNT"
+
+
+cleanup

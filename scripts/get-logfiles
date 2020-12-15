@@ -14,5 +14,4 @@ cleanup() {
 source "$script_dir/../src/droplet-operations"
 
 fetch_log_files
-
-# destroy_all_droplets
+cleanup
