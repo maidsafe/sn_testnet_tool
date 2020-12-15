@@ -1,5 +1,5 @@
 elders-ip-list
 adults-ip-list
 doctl*
-logs/
+logs/*
 connection_info
