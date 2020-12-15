@@ -80,3 +80,17 @@ function clear_safe_data {
         done
         wait
 }
+
+function fetch_log_files {
+        elder_count=0
+        for ip in $(<elders-ip-list xargs -r); do
+                scp root@${ip}:/root/node_data/node.stdout logs/elder-${elder_count}.log
+                elder_count=$((elder_count + 1))
+        done
+        adult_count=0
+        for ip in $(<adults-ip-list xargs -r); do
+                scp root@${ip}:/root/node-1-data/node.stdout logs/adult-$((adult_count)).log
+                scp root@${ip}:/root/node-2-data/node.stdout logs/adult-$((adult_count + 1)).log
+                adult_count=$((adult_count + 2))
+        done
+}
