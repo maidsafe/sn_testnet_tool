@@ -39,7 +39,7 @@ echo "# Elders: $CURRENT_ELDER_COUNT"
 echo "# Adults: $CURRENT_ADULT_COUNT"
 echo "--------------"
 # echo "Total number of splits seen: $SPLITS_OCCURED_COUNT"
-echo "Total number of Elder Membership changes seen: $SECTION_ELDER_CHANGES_COUNT"
+echo "Total number of Elder Membership changes seen across all logs: $SECTION_ELDER_CHANGES_COUNT"
 
 
 cleanup
