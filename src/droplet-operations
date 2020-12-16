@@ -101,3 +101,10 @@ function fetch_log_files {
         echo "Logs updated"
 
 }
+
+function fetch_ip_files {
+        
+        wget https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/elders-ip-list
+        wget https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/adults-ip-list
+
+}
