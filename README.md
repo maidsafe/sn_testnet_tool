@@ -7,9 +7,9 @@ Adults nodes are killed and restarted at random intervals creating network churn
 
 ```
 export DIGITAL_OCEAN_TOKEN=<api-token>
-export AWS_ACCESS_KEY_ID=AKIAVVODCRMSJ5MV63VB
-export AWS_SECRET_KEY=<secret-key>
-export AWS_DEFAULT_REGION=eu-west-2
+export AWS_ACCESS_KEY_ID=<access-key>
+export AWS_SECRET_ACCESS_KEY=<secret-key>
+export AWS_DEFAULT_REGION=<region, e.g. eu-west-2>
 cd scripts/
 ./start-testnet
 ```
