@@ -11,7 +11,6 @@ cleanup() {
   # script cleanup here
 }
 
-
 #  NOTE: this requires ripgrep with perl compat (the -P), this may need a custom build of ripgrep via: "cargo build --release --features 'pcre2'"
 
 # wc -l counts lines from the ripgrep output

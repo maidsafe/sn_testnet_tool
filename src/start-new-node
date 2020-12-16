@@ -11,9 +11,9 @@ hcc=$1
 data_path=$2
 
 # 2mb
-2MB = $(( 2 * 1024 * 1024 ))
+TWO_MB=$(( 2 * 1024 * 1024 ))
 #  Node capacity
-max_capacity=${3:-$2MB}
+max_capacity=${3:-$TWO_MB}
 
 
 if [ -d "$data_path" ]; then 
