@@ -15,6 +15,10 @@ function download_node_binary_on_nodes {
 }
 
 function deploy_elders {
+    2MB = $(( 2 * 1024 * 1024 ))
+    max_capacity=${1:-$2MB}
+
+
     INTERVAL_BETWEEN_ELDERS=30
     elder_nodes=()
     for ip in $(<elders-ip-list xargs -r); do
