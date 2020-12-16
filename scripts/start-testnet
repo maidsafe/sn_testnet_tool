@@ -15,11 +15,11 @@ NODE_COUNT=${1:-11}
 ELDER_COUNT=5
 adult_count=$(($NODE_COUNT-$ELDER_COUNT))
 # 2mb
-2MB = $(( 2 * 1024 * 1024 ))
-node_capacity=${1:-$2MB}
+TWO_MB=$(( 2 * 1024 * 1024 ))
+node_capacity=${1:-$TWO_MB}
 
-source ../src/droplet-operations
-source ../src/section-operations
+source "$script_dir/../src/droplet-operations"
+source "$script_dir/../src/section-operations"
 
 setup_doctl
 create_elder_droplets

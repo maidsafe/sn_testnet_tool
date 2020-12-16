@@ -15,8 +15,8 @@ function download_node_binary_on_nodes {
 }
 
 function deploy_elders {
-    2MB = $(( 2 * 1024 * 1024 ))
-    max_capacity=${1:-$2MB}
+    TWO_MB=$(( 2 * 1024 * 1024 ))
+    max_capacity=${1:-$TWO_MB}
 
 
     INTERVAL_BETWEEN_ELDERS=30
@@ -46,8 +46,8 @@ function deploy_elders {
 
 function deploy_adults {
     # 2mb
-    2MB = $(( 2 * 1024 * 1024 ))
-    max_capacity=${1:-$2MB}
+    TWO_MB=$(( 2 * 1024 * 1024 ))
+    max_capacity=${1:-$TWO_MB}
 
     INTERVAL_BETWEEN_ADULTS=15
     adult_nodes=()
