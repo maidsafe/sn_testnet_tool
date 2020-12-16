@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+mkdir -p data
+
+head -c 1K </dev/urandom >data/1K-file
+head -c 5M </dev/urandom >data/5M-file
