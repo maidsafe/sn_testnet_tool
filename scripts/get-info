@@ -31,8 +31,7 @@ CURRENT_ADULT_COUNT=$(rg -P "Becoming Adult(?!.*Becoming Elder)" logs/* -o -UN -
 # PREFIX=$(rg "New prefix is:" logs/* -o)
 SECTION_ELDER_CHANGES_COUNT=$(rg "New event received from the Network: EldersChanged" logs/* -o -N | wc -l)
 
-echo "beeop"
-
+echo "Status at $(date +"%T")"
 echo "Total nodes: $VILLAGE"
 echo "--------------"
 echo "# Elders: $CURRENT_ELDER_COUNT"

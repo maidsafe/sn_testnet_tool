@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+
+while :
+do
+  echo "Checking testnet status"
+	"$script_dir/get-logfiles"
+  echo "..."
+	"$script_dir/get-info"
+  echo "..."
+	echo "Press CTRL+C to exit"
+	sleep 3
+done
+
+cleanup
