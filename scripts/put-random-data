@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+while :
+do
+  dd if=/dev/urandom of=/tmp/rand.dat bs=1k count=162
+  safe files put /tmp/rand.dat --dry-run
+  safe files put /tmp/rand.dat 
+	echo "Press CTRL+C to stop putting random data"
+done
