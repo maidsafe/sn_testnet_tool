@@ -41,6 +41,10 @@ function deploy_elders {
 }
 
 function deploy_adults {
+    # 2mb
+    2MB = $(( 2 * 1024 * 1024 ))
+    max_capacity=${1:-$2MB}
+
     INTERVAL_BETWEEN_ADULTS=15
     adult_nodes=()
     for ip in $(<adults-ip-list xargs -r); do
@@ -62,9 +66,9 @@ function deploy_adults {
             printf '%d ' ${j};
             sleep 1;
         done
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data" $max_capacity
         sleep 5
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data"
+        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data" $max_capacity
     done
 }
 

@@ -10,6 +10,12 @@ hcc=$1
 # Node data path
 data_path=$2
 
+# 2mb
+2MB = $(( 2 * 1024 * 1024 ))
+#  Node capacity
+max_capacity=${3:-$2MB}
+
+
 if [ -d "$data_path" ]; then 
     rm -rf $data_path/*;
 else
@@ -21,4 +27,4 @@ export RUST_LOG=sn_node=trace
 export RUST_BACKTRACE=1
 
 chmod +x sn_node
-./sn_node --root-dir ${data_path} --hard-coded-contacts ${hcc} -vvvvv &> ${data_path}/node.stdout &
+./sn_node --max-capacity ${max-capacity} --root-dir ${data_path} --hard-coded-contacts ${hcc} -vvvvv &> ${data_path}/node.stdout &

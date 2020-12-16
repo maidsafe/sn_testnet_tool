@@ -10,18 +10,21 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 NODE_COUNT=${1:-11}
 ELDER_COUNT=5
 adult_count=$(($NODE_COUNT-$ELDER_COUNT))
+# 2mb
+2MB = $(( 2 * 1024 * 1024 ))
+node_capacity=${1:-$2MB}
 
 source ../src/droplet-operations
 source ../src/section-operations
 
 setup_doctl
 create_elder_droplets
-create_adult_droplets $adult_count
+create_adult_droplets $adult_count 
 echo "$NODE_COUNT Droplets created"
 register_hosts
 download_node_binary_on_nodes
-deploy_elders
-deploy_adults
+deploy_elders $node_capacity
+deploy_adults $node_capacity
 churn
 
 # destroy_all_droplets
