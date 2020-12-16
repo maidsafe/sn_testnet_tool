@@ -11,6 +11,8 @@ function create_elder_droplets {
         done
 
         ./doctl compute droplet list 'safe-testnet-elder-*' --format "PublicIPv4" --no-header > elders-ip-list
+
+        aws s3 cp elders-ip-list s3://safe-testnet-tool/elders-ip-list --acl public-read
 }
 
 function create_adult_droplets {
@@ -25,6 +27,8 @@ function create_adult_droplets {
         done
 
         ./doctl compute droplet list 'safe-testnet-adult-*' --format "PublicIPv4" --no-header > adults-ip-list
+
+        aws s3 cp adults-ip-list s3://safe-testnet-tool/adults-ip-list --acl public-read
 }
 
 function setup_doctl {
