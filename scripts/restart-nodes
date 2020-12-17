@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+# set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+echo "Restaring sn_node on all droplets"
+
+NODE_COUNT=${1:-11}
+ELDER_COUNT=5
+adult_count=$(($NODE_COUNT-$ELDER_COUNT))
+# 2mb
+TWO_MB=$(( 2 * 1024 * 1024 ))
+node_capacity=${1:-$TWO_MB}
+
+source "$script_dir/../src/droplet-operations"
+source "$script_dir/../src/section-operations"
+
+
+#  STOP ELDERS
+elder_nodes=()
+for ip in $(<elders-ip-list xargs); do
+    elder_nodes+=(${ip})
+done
+
+ip_list_len=${#elder_nodes[@]}
+
+for (( i = 0; i < ip_list_len; i++ )); do
+    echo "Targeting node at ${elder_nodes[i]}"
+    echo "Stopping node"
+      ssh root@${elder_nodes[i]} "pkill -f sn_node"
+done
+
+echo "elders stopped"
+
+
+
+#  STOP ELDERS
+adult_nodes=()
+for ip in $(<adults-ip-list xargs); do
+    adult_nodes+=(${ip})
+done
+
+ip_list_len=${#adult_nodes[@]}
+
+for (( i = 0; i < ip_list_len; i++ )); do
+    echo "Targeting node at ${adult_nodes[i]}"
+    echo "Stopping node"
+    ssh root@${adult_nodes[i]} "pkill -f sn_node"
+done
+
+echo "adults stopped"
+
+
+echo "Restarting all nodes"
+# download_node_binary_on_nodes
+# echo "Binary downloaded to all nodes"
+deploy_elders $node_capacity
+echo "elders started"
+deploy_adults $node_capacity
+echo "adults started"
+
+
+cleanup
