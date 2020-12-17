@@ -11,7 +11,19 @@ cleanup() {
   # script cleanup here
 }
 
-source "$script_dir/../src/droplet-operations"
+mkdir -p logs
+elder_count=0
+for ip in $(<elders-ip-list xargs); do
+        # echo "accessing root@${ip}:/root/node_data/node.stdout"
+        #  TODO: this is not overwriting files locally on linux
+        rsync --partial root@${ip}:/root/node_data/node.stdout logs/initial-elder-${elder_count}.log
+        elder_count=$((elder_count + 1))
+done
 
-fetch_log_files
+for ip in $(<adults-ip-list xargs); do
+        rsync --partial root@${ip}:/root/node_data/node.stdout logs/${ip}-1.log
+done
+echo "Logs updated"
+
+
 cleanup

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # https://betterdev.blog/minimal-safe-bash-script-template/
-# set -Eeuo pipefail
+set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
@@ -11,16 +11,8 @@ cleanup() {
   # script cleanup here
 }
 
+echo "Destroying all droplets"
+source "$script_dir/../src/droplet-operations"
 
-while :
-do
-  echo "Checking testnet status"
-	"$script_dir/get-logfiles"
-  echo "..."
-	"$script_dir/get-info"
-  echo "..."
-	echo "Press CTRL+C to exit"
-	sleep 3
-done
-
+destroy_all_droplets
 cleanup

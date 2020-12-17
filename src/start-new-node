@@ -6,14 +6,14 @@
 # Required arguments
 
 # Hard coded contacts
-hcc=$1
+hard_coded_contacts=$1
 # Node data path
 data_path=$2
 
 # 2mb
 TWO_MB=$(( 2 * 1024 * 1024 ))
 #  Node capacity
-max_capacity=${3:-$TWO_MB}
+MAX_CAPACITY=${3:-$TWO_MB}
 
 
 if [ -d "$data_path" ]; then 
@@ -26,5 +26,8 @@ fi
 export RUST_LOG=sn_node=trace
 export RUST_BACKTRACE=1
 
-chmod +x sn_node
-./sn_node --max-capacity ${max-capacity} --root-dir ${data_path} --hard-coded-contacts ${hcc} -vvvvv &> ${data_path}/node.stdout &
+echo "Starting node w/ capacity $MAX_CAPACITY"
+echo "./sn_node --max-capacity \"${MAX_CAPACITY}\" --root-dir ${data_path} --hard-coded-contacts ${hard_coded_contacts} -vvvvv &> ${data_path}/node.stdout &"
+
+chmod +x sn_node 
+./sn_node --max-capacity $MAX_CAPACITY --root-dir ${data_path} --hard-coded-contacts ${hard_coded_contacts} -vvvvv &> ${data_path}/node.stdout &

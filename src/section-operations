@@ -1,66 +1,74 @@
 #!/bin/bash
 
 function download_node_binary_on_nodes {
+    echo "Downloading node bindary to nodes"
     node_version="latest"
     node_url="https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-${node_version}-x86_64-unknown-linux-musl.tar.gz"
     
-    for ip in $(<elders-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
+    for ip in $(<elders-ip-list xargs); do
+        echo "installing node on elder @: $ip"
+        ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=5 -q root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
+
     done
 
-    for ip in $(<adults-ip-list xargs -r); do
-        ssh -o "BatchMode yes" root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
+    for ip in $(<adults-ip-list xargs); do
+        echo "installing node on adult @: $ip"
+        ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=5 -q root@${ip} "wget ${node_url} && tar xf sn_node-latest-x86_64-unknown-linux-musl.tar.gz" 1>"logs/$ip.log" 2>&1 &
+
     done
     wait
 }
 
 function deploy_elders {
-    TWO_MB=$(( 2 * 1024 * 1024 ))
-    max_capacity=${1:-$TWO_MB}
+    TWO_GB=$(( 2 * 1024 * 1024 * 1024))
+    TWO_MB=$(( 2 * 1024 * 1024))
+    MAX_CAPACITY=${1:-$TWO_MB}
 
 
     INTERVAL_BETWEEN_ELDERS=30
     elder_nodes=()
-    for ip in $(<elders-ip-list xargs -r); do
+    for ip in $(<elders-ip-list xargs); do
         elder_nodes+=(${ip})
     done
-    ssh root@${elder_nodes[0]} "bash -s" < start-genesis-node ${elder_nodes[0]} > connection_info
-    cp connection_info ~/.config/sn_node/node_connection_info.config
-    hcc=$(cat connection_info)
+    ssh root@${elder_nodes[0]} "bash -s" < "$script_dir/../src/start-genesis-node" ${elder_nodes[0]} 
+    # cp connection_info ~/.config/sn_node/node_connection_info.config
+    hard_coded_contacts=$(ssh root@${elder_nodes[0]} "cat ~/.safe/node/node_connection_info.config")
+    echo $hard_coded_contacts > connection_info
     #Convert it into an array
-    hcc="[${hcc}]";
+    hard_coded_contacts="[${hard_coded_contacts}]";
 
-    echo "Genesis node running with connection info: ${hcc}"
+    echo "Genesis node running with connection info: ${hard_coded_contacts}"
 
     ip_list_len=${#elder_nodes[@]}
+
     for (( i = 1; i < ip_list_len; i++ )); do
         echo "Targeting node at ${elder_nodes[i]}"
-        printf '\nRunning elder number: %d  at in... ' $(($i));
+        printf '\nStarting elder number: %d  in... ' $(($i));
         for (( j = ${INTERVAL_BETWEEN_ELDERS}; j > 0; --j )); do
             printf '%d ' ${j};
             sleep 1;
         done
-        ssh root@${elder_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node_data"
+         ssh root@${elder_nodes[i]} "bash -s" < "$script_dir/../src/start-new-node" ${hard_coded_contacts@Q} "node_data" $MAX_CAPACITY
     done
 }
 
 function deploy_adults {
     # 2mb
     TWO_MB=$(( 2 * 1024 * 1024 ))
-    max_capacity=${1:-$TWO_MB}
+    MAX_CAPACITY=${1:-$TWO_MB}
 
     INTERVAL_BETWEEN_ADULTS=15
     adult_nodes=()
-    for ip in $(<adults-ip-list xargs -r); do
+    for ip in $(<adults-ip-list xargs); do
         adult_nodes+=(${ip})
     done
-    hcc=$(cat connection_info)
-    if [[ ${hcc} == "" ]]; then
+    hard_coded_contacts=$(cat connection_info)
+    if [[ ${hard_coded_contacts} == "" ]]; then
         printf 'Hard coded contacts not available.\n.';
         exit 1;
     fi
     #Convert it into an array
-    hcc="[${hcc}]";
+    hard_coded_contacts="[${hard_coded_contacts}]";
 
     ip_list_len=${#adult_nodes[@]}
     for (( i = 0; i < ip_list_len; i++ )); do
@@ -70,31 +78,7 @@ function deploy_adults {
             printf '%d ' ${j};
             sleep 1;
         done
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data" $max_capacity
-        sleep 5
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data" $max_capacity
+        ssh root@${adult_nodes[i]} "bash -s" < "$script_dir/../src/start-new-node" ${hard_coded_contacts@Q} "node_data" $MAX_CAPACITY
     done
 }
 
-function churn {
-    adult_nodes=()
-    for ip in $(<adults-ip-list xargs -r); do
-        adult_nodes+=(${ip})
-    done
-    time=(5m 10m 15m)
-    hcc=$(cat connection_info)
-    hcc="[${hcc}]"
-    while true; do
-        t=$((RANDOM % 3))
-        echo "Sleep: ${time[t]}"
-        sleep ${time[t]}
-        i=$((RANDOM % 10))
-        echo "Churning Adults at node ${i}"
-        ssh root@${adult_nodes[i]} 'pkill sn_node && rm -rf node*'
-        echo "Sleep 15m"
-        sleep 15m
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-1-data"
-        sleep 5
-        ssh root@${adult_nodes[i]} "bash -s" < start-new-node ${hcc@Q} "node-2-data"
-    done
-}
