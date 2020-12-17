@@ -11,7 +11,7 @@ cleanup() {
   # script cleanup here
 }
 
-echo "Restaring sn_node on all droplets"
+echo "Restarting sn_node on all droplets"
 
 NODE_COUNT=${1:-11}
 ELDER_COUNT=5
