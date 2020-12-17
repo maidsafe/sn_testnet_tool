@@ -33,9 +33,9 @@ done
 ip_list_len=${#elder_nodes[@]}
 
 for (( i = 0; i < ip_list_len; i++ )); do
-    echo "Targeting node at ${elder_nodes[i]}"
-    echo "Stopping node"
-      ssh root@${elder_nodes[i]} "pkill -f sn_node"
+    echo "Stopping elder node ${elder_nodes[i]}"
+    ssh root@${elder_nodes[i]} "pkill -f sn_node"
+    echo "node stopped"
 done
 
 echo "elders stopped"
@@ -51,9 +51,9 @@ done
 ip_list_len=${#adult_nodes[@]}
 
 for (( i = 0; i < ip_list_len; i++ )); do
-    echo "Targeting node at ${adult_nodes[i]}"
-    echo "Stopping node"
+    echo "Stopping adult node at ${adult_nodes[i]}"
     ssh root@${adult_nodes[i]} "pkill -f sn_node"
+    echo "node stopped"
 done
 
 echo "adults stopped"
