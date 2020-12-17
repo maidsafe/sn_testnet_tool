@@ -21,7 +21,7 @@ VILLAGE=$(rg "Becoming Adult|Becoming Elder" logs/* -c | wc -l)
 
 CURRENT_ELDER_COUNT=$(rg -P "Becoming Elder(?!.*Becoming Adult)" logs/* -o -UN --multiline-dotall | wc -l)
 CURRENT_ADULT_COUNT=$(rg -P "Becoming Adult(?!.*Becoming Elder)" logs/* -o -UN --multiline-dotall | wc -l)
-
+FAILED_TO_LAUNCH_COUNT=$(rg "Cannot start node" | wc -l)
 
 # SPLITS_OCCURED_COUNT=$(rg "Split occured" logs/*)
 # SPLITS_OCCURED_COUNT=$(rg "Split occured" logs/*):-0  
@@ -32,6 +32,7 @@ SECTION_ELDER_CHANGES_COUNT=$(rg "New event received from the Network: EldersCha
 
 echo "Status at $(date +"%T")"
 echo "Total nodes: $VILLAGE"
+echo "Number of nodes which failed to launch: $FAILED_TO_LAUNCH_COUNT"
 echo "--------------"
 echo "# Elders: $CURRENT_ELDER_COUNT"
 echo "# Adults: $CURRENT_ADULT_COUNT"
