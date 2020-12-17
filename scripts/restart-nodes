@@ -10,6 +10,9 @@ cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
   # script cleanup here
 }
+echo "updating ip lists"
+"$script_dir/get-ips"
+
 
 echo "Restarting sn_node on all droplets"
 
