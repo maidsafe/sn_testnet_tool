@@ -16,7 +16,7 @@ elder_count=0
 for ip in $(<elders-ip-list xargs); do
         # echo "accessing root@${ip}:/root/node_data/node.stdout"
         #  TODO: this is not overwriting files locally on linux
-        rsync --partial root@${ip}:/root/node_data/node.stdout logs/initial-elder-${elder_count}.log
+        rsync --partial root@${ip}:/root/node_data/node.stdout logs/initial-elder-${elder_count}-${ip}.log
         elder_count=$((elder_count + 1))
 done
 
