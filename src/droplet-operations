@@ -98,8 +98,6 @@ function clear_safe_data {
 }
 
 function fetch_ip_files {
-        
         aws s3 cp s3://safe-testnet-tool/elders-ip-list ./
         aws s3 cp s3://safe-testnet-tool/adults-ip-list ./
-
 }
