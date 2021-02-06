@@ -11,7 +11,10 @@ cleanup() {
   # script cleanup here
 }
 
-source "$script_dir/../src/droplet-operations"
+# source "$script_dir/../src/droplet-operations"
 
-fetch_ip_files
+aws s3 cp s3://safe-testnet-tool/ip-list ./
+aws s3 cp s3://safe-testnet-tool/genesis-ip ./
+./scripts/register_keys.sh
+
 cleanup

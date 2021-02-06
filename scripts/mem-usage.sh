@@ -11,8 +11,11 @@ cleanup() {
   # script cleanup here
 }
 
-echo "Destroying all droplets"
-source "$script_dir/../src/droplet-operations"
+echo "Mem usage in mbs for node at ip:"
+mkdir -p logs
+for ip in $(<ip-list xargs); do
+    mb=$(ssh root@${ip} 'process=$(pgrep sn_node -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$ip:    ${mb}MB" &
 
-destroy_all_droplets
+done
+
 cleanup
