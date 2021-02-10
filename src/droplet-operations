@@ -8,7 +8,7 @@ function create_elder_droplets {
                                 --size s-4vcpu-8gb \
                                 --image ubuntu-18-04-x64 \
                                 --region lon1 \
-                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781,29201567] \
+                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781,29201567,29586082] \
                                 --wait
         done
 
@@ -26,7 +26,7 @@ function create_adult_droplets {
                                 --size s-4vcpu-8gb \
                                 --image ubuntu-18-04-x64 \
                                 --region lon1 \
-                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781,29201567] \
+                                --ssh-keys=[26400596,26204985,26204991,19315097,26204781,29201567,29586082] \
                                 --wait
         done
 
