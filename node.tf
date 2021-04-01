@@ -46,8 +46,8 @@ resource "digitalocean_droplet" "sn_node" {
       "sleep 5",
       # "sleep $((${count.index * 2}));",
       "echo \"Starting node w/ capacity $MAX_CAPACITY\"",
-      "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --lan --root-dir ~/node_data --local-ip ${digitalocean_droplet.sn_node[count.index].ipv4_address} --external-ip ${digitalocean_droplet.sn_node[count.index].ipv4_address}   --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv &\"",
-      "nohup 2>&1 ./sn_node --max-capacity $MAX_CAPACITY --lan --root-dir ~/node_data --local-ip ${digitalocean_droplet.sn_node[count.index].ipv4_address} --external-ip ${digitalocean_droplet.sn_node[count.index].ipv4_address}  --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv &",
+      "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --lan --root-dir ~/node_data --local-ip ${self.ipv4_address} --external-ip ${self.ipv4_address}   --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv &\"",
+      "nohup 2>&1 ./sn_node --max-capacity $MAX_CAPACITY --lan --root-dir ~/node_data --local-ip ${self.ipv4_address} --external-ip ${self.ipv4_address}  --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv &",
       "sleep 5",
       "echo 'node ${count.index + 1} set up'"
     ]

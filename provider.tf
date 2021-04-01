@@ -29,7 +29,7 @@ variable "node_bin" {
 
 # eg RUST_LOG=sn_node=trace
 variable "remote_log_level" {
-  default = "RUST_LOG=sn_node=trace"
+  default = "RUST_LOG=sn_node=trace,qp2p=trace"
   # default = "RUST_LOG=sn_node=trace,sn_routing=debug,qp2p=debug"
 }
 
