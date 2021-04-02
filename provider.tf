@@ -41,6 +41,10 @@ variable "max_capacity" {
   default = "2 * 1024 * 1024"
 }
 
+variable "port" {
+  type    = number
+  default = 12000
+}
 
 variable "ssh_keys" {
   type    = list(number)
