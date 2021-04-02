@@ -41,13 +41,13 @@ resource "digitalocean_droplet" "sn_node" {
       "export ${var.remote_log_level}",
       # "export RUST_BACKTRACE=1",
       "MAX_CAPACITY=$((${var.max_capacity}))",
-      "HARD_CODED_CONTACTS='[\"${digitalocean_droplet.sn_genesis.ipv4_address}:5466\"]'",
+      "HARD_CODED_CONTACTS='[\"${digitalocean_droplet.sn_genesis.ipv4_address}:${var.port}\"]'",
       "echo hcc-$HARD_CODED_CONTACTS",
       "sleep 5",
       # "sleep $((${count.index * 2}));",
       "echo \"Starting node w/ capacity $MAX_CAPACITY\"",
-      "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv &\"",
-      "nohup 2>&1 ./sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv --local-ip ${self.ipv4_address} --local-port 5466 --external-ip ${self.ipv4_address} --external-port 5466 &",
+      "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv --local-ip ${self.ipv4_address} --local-port ${var.port} --external-ip ${self.ipv4_address} --external-port ${var.port}  &\"",
+      "nohup 2>&1 ./sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --hard-coded-contacts $HARD_CODED_CONTACTS -vvvvv --local-ip ${self.ipv4_address} --local-port ${var.port} --external-ip ${self.ipv4_address} --external-port ${var.port} &",
       "sleep 5",
       "echo 'node ${count.index + 1} set up'"
     ]
