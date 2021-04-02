@@ -17,7 +17,7 @@ terraform {
 variable "do_token" {}
 
 # location of ssh key to log into nodes
-variable "pvt_key" {}
+#variable "pvt_key" {}
 
 variable "number_of_nodes" {
   default = "5"

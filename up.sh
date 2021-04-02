@@ -9,7 +9,7 @@ node_capacity=${1:-$TWO_MB}
 
 terraform apply \
      -var "do_token=${DO_PAT}" \
-     -var "pvt_key=${1}" \
+     # -var "pvt_key=${1}" \
      -var "number_of_nodes=${NODE_OF_NODES}" \
      -var "node_bin=${3}"
 
