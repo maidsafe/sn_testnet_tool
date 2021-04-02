@@ -1,4 +1,4 @@
-resource "digitalocean_droplet" "sn_genesis" {
+resource "digitalocean_droplet" "testnet_genesis" {
     image = "ubuntu-18-04-x64"
     name = "safe-node-genesis"
     region = var.region
@@ -35,18 +35,18 @@ resource "digitalocean_droplet" "sn_genesis" {
       "export ${var.remote_log_level}",
       # "export RUST_BACKTRACE=1",
       # Do we still need rm here? wouldn't exist at this point
-      "nohup 2>&1 ./sn_node --first --local-ip ${digitalocean_droplet.sn_genesis.ipv4_address} --local-port ${var.port} --external-ip ${digitalocean_droplet.sn_genesis.ipv4_address} --external-port ${var.port} --root-dir ~/node_data -vvvvv &",
+      "nohup 2>&1 ./sn_node --first --local-ip ${digitalocean_droplet.testnet_genesis.ipv4_address} --local-port ${var.port} --external-ip ${digitalocean_droplet.testnet_genesis.ipv4_address} --external-port ${var.port} --root-dir ~/node_data -vvvvv &",
       "sleep 5;"
     ]
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.sn_genesis.ipv4_address} > ip-list"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ip-list"
          
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.sn_genesis.ipv4_address} > genesis-ip"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > genesis-ip"
          
   }
 }
