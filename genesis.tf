@@ -11,7 +11,7 @@ resource "digitalocean_droplet" "sn_genesis" {
         user = "root"
         type = "ssh"
         timeout = "2m"
-        #private_key = file(var.pvt_key)
+        private_key = file(var.pvt_key)
     }
 
 
