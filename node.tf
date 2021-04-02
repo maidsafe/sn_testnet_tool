@@ -1,4 +1,4 @@
-resource "digitalocean_droplet" "sn_node" {
+resource "digitalocean_droplet" "testnet_node" {
     # count = 5
     count = var.number_of_nodes
     image = "ubuntu-18-04-x64"
@@ -18,7 +18,7 @@ resource "digitalocean_droplet" "sn_node" {
     }
 
     # depends_on = [
-    #   digitalocean_droplet.sn_genesis,
+    #   digitalocean_droplet.testnet_genesis,
     # ]
 
     provisioner "remote-exec" {
@@ -41,7 +41,7 @@ resource "digitalocean_droplet" "sn_node" {
       "export ${var.remote_log_level}",
       # "export RUST_BACKTRACE=1",
       "MAX_CAPACITY=$((${var.max_capacity}))",
-      "HARD_CODED_CONTACTS='[\"${digitalocean_droplet.sn_genesis.ipv4_address}:${var.port}\"]'",
+      "HARD_CODED_CONTACTS='[\"${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port}\"]'",
       "echo hcc-$HARD_CODED_CONTACTS",
       "sleep 5",
       # "sleep $((${count.index * 2}));",
