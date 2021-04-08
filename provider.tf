@@ -38,7 +38,7 @@ variable "node_bin_url" {
 }
 
 variable "max_capacity" {
-  default = "2 * 1024 * 1024 * 1024"
+  default = "100 * 1024 * 1024"
 }
 
 variable "port" {
