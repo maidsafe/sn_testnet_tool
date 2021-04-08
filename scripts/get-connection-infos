@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+rm connection-infos
+
+mkdir -p connection-infos
+for ip in $(<ip-list xargs); do
+        rsync root@${ip}:~/.safe/node/node_connection_info.config connection-infos/${ip}.info
+done
+
+echo "Downloaded connection info files"
+
+infos=()
+echo "[" > node_connection_info.config
+
+for file in $(ls connection-infos); do
+    infos+=($(cat connection-infos/$file | head -2 | tail -1))
+done
+
+last=${infos[-1]}
+for info in "${infos[@]}"; do
+    if [[ $info == $last ]]
+    then
+        echo $info >> node_connection_info.config
+    else
+        echo "$info," >> node_connection_info.config
+    fi
+done
+
+echo "]" >> node_connection_info.config
+
+cleanup
