@@ -16,3 +16,4 @@ terraform apply \
 aws s3 cp ip-list s3://safe-testnet-tool/ip-list --acl public-read
 aws s3 cp ip-list s3://safe-testnet-tool/genesis-ip --acl public-read
 ./scripts/register_keys.sh
+./scripts/get-connection-infos

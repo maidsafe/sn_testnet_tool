@@ -11,12 +11,13 @@ cleanup() {
   # script cleanup here
 }
 
-rm connection-infos
+rm connection-infos -rf || true
 
 mkdir -p connection-infos
 for ip in $(<ip-list xargs); do
-        rsync root@${ip}:~/.safe/node/node_connection_info.config connection-infos/${ip}.info
+        rsync root@${ip}:~/.safe/node/node_connection_info.config connection-infos/${ip}.info &
 done
+wait
 
 echo "Downloaded connection info files"
 

@@ -43,7 +43,7 @@ variable "max_capacity" {
 
 variable "port" {
   type    = number
-  default = 0
+  default = 12000
 }
 
 variable "ssh_keys" {

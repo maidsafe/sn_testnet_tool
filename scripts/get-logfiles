@@ -17,6 +17,7 @@ mkdir -p logs
 for ip in $(<ip-list xargs); do
         rsync --partial root@${ip}:~/nohup.out logs/${ip}.log &
 done
+wait
 
 echo "Logs updated"
 
