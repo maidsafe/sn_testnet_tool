@@ -16,13 +16,13 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
 
     provisioner "remote-exec" {
-      script=  var.node_bin == "" ? "src/download-node.sh" : ""
+      script=  var.node_bin == "" ? "src/download-node.sh" : "./nonsense.sh"
     }
 
     provisioner "file" {
-      # if no bin defined, we put up (existing 'up.sh') junk and dont care about it anymore
-      source      = var.node_bin == "" ? "up.sh" : var.node_bin
-      destination = var.node_bin == "" ? "up.sh" : "sn_node"
+      # if no bin defined, we put up (existing 'nonsense.sh') junk and dont care about it anymore
+      source      = var.node_bin == "" ? "nonsense.sh" : var.node_bin
+      destination = var.node_bin == "" ? "nonsense.sh" : "sn_node"
     }
 
     provisioner "remote-exec" {
