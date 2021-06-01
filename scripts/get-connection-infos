@@ -11,7 +11,7 @@ cleanup() {
   # script cleanup here
 }
 
-rm connection-infos -rf || true
+rm -rf connection-infos || true
 
 mkdir -p connection-infos
 for ip in $(<ip-list xargs); do
@@ -28,15 +28,12 @@ for file in $(ls connection-infos); do
     infos+=($(cat connection-infos/$file | head -2 | tail -1))
 done
 
-last=${infos[-1]}
 for info in "${infos[@]}"; do
-    if [[ $info == $last ]]
-    then
-        echo $info >> node_connection_info.config
-    else
         echo "$info," >> node_connection_info.config
-    fi
 done
+
+# replace the last (two) chars which are ,\n
+truncate -s-2 node_connection_info.config
 
 echo "]" >> node_connection_info.config
 
