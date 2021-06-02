@@ -11,7 +11,8 @@ terraform apply \
      -var "do_token=${DO_PAT}" \
      -var "pvt_key=${1}" \
      -var "number_of_nodes=${NODE_OF_NODES}" \
-     -var "node_bin=${3}"
+     -var "node_bin=${3}" \
+     --parallelism 20
 
 aws s3 cp ip-list s3://safe-testnet-tool/ip-list --acl public-read
 aws s3 cp ip-list s3://safe-testnet-tool/genesis-ip --acl public-read
