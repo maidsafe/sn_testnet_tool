@@ -2,6 +2,7 @@
 SSH_KEY=${1}
 NODE_OF_NODES=${2:-1}
 NODE_BIN=${3}
+AUTO_APPROVE=${4}
 
 TESTNET_CHANNEL=$(terraform workspace show)
 # location of node file to upload
@@ -13,9 +14,10 @@ terraform apply \
      -var "pvt_key=${1}" \
      -var "number_of_nodes=${NODE_OF_NODES}" \
      -var "node_bin=${3}" \
-     --parallelism 15
-
-aws s3 cp "$TESTNET_CHANNEL-ip-list" "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list" --acl public-read
-aws s3 cp "$TESTNET_CHANNEL-genesis-ip" "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip" --acl public-read
-./scripts/register_keys.sh
-./scripts/get-connection-infos
+     --parallelism 15 ${AUTO_APPROVE} && \
+     # copy data to s3
+     aws s3 cp "$TESTNET_CHANNEL-ip-list" "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list" --acl public-read && \
+     aws s3 cp "$TESTNET_CHANNEL-genesis-ip" "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip" --acl public-read && \
+     # get local files updated
+     ./scripts/register_keys.sh && \
+     ./scripts/get-connection-infos
