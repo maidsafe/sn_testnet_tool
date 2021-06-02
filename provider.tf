@@ -23,6 +23,11 @@ variable "number_of_nodes" {
   default = "5"
 }
 
+variable "testnet_channel" {
+  default = "public"
+}
+
+
 variable "node_bin" {
   default = ""
 }

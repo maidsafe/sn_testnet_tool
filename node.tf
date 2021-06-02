@@ -2,7 +2,7 @@ resource "digitalocean_droplet" "testnet_node" {
     # count = 5
     count = var.number_of_nodes
     image = "ubuntu-18-04-x64"
-    name = "safe-node-${count.index + 1}"
+    name = "${terraform.workspace}-safe-node-${count.index + 1}"
     region = var.region
     size = var.size
     private_networking = true
@@ -54,6 +54,6 @@ resource "digitalocean_droplet" "testnet_node" {
   }
 
   provisioner "local-exec" {
-    command = "echo ${self.ipv4_address} >> ip-list"
+    command = "echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list"
   }
 }

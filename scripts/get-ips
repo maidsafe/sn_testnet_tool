@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TESTNET_CHANNEL=$(terraform workspace show)
+
 # https://betterdev.blog/minimal-safe-bash-script-template/
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
@@ -13,8 +15,8 @@ cleanup() {
 
 # source "$script_dir/../src/droplet-operations"
 
-aws s3 cp s3://safe-testnet-tool/ip-list ./
-aws s3 cp s3://safe-testnet-tool/genesis-ip ./
+aws s3 cp "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list" ./
+aws s3 cp "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip"./
 ./scripts/register_keys.sh
 
 cleanup

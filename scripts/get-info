@@ -3,6 +3,7 @@
 # https://betterdev.blog/minimal-safe-bash-script-template/
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
+TESTNET_CHANNEL=$(terraform workspace show)
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 

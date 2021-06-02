@@ -1,12 +1,14 @@
 ip-list
+*-ip-list
 genesis-ip
+*-genesis-ip
 elders-ip-list
 adults-ip-list
 doctl*
-logs/*
-connection-infos/*
+*logs/*
+*connection-infos/*
 data/*
-node_connection_info.config
+*node_connection_info.config
 *.zip
 # incase of uploading the node itself from this folder, lets keep it out of git
 sn_node

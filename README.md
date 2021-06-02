@@ -18,7 +18,26 @@ terraform init
 terraform state pull
 ```
 
-Create a network:
+## Testnet Channels
+
+We can create separate testnets using terraform workspaces. All commands/scripts will operate on the selected workspace.
+
+To see your current workspace:
+
+```
+terraform workspace show
+```
+
+We generally use `alpha`, `beta` and `public` testnets. To switch to one
+
+```
+terraform workspace use alpha
+```
+
+
+### Creating a testnet
+
+Once you have a workspace chosen you can create a test network:
 ```
 ./up.sh <path-to-your-DO-registered-ssh-key> [number of nodes] [custom node bin location(must be musl)]
 ```
@@ -29,7 +48,7 @@ Bring down a network:
 ./down <path-to-your-DO-registered-ssh-key>
 ```
 
-Get ips from aws:
+Get ips from aws for your workspace:
 
 ```
 ./scripts/get-ips
@@ -46,3 +65,11 @@ See continual network status:
 ```
 ./scripts/status
 ```
+
+## Using the network
+
+```
+./scripts/use-network
+```
+
+Will copy the current workspace config to you `~/.safe/node/node_connection_info.config

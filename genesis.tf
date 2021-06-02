@@ -1,6 +1,6 @@
 resource "digitalocean_droplet" "testnet_genesis" {
     image = "ubuntu-18-04-x64"
-    name = "safe-node-genesis"
+    name = "${terraform.workspace}-safe-node-genesis"
     region = var.region
     size = var.size
     private_networking = true
@@ -41,12 +41,12 @@ resource "digitalocean_droplet" "testnet_genesis" {
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ip-list"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list"
          
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > genesis-ip"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip"
          
   }
 }
