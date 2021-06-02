@@ -14,6 +14,8 @@ files/*
 addresses/*
 # incase of uploading the node itself from this folder, lets keep it out of git
 sn_node
+*.log
+.DS_Store
 
 # Local .terraform directories
 **/.terraform/*

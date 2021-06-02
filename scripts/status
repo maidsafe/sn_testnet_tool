@@ -15,7 +15,7 @@ cleanup() {
 while :
 do
   echo "Checking testnet status"
-	"$script_dir/get-logfiles"
+	"$script_dir/logs"
   echo "..."
 	"$script_dir/get-info"
   echo "..."

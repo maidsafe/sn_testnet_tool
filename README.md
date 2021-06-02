@@ -57,7 +57,7 @@ Get ips from aws for your workspace:
 Get logfiles (requires a populated ip file):
 
 ```
-./scripts/get-logfiles
+./scripts/logs
 ```
 
 See continual network status:
