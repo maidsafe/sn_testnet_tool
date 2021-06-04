@@ -10,6 +10,8 @@ doctl*
 data/*
 *node_connection_info.config
 *.zip
+files/*
+addresses/*
 # incase of uploading the node itself from this folder, lets keep it out of git
 sn_node
 
