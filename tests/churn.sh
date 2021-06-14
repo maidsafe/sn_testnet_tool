@@ -4,11 +4,8 @@
 set -e
 
 LOCAL_NODE_BUILD=${1}
-
-POST_SPLIT_WAIT=$((60 * 1))
-STANDARD_WAIT="20"
-
-INCREASED_COUNT=45
+STANDARD_WAIT="35"
+INCREASED_COUNT=51
 # actual reduction happens in loop below
 REDUCED_COUNT="$INCREASED_COUNT"
 
@@ -44,7 +41,7 @@ function generate_data {
     timestamp=$(date +"%T")
 
     # generate random files (count is how many mbs), so 1->4mb with 0..4 here
-    for i in {1..5}; do
+    for i in {1..7}; do
         echo "generating file of size ${i}mb"
         # worth noting "bs=1m" goes on mac, if its an issue on linux, it's "1M" (capital) needed, and we'll need a platform check here
         dd if=/dev/urandom of="$TMPDIR/files/randomfile-$timestamp-$i" bs=1m count=$i
@@ -141,10 +138,6 @@ echo ""
 mkdir -p $TMPDIR/files
 mkdir -p $TMPDIR/addresses
 
-echo ""
-echo "> Generating random files and putting onto the network"
-echo ""
-
 
 generate_data
 
@@ -174,7 +167,7 @@ echo "==> The network has successfully split"
 echo ""
 
 echo "waiting for stability"
-sleep $STANDARD_WAIT
+sleep $(($STANDARD_WAIT * 3))
 
 
 echo ""
@@ -191,7 +184,7 @@ sleep $STANDARD_WAIT
 echo "...wait over"
 
 
- for i in {1..3}; do       
+ for i in {1..4}; do       
     # currently limit drops to two at a time replica count is 3 so any more and we may loose chunks
     REDUCED_COUNT=$(( REDUCED_COUNT - 2 ))
     echo ""
@@ -203,7 +196,7 @@ echo "...wait over"
 
 
     echo ""
-    echo "> Waiting $STANDARD_WAIT; network should be using AE to reseed lost chunks"
+    echo "> Waiting $STANDARD_WAIT; network should be using AE to reseed lost chunks. (We now have ${REDUCED_COUNT} nodes.)"
     echo ""
     sleep $STANDARD_WAIT
 
@@ -218,8 +211,10 @@ echo ""
 echo ""
 echo "==> Tests Done! Things look good! "
 
-echo "==> Dont forget to bring down the churn network if you are finished. (\"terraform workspace select\" && \"./down.sh\")"
-
+echo "==> Bringing down the churn test-network"
+./down.sh ~/.ssh/sharing_rsa -auto-approve >/dev/null || exit
+echo "> Churn network has been destoyed"
+echo ""
 echo "==> Switching back to the $current_space terraform workspace."
 echo ""
 terraform workspace select $current_space
