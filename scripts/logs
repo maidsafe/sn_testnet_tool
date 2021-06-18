@@ -13,11 +13,11 @@ cleanup() {
   # script cleanup here
 }
 
-# rm logs/* || true
+rm logs/${TESTNET_CHANNEL}/* || true
 
 mkdir -p logs/${TESTNET_CHANNEL}
 for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-        rsync --partial root@${ip}:~/nohup.out logs/${TESTNET_CHANNEL}/${ip}.log &
+        rsync -r --partial root@${ip}:~/logs logs/${TESTNET_CHANNEL}/${ip} &
 done
 wait
 

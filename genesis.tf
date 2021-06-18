@@ -35,7 +35,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
       "export ${var.remote_log_level}",
       # "export RUST_BACKTRACE=1",
       # Do we still need rm here? wouldn't exist at this point
-      "nohup 2>&1 ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data -vvv &",
+      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data -vvvvv --log-dir ~/logs &",
       "sleep 5;"
     ]
   }
