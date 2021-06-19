@@ -32,10 +32,9 @@ resource "digitalocean_droplet" "testnet_genesis" {
     provisioner "remote-exec" {
     inline = [
       "echo 'Setting ENV vars'",
-      "export ${var.remote_log_level}",
       # "export RUST_BACKTRACE=1",
       # Do we still need rm here? wouldn't exist at this point
-      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data -vvvvv --log-dir ~/logs &",
+      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data ${var.remote_log_level} --log-dir ~/logs &",
       "sleep 5;"
     ]
   }

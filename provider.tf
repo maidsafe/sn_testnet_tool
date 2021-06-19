@@ -34,14 +34,15 @@ variable "node_bin" {
 
 # eg RUST_LOG=sn_node=trace
 variable "remote_log_level" {
-  default = "RUST_LOG=sn_node=trace"
-  # default = "RUST_LOG=sn_node=trace,sn_routing=debug,qp2p=debug"
+  default = "-vvvvv"
+  # default = "RUST_LOG=sn_node=trace,sn_routing=trace"
 }
 
 variable "node_bin_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
+/// 1024mb by default
 variable "max_capacity" {
   default = "1024 * 1024 * 1024"
 }
