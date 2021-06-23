@@ -31,7 +31,7 @@ terraform workspace show
 We generally use `alpha`, `beta` and `public` testnets. To switch to one
 
 ```
-terraform workspace use alpha
+terraform workspace select alpha
 ```
 
 
