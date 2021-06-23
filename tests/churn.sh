@@ -154,8 +154,9 @@ echo ""
 
 echo "Getting logfiles to check for split"
 current_workspace=$(terraform workspace show)
-rm -rf ./logs/$current_workspace || true && ./scripts/logs
-prefix_count=$(rg "Prefix\(0\)" ./logs/$current_workspace/* | wc -l)
+./scripts/logs
+# -u needed here to search log dirs
+prefix_count=$(rg "Prefix\(0\)" ./logs/$current_workspace -u | wc -l)
 if ! [ $prefix_count -gt 0 ]
     then
         echo "No split, try changing INCREASED_COUNT in the script!"
