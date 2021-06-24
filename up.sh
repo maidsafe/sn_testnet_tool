@@ -1,3 +1,12 @@
+#!/bin/bash
+
+if ! command -v terraform &> /dev/null
+then
+    echo "terraform could not be found and is required"
+    exit
+fi
+
+
 # your local ssh key for connecting to nodes to deploy
 SSH_KEY=${1}
 NODE_OF_NODES=${2:-1}
