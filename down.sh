@@ -1,3 +1,11 @@
+#!/bin/bash
+
+if ! command -v terraform &> /dev/null
+then
+    echo "terraform could not be found and is required"
+    exit
+fi
+
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 TESTNET_CHANNEL=$(terraform workspace show)
 AUTO_APPROVE=${2}
