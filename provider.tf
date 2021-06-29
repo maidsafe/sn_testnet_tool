@@ -34,7 +34,7 @@ variable "node_bin" {
 
 # eg RUST_LOG=sn_node=trace
 variable "remote_log_level" {
-  default = "-vvvvv"
+  default = "-vvv"
   # default = "RUST_LOG=sn_node=trace,sn_routing=trace"
 }
 
@@ -44,7 +44,7 @@ variable "node_bin_url" {
 
 /// 512mb by default
 variable "max_capacity" {
-  default = "1024 * 1024 * 512"
+  default = "1024 * 1024 * 1024"
 }
 
 variable "port" {

@@ -43,7 +43,7 @@ resource "digitalocean_droplet" "testnet_node" {
       inline = [
         "echo 'Setting ENV vars'",
         # "export RUST_BACKTRACE=1",
-        "MAX_CAPACITY=$((${terraform.workspace == "public" ? "1024 * 1024 * 100"  : var.max_capacity}))",
+        "MAX_CAPACITY=$((${terraform.workspace == "public" ? "1024 * 1024 * 512"  : var.max_capacity}))",
         "HARD_CODED_CONTACTS='[\"${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port}\"]'",
         "echo hcc-$HARD_CODED_CONTACTS",
         "sleep 5",
