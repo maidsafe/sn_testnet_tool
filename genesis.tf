@@ -10,8 +10,8 @@ resource "digitalocean_droplet" "testnet_genesis" {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "2m"
-        private_key = file(var.pvt_key)
+        timeout = "10m"
+        #private_key = file(var.pvt_key)
     }
 
 
