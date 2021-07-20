@@ -129,7 +129,7 @@ echo "==> Setting up the safe CLI with fresh tokens"
 echo ""
 
 # assuming we have the cli installed and up to date
-safe keys create --test-coins --preload 1000000 --for-cli
+safe keys create --for-cli
 
 echo ""
 echo "> Making fresh local temp dirs"
