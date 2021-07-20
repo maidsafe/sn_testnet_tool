@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Uploads 20 files of 1MB each
-safe keys create --test-coins --preload 1000000 --for-cli
+safe keys create --for-cli
 timestamp=$(date +"%T")
 mkdir -p files
 mkdir -p addresses
