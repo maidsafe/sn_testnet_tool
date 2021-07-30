@@ -10,8 +10,8 @@ resource "digitalocean_droplet" "testnet_genesis" {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "2m"
-        private_key = file(var.pvt_key)
+        timeout = "10m"
+        #private_key = file(var.pvt_key)
     }
 
 
@@ -34,7 +34,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
       "echo 'Setting ENV vars'",
       # "export RUST_BACKTRACE=1",
       # Do we still need rm here? wouldn't exist at this point
-      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data ${var.remote_log_level} --log-dir ~/logs &",
+      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data ${var.remote_log_level} --log-dir ~/logs --json-logs &",
       "sleep 5;"
     ]
   }

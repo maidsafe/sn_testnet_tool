@@ -6,7 +6,7 @@ TESTNET_CHANNEL=$(terraform workspace show)
 #  ensure ips are registered
 echo "Registering node keys w/ system"
 while read -r ip; do
-    ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts &
+    ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
 done < ${TESTNET_CHANNEL}-ip-list
 wait
 
