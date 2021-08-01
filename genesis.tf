@@ -11,7 +11,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
         user = "root"
         type = "ssh"
         timeout = "10m"
-        #private_key = file(var.pvt_key)
+        private_key = file(var.pvt_key)
     }
 
 
