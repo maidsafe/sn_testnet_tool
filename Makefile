@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 SN_TESTNET_SSH_KEY_PATH := ~/.ssh/id_rsa
-SN_TESTNET_NO_OF_NODES := 20
+SN_TESTNET_NO_OF_NODES := 15
 
 alpha:
 	rm -rf .terraform

@@ -13,8 +13,7 @@ resource "digitalocean_droplet" "testnet_node" {
         user = "root"
         type = "ssh"
         timeout = "10m"
-        #private_key = file(var.pvt_key)
-
+        private_key = file(var.pvt_key)
     }
 
     # depends_on = [
