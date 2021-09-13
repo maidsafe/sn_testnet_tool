@@ -5,6 +5,8 @@ set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
 TESTNET_CHANNEL=$(terraform workspace show)
+DEFAULT_WORKING_DIR="."
+WORKING_DIR="${GITHUB_ACTION_PATH:-$DEFAULT_WORKING_DIR}"
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
@@ -13,30 +15,30 @@ cleanup() {
   # script cleanup here
 }
 
-rm -rf ${TESTNET_CHANNEL}-connection-infos || true
+rm -rf ${WORKING_DIR}/${TESTNET_CHANNEL}-connection-infos || true
 
-mkdir -p ${TESTNET_CHANNEL}-connection-infos
-for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-        rsync root@${ip}:~/.safe/node/node_connection_info.config ${TESTNET_CHANNEL}-connection-infos/${ip}.info &
+mkdir -p ${WORKING_DIR}/${TESTNET_CHANNEL}-connection-infos
+for ip in $(<${WORKING_DIR}/${TESTNET_CHANNEL}-ip-list xargs); do
+        rsync root@${ip}:~/.safe/node/node_connection_info.config ${WORKING_DIR}/${TESTNET_CHANNEL}-connection-infos/${ip}.info &
 done
 wait
 
 echo "Downloaded connection info files"
 
 infos=()
-echo "[" > ${TESTNET_CHANNEL}-node_connection_info.config
+echo "[" > ${WORKING_DIR}/${TESTNET_CHANNEL}-node_connection_info.config
 
-for file in $(ls ${TESTNET_CHANNEL}-connection-infos); do
-    infos+=($(cat ${TESTNET_CHANNEL}-connection-infos/$file | head -2 | tail -1))
+for file in $(ls ${WORKING_DIR}/${TESTNET_CHANNEL}-connection-infos); do
+    infos+=($(cat ${WORKING_DIR}/${TESTNET_CHANNEL}-connection-infos/$file | head -2 | tail -1))
 done
 
 for info in "${infos[@]}"; do
-        echo "$info," >> ${TESTNET_CHANNEL}-node_connection_info.config
+        echo "$info," >> ${WORKING_DIR}/${TESTNET_CHANNEL}-node_connection_info.config
 done
 
 # replace the last (two) chars which are ,\n
-truncate -s-2 ${TESTNET_CHANNEL}-node_connection_info.config
+truncate -s-2 ${WORKING_DIR}/${TESTNET_CHANNEL}-node_connection_info.config
 
-echo "]" >> ${TESTNET_CHANNEL}-node_connection_info.config
+echo "]" >> ${WORKING_DIR}/${TESTNET_CHANNEL}-node_connection_info.config
 
 cleanup

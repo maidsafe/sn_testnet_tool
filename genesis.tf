@@ -40,12 +40,12 @@ resource "digitalocean_droplet" "testnet_genesis" {
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-ip-list"
          
   }
 
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip"
+    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-genesis-ip"
          
   }
 }

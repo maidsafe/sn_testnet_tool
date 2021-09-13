@@ -56,7 +56,7 @@ resource "digitalocean_droplet" "testnet_node" {
   }
 
   provisioner "local-exec" {
-    command = "echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list"
+    command = "echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-ip-list"
     on_failure = continue
   }
 
