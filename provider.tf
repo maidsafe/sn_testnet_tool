@@ -27,6 +27,8 @@ variable "testnet_channel" {
   default = "public"
 }
 
+variable "working_dir" {}
+
 
 variable "node_bin" {
   default = ""

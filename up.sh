@@ -7,6 +7,8 @@ NODE_OF_NODES=${2:-1}
 NODE_BIN=${3}
 NODE_VERSION=${4}
 AUTO_APPROVE=${5}
+DEFAULT_WORKING_DIR="."
+WORKING_DIR="${GITHUB_ACTION_PATH:-$DEFAULT_WORKING_DIR}"
 
 function check_dependencies() {
     set +e
@@ -60,17 +62,19 @@ function run_terraform_apply() {
          -var "pvt_key=${SSH_KEY_PATH}" \
          -var "number_of_nodes=${NODE_OF_NODES}" \
          -var "node_bin=${node_bin_path}" \
+         -var "working_dir=${WORKING_DIR}" \
          --parallelism 15 ${AUTO_APPROVE}
 }
 
 function copy_ips_to_s3() {
     local testnet_channel=$(terraform workspace show)
+    echo "$WORKING_DIR/$testnet_channel-ip-list"
     aws s3 cp \
-        "$testnet_channel-ip-list" \
+        "$WORKING_DIR/$testnet_channel-ip-list" \
         "s3://safe-testnet-tool/$testnet_channel-ip-list" \
         --acl public-read
     aws s3 cp \
-        "$testnet_channel-genesis-ip" \
+        "$WORKING_DIR/$testnet_channel-genesis-ip" \
         "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
         --acl public-read
 }
