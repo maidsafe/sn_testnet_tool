@@ -8,7 +8,7 @@ NODE_BIN=${3}
 NODE_VERSION=${4}
 AUTO_APPROVE=${5}
 DEFAULT_WORKING_DIR="."
-WORKING_DIR="${GITHUB_ACTION_PATH:-$DEFAULT_WORKING_DIR}"
+WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
 
 function check_dependencies() {
     set +e
@@ -82,6 +82,11 @@ function copy_ips_to_s3() {
 function update_local_state() {
     ./scripts/register_keys.sh
     ./scripts/get-connection-infos
+    local testnet_channel=$(terraform workspace show)
+    aws s3 cp \
+        "$WORKING_DIR/$testnet_channel-node_connection_info.config" \
+        "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config" \
+        --acl public-read
 }
 
 check_dependencies

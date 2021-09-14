@@ -3,7 +3,7 @@
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 TESTNET_CHANNEL=$(terraform workspace show)
 DEFAULT_WORKING_DIR="."
-WORKING_DIR="${GITHUB_ACTION_PATH:-$DEFAULT_WORKING_DIR}"
+WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
 
 #  ensure ips are registered
 echo "Registering node keys w/ system"
