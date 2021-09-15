@@ -12,7 +12,7 @@ alpha:
 		"${SN_TESTNET_NODE_BIN}" \
 		"${SN_TESTNET_NODE_VERSION}" \
 		"-auto-approve"
-	./scripts/get-connection-infos
+	# ./scripts/get-connection-infos
 	[[ ! -d "~/.safe/node" ]] && mkdir -p ~/.safe/node
 	rm -f ~/.safe/node/node_connection_info.config
 	cp alpha-node_connection_info.config ~/.safe/node/node_connection_info.config
@@ -31,7 +31,7 @@ beta:
 		"${SN_TESTNET_NODE_BIN}" \
 		"${SN_TESTNET_NODE_VERSION}" \
 		"-auto-approve"
-	./scripts/get-connection-infos
+	# ./scripts/get-connection-infos
 	[[ ! -d "~/.safe/node" ]] && mkdir -p ~/.safe/node
 	rm -f ~/.safe/node/node_connection_info.config
 	cp beta-node_connection_info.config ~/.safe/node/node_connection_info.config

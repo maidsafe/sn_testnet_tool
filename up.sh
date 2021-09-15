@@ -10,6 +10,8 @@ AUTO_APPROVE=${5}
 DEFAULT_WORKING_DIR="."
 WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
 
+testnet_channel=$(terraform workspace show)
+
 function check_dependencies() {
     set +e
     declare -a dependecies=("terraform" "aws" "tar")
@@ -67,8 +69,6 @@ function run_terraform_apply() {
 }
 
 function copy_ips_to_s3() {
-    local testnet_channel=$(terraform workspace show)
-    echo "$WORKING_DIR/$testnet_channel-ip-list"
     aws s3 cp \
         "$WORKING_DIR/$testnet_channel-ip-list" \
         "s3://safe-testnet-tool/$testnet_channel-ip-list" \
@@ -81,13 +81,12 @@ function copy_ips_to_s3() {
 
 function update_local_state() {
     ./scripts/register_keys.sh
-    ./scripts/get-connection-infos
-    local testnet_channel=$(terraform workspace show)
     aws s3 cp \
         "$WORKING_DIR/$testnet_channel-node_connection_info.config" \
         "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config" \
         --acl public-read
 }
+
 
 check_dependencies
 run_terraform_apply

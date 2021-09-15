@@ -15,6 +15,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
     }
 
 
+
     provisioner "remote-exec" {
       script=  var.node_bin == "" ? "src/download-node.sh" : "./nonsense.sh"
     }
@@ -30,11 +31,10 @@ resource "digitalocean_droplet" "testnet_genesis" {
     }
 
     provisioner "remote-exec" {
-    inline = [
-      "echo 'Setting ENV vars'",
-      # "export RUST_BACKTRACE=1",
-      # Do we still need rm here? wouldn't exist at this point
-      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data ${var.remote_log_level} --log-dir ~/logs --json-logs &",
+      inline = [
+        "echo 'Setting ENV vars'",
+        "export RUST_LOG=safe_network=trace,qp2p=trace",
+      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data --log-dir ~/logs --json-logs &",
       "sleep 5;"
     ]
   }
@@ -44,8 +44,25 @@ resource "digitalocean_droplet" "testnet_genesis" {
          
   }
 
+  # lets register ssh key locally
+   provisioner "local-exec" {
+    command = "ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts"
+  }
+
+  # clear the old connection info
+  provisioner "local-exec" {
+        command = "rm ${terraform.workspace}-node_connection_info.config || true"
+  }
+  
    provisioner "local-exec" {
     command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-genesis-ip"
          
   }
+
+  # grab the workspace node config for genesis
+   provisioner "local-exec" {
+    command = "rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config"
+         
+  }
+
 }
