@@ -42,13 +42,12 @@ resource "digitalocean_droplet" "testnet_node" {
     provisioner "file" {
       source      = "./${terraform.workspace}-node_connection_info.config"
       destination = "~/.safe/node/node_connection_info.config"
-      # on_failure = continue
     }
     provisioner "remote-exec" {
       on_failure = continue
       inline = [
         "echo 'Setting ENV vars'",
-        "export RUST_LOG=safe_network=trace,qp2p=trace",
+        # "export RUST_LOG=safe_network=trace,qp2p=trace",
         "MAX_CAPACITY=$((${terraform.workspace == "public" ? "1024 * 1024 * 512"  : var.max_capacity}))",
         "sleep 5",
         # "sleep $((${count.index * 2}));",
