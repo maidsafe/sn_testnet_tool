@@ -14,7 +14,7 @@ testnet_channel=$(terraform workspace show)
 
 function check_dependencies() {
     set +e
-    declare -a dependecies=("terraform" "aws" "tar")
+    declare -a dependecies=("terraform" "aws" "tar" "jq")
     for dependency in "${dependecies[@]}"
     do
         if ! command -v "$dependency" &> /dev/null; then
@@ -77,14 +77,14 @@ function copy_ips_to_s3() {
         "$WORKING_DIR/$testnet_channel-genesis-ip" \
         "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
         --acl public-read
-}
-
-function update_local_state() {
-    ./scripts/register_keys.sh
     aws s3 cp \
         "$WORKING_DIR/$testnet_channel-node_connection_info.config" \
         "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config" \
         --acl public-read
+}
+
+function update_local_state() {
+    ./scripts/register_keys.sh
 }
 
 
