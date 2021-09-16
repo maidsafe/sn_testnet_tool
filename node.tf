@@ -60,29 +60,11 @@ resource "digitalocean_droplet" "testnet_node" {
       ]
   }
 
-   provisioner "local-exec" {
-    command = "ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts"
-         
-  }
-
   provisioner "local-exec" {
-    command = "echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-ip-list"
-    on_failure = continue
+    command = <<EOH
+      echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list
+      ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
+      echo $(./jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ./${terraform.workspace}-node_connection_info.config) > ./${terraform.workspace}-node_connection_info.config
+    EOH
   }
-
-  # lets register ssh key locally
-   provisioner "local-exec" {
-    command = "ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts"
-  }
-
-  provisioner "local-exec" {
-    command = "tmp_config=$(mktemp /tmp/config.XXXXXXXXX) && cat ${terraform.workspace}-node_connection_info.config | awk -v socket=${"${self.ipv4_address}"}:1200\"\" 'NR==4{print socket\",\"}1' > $tmp_config && mv $tmp_config ${terraform.workspace}-node_connection_info.config"
-    # command = "cat ${terraform.workspace}-node_connection_info.config | awk -v ip=$socket 'NR==4{print socket}1' > $TMPDIR/temp-config && mv $TMPDIR/temp-config ${terraform.workspace}-node_connection_info.config"
-    # on_failure = continue
-  }
-
-  # provisioner "local-exec" {
-  #   when    = destroy
-  #   command = "sed -i '/${self.ipv4_address}/d' ip-list"
-  # }
 }

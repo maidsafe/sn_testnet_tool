@@ -34,35 +34,30 @@ resource "digitalocean_droplet" "testnet_genesis" {
       inline = [
         "echo 'Setting ENV vars'",
         "export RUST_LOG=safe_network=trace,qp2p=trace",
-      "nohup ./sn_node --first ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data --log-dir ~/logs --json-logs &",
+        "nohup ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data --log-dir ~/logs --json-logs &",
       "sleep 5;"
     ]
   }
 
+    # doesnt work yet
+    #case "$OSTYPE" in
+    #  darwin*)  curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64 ;; 
+    #  linux*)   curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 ;;
+    #  msys*)    curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe ;;
+    #  cygwin*)  curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe ;;
+    #  *)        echo "unknown OS: $OSTYPE" ;;
+    #esac
+
    provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-ip-list"
+    command = <<EOH
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
+      rm ${terraform.workspace}-node_connection_info.config
+      ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config
+      curl -L -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+      chmod 0755 jq
+    EOH
          
   }
-
-  # lets register ssh key locally
-   provisioner "local-exec" {
-    command = "ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts"
-  }
-
-  # clear the old connection info
-  provisioner "local-exec" {
-        command = "rm ${terraform.workspace}-node_connection_info.config || true"
-  }
-  
-   provisioner "local-exec" {
-    command = "echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-genesis-ip"
-         
-  }
-
-  # grab the workspace node config for genesis
-   provisioner "local-exec" {
-    command = "rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config"
-         
-  }
-
 }
