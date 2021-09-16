@@ -16,8 +16,8 @@ AUTO_APPROVE=${2}
 terraform destroy -var "do_token=${DO_PAT}" -var "pvt_key=${1}" -var "working_dir=${WORKING_DIR}" --parallelism 15 ${AUTO_APPROVE} && \
     rm ${WORKING_DIR}/${TESTNET_CHANNEL}-ip-list || true
 
-aws s3 rm "s3://safe-testnet-tool/$testnet_channel-ip-list"
+aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list"
 
-aws s3 rm "s3://safe-testnet-tool/$testnet_channel-genesis-ip"
+aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip"
 
-aws s3 rm "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config"
+aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-node_connection_info.config"

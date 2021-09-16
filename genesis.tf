@@ -39,15 +39,6 @@ resource "digitalocean_droplet" "testnet_genesis" {
     ]
   }
 
-    # doesnt work yet
-    #case "$OSTYPE" in
-    #  darwin*)  curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64 ;; 
-    #  linux*)   curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 ;;
-    #  msys*)    curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe ;;
-    #  cygwin*)  curl -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-win64.exe ;;
-    #  *)        echo "unknown OS: $OSTYPE" ;;
-    #esac
-
    provisioner "local-exec" {
     command = <<EOH
       echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list
@@ -55,8 +46,6 @@ resource "digitalocean_droplet" "testnet_genesis" {
       rm ${terraform.workspace}-node_connection_info.config
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
       rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config
-      curl -L -o jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-      chmod 0755 jq
     EOH
          
   }

@@ -16,9 +16,9 @@ resource "digitalocean_droplet" "testnet_node" {
         private_key = file(var.pvt_key)
     }
 
-    # depends_on = [
-    #   digitalocean_droplet.testnet_genesis,
-    # ]
+    depends_on = [
+      digitalocean_droplet.testnet_genesis,
+    ]
 
     provisioner "remote-exec" {
       script=  var.node_bin == "" ? "src/download-node.sh" : "./nonsense.sh"
@@ -63,7 +63,7 @@ resource "digitalocean_droplet" "testnet_node" {
     command = <<EOH
       echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-      echo $(./jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ./${terraform.workspace}-node_connection_info.config) > ./${terraform.workspace}-node_connection_info.config
+      echo $(jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ./${terraform.workspace}-node_connection_info.config) > ./${terraform.workspace}-node_connection_info.config
     EOH
   }
 }
