@@ -33,7 +33,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
     provisioner "remote-exec" {
       inline = [
         "echo 'Setting ENV vars'",
-        "export RUST_LOG=safe_network=trace,qp2p=trace",
+        # "export RUST_LOG=safe_network=trace",
         "nohup ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-igd --root-dir ~/node_data --log-dir ~/logs --json-logs &",
       "sleep 5;"
     ]
