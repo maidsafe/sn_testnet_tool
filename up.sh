@@ -83,12 +83,7 @@ function copy_ips_to_s3() {
         --acl public-read
 }
 
-function update_local_state() {
-    ./scripts/register_keys.sh
-}
-
 
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
-update_local_state
