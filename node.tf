@@ -40,7 +40,7 @@ resource "digitalocean_droplet" "testnet_node" {
 
     # upload the genesis node config
     provisioner "file" {
-      source      = "./${terraform.workspace}-node_connection_info.config"
+      source      = "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
       destination = "~/.safe/node/node_connection_info.config"
     }
     provisioner "remote-exec" {
@@ -63,7 +63,7 @@ resource "digitalocean_droplet" "testnet_node" {
     command = <<EOH
       echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-      echo $(jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ./${terraform.workspace}-node_connection_info.config) > ./${terraform.workspace}-node_connection_info.config
+      echo $(jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ${var.working_dir}/${terraform.workspace}-node_connection_info.config) > ${var.working_dir}/${terraform.workspace}-node_connection_info.config
     EOH
   }
 }
