@@ -81,7 +81,9 @@ resource "digitalocean_droplet" "testnet_node" {
 
   provisioner "local-exec" {
     command = <<EOH
-      echo ${self.ipv4_address} >> ${terraform.workspace}-ip-list
+      mkdir -p ~/.ssh/
+      touch ~/.ssh/known_hosts
+      echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
       echo $(jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ${var.working_dir}/${terraform.workspace}-node_connection_info.config) > ${var.working_dir}/${terraform.workspace}-node_connection_info.config
     EOH
