@@ -41,16 +41,19 @@ resource "digitalocean_droplet" "testnet_node" {
     provisioner "local-exec" {
       command = <<EOH
         if ! [ -f ${var.working_dir}/${terraform.workspace}-node_connection_info.config ]; then
+          echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-node_connection_info.config to ${var.working_dir}/${terraform.workspace}-node_connection_info.config"
           aws s3 cp \
             "s3://safe-testnet-tool/${terraform.workspace}-node_connection_info.config" \
             "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
         fi
         if ! [ -f ${var.working_dir}/${terraform.workspace}-ip-list ]; then
+          echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-ip-list to ${var.working_dir}/${terraform.workspace}-ip-list"
           aws s3 cp \
             "s3://safe-testnet-tool/${terraform.workspace}-ip-list" \
             "${var.working_dir}/${terraform.workspace}-ip-list"
         fi
         if ! [ -f ${var.working_dir}/${terraform.workspace}-genesis-ip ]; then
+        echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-genesis-ip to ${var.working_dir}/${terraform.workspace}-genesis-ip"
           aws s3 cp \
             "s3://safe-testnet-tool/${terraform.workspace}-genesis-ip" \
             "${var.working_dir}/${terraform.workspace}-genesis-ip"
@@ -63,6 +66,7 @@ resource "digitalocean_droplet" "testnet_node" {
       source      = "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
       destination = "~/.safe/node/node_connection_info.config"
     }
+
     provisioner "remote-exec" {
       on_failure = continue
       inline = [
