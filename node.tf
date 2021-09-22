@@ -38,6 +38,26 @@ resource "digitalocean_droplet" "testnet_node" {
       on_failure = continue
     }
 
+    provisioner "local-exec" {
+      command = <<EOH
+        if ! [ -f ${var.working_dir}/${terraform.workspace}-node_connection_info.config ]; then
+          aws s3 cp \
+            "s3://safe-testnet-tool/${terraform.workspace}-node_connection_info.config" \
+            "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
+        fi
+        if ! [ -f ${var.working_dir}/${terraform.workspace}-ip-list ]; then
+          aws s3 cp \
+            "s3://safe-testnet-tool/${terraform.workspace}-ip-list" \
+            "${var.working_dir}/${terraform.workspace}-ip-list"
+        fi
+        if ! [ -f ${var.working_dir}/${terraform.workspace}-genesis-ip ]; then
+          aws s3 cp \
+            "s3://safe-testnet-tool/${terraform.workspace}-genesis-ip" \
+            "${var.working_dir}/${terraform.workspace}-genesis-ip"
+        fi
+      EOH
+    }
+
     # upload the genesis node config
     provisioner "file" {
       source      = "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
