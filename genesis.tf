@@ -43,7 +43,9 @@ resource "digitalocean_droplet" "testnet_genesis" {
     command = <<EOH
       echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list
       echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
-      rm ${terraform.workspace}-node_connection_info.config
+      rm ${terraform.workspace}-node_connection_info.config || true
+      mkdir -p ~/.ssh/
+      touch ~/.ssh/known_hosts
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
       rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config
     EOH
