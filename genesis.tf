@@ -41,13 +41,13 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
    provisioner "local-exec" {
     command = <<EOH
-      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-ip-list
-      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
-      rm ${terraform.workspace}-node_connection_info.config || true
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-ip-list
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-genesis-ip
+      rm ${var.working_dir}/${terraform.workspace}-node_connection_info.config || true
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
-      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${terraform.workspace}-node_connection_info.config
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/.safe/node/node_connection_info.config ${var.working_dir}/${terraform.workspace}-node_connection_info.config
     EOH
          
   }
