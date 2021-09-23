@@ -19,13 +19,12 @@ resource "digitalocean_droplet" "node_builder" {
             "git clone https://github.com/maidsafe/safe_network --depth 1 -q",
             "cd safe_network",
             "apt -qq update",
-            "sleep 50",
+            "while fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do sleep 1; done",
             "apt -qq install musl-tools -y ",
-            "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y -q",
+            "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
             "rustup target add x86_64-unknown-linux-musl",
-            "cargo -V",
-            "cargo build --release --target=x86_64-unknown-linux-musl",
+            "cargo -q build --release --target=x86_64-unknown-linux-musl",
         ]
     }
 
