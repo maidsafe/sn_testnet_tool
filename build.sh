@@ -20,6 +20,10 @@ function check_dependencies() {
     done
     set -e
 
+    if [[ -z "${SSH_KEY_PATH}" ]]; then
+        echo "SSH key argument is missing. Usage ./build.sh <path to SSH private key>"
+        exit 1
+    fi
     if [[ -z "${DO_PAT}" ]]; then
         echo "The DO_PAT env variable must be set with your personal access token."
         exit 1
