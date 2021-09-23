@@ -1,4 +1,5 @@
 resource "digitalocean_droplet" "node_builder" {
+    count = var.builder_count
     image = "ubuntu-20-04-x64"
     name = "${terraform.workspace}-safe-node-builder"
     region = "lon1"
@@ -32,8 +33,8 @@ resource "digitalocean_droplet" "node_builder" {
         command = <<EOH
             mkdir -p ~/.ssh/
             touch ~/.ssh/known_hosts
-            ssh-keyscan -H ${digitalocean_droplet.node_builder.ipv4_address} >> ~/.ssh/known_hosts
-            rsync root@${digitalocean_droplet.node_builder.ipv4_address}:/root/safe_network/target/x86_64-unknown-linux-musl/release/sn_node .
+            ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
+            rsync root@${self.ipv4_address}:/root/safe_network/target/x86_64-unknown-linux-musl/release/sn_node .
         EOH
     }
 }

@@ -71,3 +71,7 @@ variable "size" {
 provider "digitalocean" {
   token = var.do_token
 }
+
+variable "builder_count" {
+  default = "0"
+}
