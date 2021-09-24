@@ -3,8 +3,14 @@
 set -e
 
 SSH_KEY_PATH=${1}
+REPO_OWNER=${2}
+COMMIT_HASH=${3}
 DEFAULT_WORKING_DIR="."
+DEFAULT_COMMIT_HASH="." # git checkout . does nothing
+DEFAULT_REPO_OWNER="maidsafe"
 WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
+REPO_OWNER="${REPO_OWNER:-$DEFAULT_REPO_OWNER}"
+COMMIT_HASH="${COMMIT_HASH:-$DEFAULT_COMMIT_HASH}"
 
 testnet_channel=$(terraform workspace show)
 
@@ -53,6 +59,8 @@ function run_terraform_apply() {
          -var "working_dir=${WORKING_DIR}" \
          -var "builder_count=1" \
          -var "pvt_key=${SSH_KEY_PATH}" -auto-approve \
+         -var "repo_owner=${REPO_OWNER}" \
+         -var "commit_hash=${COMMIT_HASH}" \
          -target=digitalocean_droplet.node_builder
     terraform destroy \
          -var "do_token=${DO_PAT}" \

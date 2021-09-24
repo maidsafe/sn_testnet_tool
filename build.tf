@@ -17,8 +17,9 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
-            "git clone https://github.com/maidsafe/safe_network --depth 1 -q",
+            "git clone https://github.com/${var.repo_owner}/safe_network -q",
             "cd safe_network",
+            "git checkout ${var.commit_hash}",
             "apt -qq update",
             "while fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do sleep 1; done",
             "apt -qq install musl-tools -y ",
@@ -34,7 +35,7 @@ resource "digitalocean_droplet" "node_builder" {
             mkdir -p ~/.ssh/
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            rsync root@${self.ipv4_address}:/root/safe_network/target/x86_64-unknown-linux-musl/release/sn_node .
+            rsync root@${self.ipv4_address}:/root/safe_network/target/x86_64-unknown-linux-musl/release/sn_node ${var.working_dir}
         EOH
     }
 }
