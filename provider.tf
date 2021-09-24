@@ -75,3 +75,11 @@ provider "digitalocean" {
 variable "builder_count" {
   default = "0"
 }
+
+variable "repo_owner" {
+  default = "maidsafe"
+}
+
+variable "commit_hash" {
+  default = "."
+}
