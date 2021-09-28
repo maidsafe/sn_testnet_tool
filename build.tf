@@ -21,7 +21,26 @@ resource "digitalocean_droplet" "node_builder" {
             "cd safe_network",
             "git checkout ${var.commit_hash}",
             "apt -qq update",
-            "while fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock >/dev/null 2>&1; do sleep 1; done",
+            <<-EOT
+                while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+                    sleep 1
+                done
+                while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
+                    sleep 1
+                done
+                while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+                    sleep 1
+                done
+                while sudo fuser /var/lib/apt/lists/ >/dev/null 2>&1 ; do
+                    sleep 1
+                done
+                if [ -f /var/log/unattended-upgrades/unattended-upgrades.log ]; then
+                    while sudo fuser /var/log/unattended-upgrades/unattended-upgrades.log >/dev/null 2>&1 ; do
+                    sleep 1
+                    done
+                fi
+            EOT
+            ,
             "apt -qq install musl-tools -y ",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
