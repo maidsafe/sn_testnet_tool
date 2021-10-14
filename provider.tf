@@ -52,6 +52,7 @@ variable "port" {
   default = 12000
 }
 
+# In terminal run: curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer <your DO_PAT>" "https://api.digitalocean.com/v2/account/keys"
 variable "ssh_keys" {
   type    = list(number)
   default = [26400596,26204985,19315097,26204781,29201567,29586082,29690435,29690776,30643220,30643816,30113222,30878672,31216015]
