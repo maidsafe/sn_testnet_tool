@@ -6,6 +6,7 @@ Adults nodes are killed and restarted at random intervals creating network churn
 ## Instructions
 
 Install terraform: https://learn.hashicorp.com/tutorials/terraform/install-cli
+Install AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html
 
 Get latest state:
 
