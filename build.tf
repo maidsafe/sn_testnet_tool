@@ -17,9 +17,6 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
-            "git clone https://github.com/${var.repo_owner}/safe_network -q",
-            "cd safe_network",
-            "git checkout ${var.commit_hash}",
             "apt -qq update",
             <<-EOT
                 while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
@@ -41,10 +38,13 @@ resource "digitalocean_droplet" "node_builder" {
                 fi
             EOT
             ,
-            "apt -qq install musl-tools -y ",
+            "git clone https://github.com/${var.repo_owner}/safe_network -q",
+            "cd safe_network",
+            "git checkout ${var.commit_hash}",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
             "rustup target add x86_64-unknown-linux-musl",
+            "apt -qq install musl-tools -y ",
             "cargo -q build --release --target=x86_64-unknown-linux-musl",
         ]
     }
