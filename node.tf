@@ -76,8 +76,8 @@ resource "digitalocean_droplet" "testnet_node" {
         "sleep 5",
         # "sleep $((${count.index * 2}));",
         "echo \"Starting node w/ capacity $MAX_CAPACITY\"",
-        "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-igd ${var.remote_log_level} --log-dir ~/logs --json-logs &\"",
-        "nohup ./sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-igd --log-dir ~/logs --json-logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level}  &",
+        "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs --json-logs &\"",
+        "nohup ./sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --json-logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
         "sleep 5",
         "echo 'node ${count.index + 1} set up'"
       ]
