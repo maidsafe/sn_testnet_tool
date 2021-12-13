@@ -17,7 +17,9 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
-            "apt -qq update",
+           "apt-get update",
+            "apt-get install build-essential -y",
+            # "bash",
             <<-EOT
                 while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
                     sleep 1
@@ -37,7 +39,11 @@ resource "digitalocean_droplet" "node_builder" {
                     done
                 fi
             EOT
-            ,
+        ]
+    }
+    provisioner "remote-exec" {
+        inline = [
+        
             "git clone https://github.com/${var.repo_owner}/safe_network -q",
             "cd safe_network",
             "git checkout ${var.commit_hash}",

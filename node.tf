@@ -21,23 +21,23 @@ resource "digitalocean_droplet" "testnet_node" {
     ]
 
     provisioner "remote-exec" {
-      script=  var.node_bin == "" ? "src/download-node.sh" : "./nonsense.sh"
+      script=  var.node_bin == "" ? "src/download-node.sh" : "./single-machine-testnet.sh"
       on_failure = continue
     }
 
     provisioner "file" {
-      # if no bin defined, we put up (existing 'nonsense.sh') junk and dont care about it anymore
-      source      = var.node_bin == "" ? "nonsense.sh" : var.node_bin
-      destination = var.node_bin == "" ? "nonsense.sh" : "sn_node"
+      # if no bin defined, we put up (existing 'single-machine-testnet.sh') which we dont use... it's just some placeholder and we dont need it hereafter
+      source      = var.node_bin == "" ? "single-machine-testnet.sh" : var.node_bin
+      destination = var.node_bin == "" ? "single-machine-testnet.sh" : "sn_node"
       on_failure = continue
     }
 
 
     provisioner "remote-exec" {
       script="src/setup-node-dirs.sh"
-      on_failure = continue
     }
 
+   
     provisioner "local-exec" {
       command = <<EOH
         if ! [ -f ${var.working_dir}/${terraform.workspace}-node_connection_info.config ]; then
@@ -61,10 +61,19 @@ resource "digitalocean_droplet" "testnet_node" {
       EOH
     }
 
+
     # upload the genesis node config
     provisioner "file" {
       source      = "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
-      destination = "~/.safe/node/node_connection_info.config"
+      destination = "node_connection_info.config"
+    }
+
+     provisioner "remote-exec" {
+      inline = [
+        "echo moving node config to correct location",
+        "cp node_connection_info.config ~/.safe/node/node_connection_info.config"
+      ]
+
     }
 
     provisioner "remote-exec" {
