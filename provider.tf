@@ -63,8 +63,9 @@ variable "region" {
 
 # droplet size and config, NOT node related
 variable "size" {
-  # default = "s-1vcpu-1gb"
-  default = "s-4vcpu-8gb"
+  default = "s-1vcpu-1gb"
+  # default = "s-4vcpu-8gb"
+  # default = "s-8vcpu-16gb"
 }
 
 
