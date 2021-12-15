@@ -3,7 +3,7 @@ resource "digitalocean_droplet" "node_builder" {
     image = "ubuntu-20-04-x64"
     name = "${terraform.workspace}-safe-node-builder"
     region = "lon1"
-    size = "s-8vcpu-16gb"
+    size = var.build-size
     private_networking = true
     ssh_keys = var.ssh_keys
 

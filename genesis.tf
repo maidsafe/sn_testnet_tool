@@ -2,7 +2,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
     image = "ubuntu-18-04-x64"
     name = "${terraform.workspace}-safe-node-genesis"
     region = var.region
-    size = var.size
+    size = var.node-size
     private_networking = true
     ssh_keys = var.ssh_keys
 
