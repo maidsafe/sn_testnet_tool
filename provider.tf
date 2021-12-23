@@ -44,7 +44,7 @@ variable "node_bin_url" {
 
 /// 1024mb by default
 variable "max_capacity" {
-  default = "1024 * 1024 * 1024"
+  default = "1024 * 1024 * 1024 * 2"
 }
 
 variable "port" {
@@ -69,9 +69,7 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-1vcpu-1gb"
-  # default = "s-4vcpu-8gb"
-  # default = "s-8vcpu-16gb"
+  default = "s-4vcpu-8gb"
 }
 
 
