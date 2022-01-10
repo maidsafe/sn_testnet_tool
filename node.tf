@@ -82,6 +82,7 @@ resource "digitalocean_droplet" "testnet_node" {
         "echo 'Setting ENV vars'",
         # "export RUST_LOG=safe_network=trace,qp2p=trace",
         "MAX_CAPACITY=$((${var.max_capacity}))",
+        "export TOKIO_CONSOLE_BIND=${self.ipv4_address}:6669",
         "sleep 5",
         # "sleep $((${count.index * 2}));",
         "echo \"Starting node w/ capacity $MAX_CAPACITY\"",
