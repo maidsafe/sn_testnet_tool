@@ -34,6 +34,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
       inline = [
         "echo 'Setting ENV vars'",
         # "export RUST_LOG=safe_network=trace",
+        "export TOKIO_CONSOLE_BIND=${digitalocean_droplet.testnet_genesis.ipv4_address}:6669",
         "nohup ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs --json-logs ${var.remote_log_level} &",
       "sleep 5;"
     ]
