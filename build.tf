@@ -18,7 +18,7 @@ resource "digitalocean_droplet" "node_builder" {
     provisioner "remote-exec" {
         inline = [
            "apt-get update",
-            "apt-get install build-essential -y",
+            # don't add apt-install steps here. move them down before `cargo build` to prevent file locks
             # "bash",
             <<-EOT
                 while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
@@ -50,7 +50,7 @@ resource "digitalocean_droplet" "node_builder" {
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
             "rustup target add x86_64-unknown-linux-musl",
-            "apt -qq install musl-tools -y ",
+            "apt -qq install musl-tools build-essential -y ",
             "cargo -q build --release --target=x86_64-unknown-linux-musl",
         ]
     }
