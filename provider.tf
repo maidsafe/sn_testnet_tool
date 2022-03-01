@@ -44,7 +44,7 @@ variable "node_bin_url" {
 
 /// 20gb by default
 variable "max_capacity" {
-  default = "1024 * 1024 * 1024 * 20"
+  default = "1024 * 1024 * 1024 * 8"
 }
 
 variable "port" {
