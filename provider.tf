@@ -35,7 +35,7 @@ variable "node_bin" {
 }
 
 variable "remote_log_level" {
-  default = "-vvvv"
+  default = "-vvv"
 }
 
 variable "node_bin_url" {
