@@ -42,7 +42,7 @@ variable "node_bin_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
-/// 20gb by default
+///8gb by default
 variable "max_capacity" {
   default = "1024 * 1024 * 1024 * 8"
 }

@@ -49,8 +49,9 @@ resource "digitalocean_droplet" "node_builder" {
             "git checkout ${var.commit_hash}",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
+            "apt update",
+            "apt -qq install musl-tools build-essential -y",
             "rustup target add x86_64-unknown-linux-musl",
-            "apt -qq install musl-tools build-essential -y ",
             "cargo -q build --release --target=x86_64-unknown-linux-musl",
         ]
     }
