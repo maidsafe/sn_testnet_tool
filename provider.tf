@@ -2,7 +2,7 @@ terraform {
   required_providers {
     digitalocean = {
       source = "digitalocean/digitalocean"
-      # version = "1.22.2"
+      version = "~> 2.0"
     }
   }
   backend "s3" {
@@ -12,11 +12,8 @@ terraform {
   }
 }
 
-
-
 variable "do_token" {}
 
-# location of ssh key to log into nodes
 variable "pvt_key" {}
 
 variable "number_of_nodes" {
@@ -42,7 +39,6 @@ variable "node_bin_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
-///8gb by default
 variable "max_capacity" {
   default = "1024 * 1024 * 1024 * 8"
 }
@@ -54,7 +50,22 @@ variable "port" {
 
 variable "ssh_keys" {
   type    = list(number)
-  default = [26400596,26204985,19315097,26204781,29201567,29586082,29690435,29690776,30643220,30643816,30113222,30878672,31216015]
+  default = [
+    26400596, # Francis Brunelle
+    26204985, # David Irvine
+    19315097, # Stephen Coyle
+    26204781, # Lionel Faber
+    29201567, # Josh Wilson
+    29586082, # Gabriel Viganotti
+    29690435, # Yogeshwar Murugan
+    29690776, # Edward Holst
+    30643220, # Chris Connelly
+    30643816, # Anselme Grumbach
+    30113222, # Qi Ma
+    30878672, # Chris O'Neil
+    31216015, # QA
+    34183228, # GH Actions Automation
+  ]
 }
 
 variable "region" {
