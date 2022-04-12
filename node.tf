@@ -37,7 +37,10 @@ resource "digitalocean_droplet" "testnet_node" {
       script="src/setup-node-dirs.sh"
     }
 
-   
+    provisioner "remote-exec" {
+      script="src/install-and-run-metricbeat.sh"
+    }
+
     provisioner "local-exec" {
       command = <<EOH
         if ! [ -f ${var.working_dir}/${terraform.workspace}-node_connection_info.config ]; then

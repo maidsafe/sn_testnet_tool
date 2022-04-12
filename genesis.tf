@@ -31,6 +31,10 @@ resource "digitalocean_droplet" "testnet_genesis" {
     }
 
     provisioner "remote-exec" {
+      script="src/install-and-run-metricbeat.sh"
+    }
+
+    provisioner "remote-exec" {
       inline = [
         "echo 'Setting ENV vars'",
         # "export RUST_LOG=sn_node=debug",
