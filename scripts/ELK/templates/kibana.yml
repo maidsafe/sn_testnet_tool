@@ -1,0 +1,26 @@
+# ================= Instance Identifiers ================
+server.name: "sn-kibana"
+
+# ============= IP, Port and Node Type ==================
+server.port: 5601
+
+server.host: "0.0.0.0" # Update to current Public IP of Kibana server
+
+elasticsearch.hosts: ["http://178.62.25.89:9200"] # Update to current PUBLIC-IP of Elastic server
+
+# =================== Logging =======================
+logging.root.level: debug
+
+logging:
+  appenders:
+    file:
+      type: file
+      fileName: /var/log/kibana/kibana.log
+      layout:
+        type: json
+  root:
+    appenders:
+      - default
+      - file
+	  
+pid.file: /run/kibana/kibana.pid

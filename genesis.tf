@@ -17,7 +17,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
 
     provisioner "remote-exec" {
-      script=  var.node_bin == "" ? "src/download-node.sh" : "./single-machine-testnet.sh"
+      script=  var.node_bin == "" ? "scripts/download-node.sh" : "./single-machine-testnet.sh"
     }
 
     provisioner "file" {
@@ -27,7 +27,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
     }
 
     provisioner "remote-exec" {
-      script="src/setup-node-dirs.sh"
+      script="scripts/setup-node-dirs.sh"
     }
 
     provisioner "remote-exec" {
