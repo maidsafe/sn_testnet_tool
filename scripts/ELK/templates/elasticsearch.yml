@@ -1,0 +1,39 @@
+# ================= Instance Identifiers ================
+cluster.name: sn_testnet_monitor
+
+node.name: sn-elastic
+
+# =================== Directories =======================
+# Storage dir for Elastic
+path.data: /var/lib/elasticsearch
+
+# Log dir for Elastic
+path.logs: /var/log/elasticsearch
+
+# ============= IP, Port and Node Type ==================
+
+# Machine's public IP
+network.host: <ELASTIC-MACHINE-PUBLIC-IP>
+
+http.port: 9200
+
+# Must be set if not run in cluster mode
+discovery.type: single-node
+
+# ============= Security set to false ===================
+xpack.security.enabled: false
+
+xpack.security.enrollment.enabled: false
+
+xpack.security.http.ssl:
+  enabled: false
+  keystore.path: certs/http.p12
+
+xpack.security.transport.ssl:
+  enabled: false
+  verification_mode: certificate
+  keystore.path: certs/transport.p12
+  truststore.path: certs/transport.p12
+  
+# ================ Scope of the service ==================
+http.host: [_local_, _site_, _global_]
