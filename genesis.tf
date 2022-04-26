@@ -32,6 +32,7 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
     provisioner "remote-exec" {
       script="scripts/ELK/install-and-run-metricbeat.sh"
+      on_failure = continue
     }
 
     provisioner "remote-exec" {
