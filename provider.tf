@@ -39,10 +39,6 @@ variable "node_bin_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
-variable "max_capacity" {
-  default = "1024 * 1024 * 1024 * 8"
-}
-
 variable "port" {
   type    = number
   default = 12000
@@ -51,15 +47,12 @@ variable "port" {
 variable "ssh_keys" {
   type    = list(number)
   default = [
-    26400596, # Francis Brunelle
     26204985, # David Irvine
     19315097, # Stephen Coyle
-    26204781, # Lionel Faber
     29201567, # Josh Wilson
     29586082, # Gabriel Viganotti
     29690435, # Yogeshwar Murugan
     29690776, # Edward Holst
-    30643220, # Chris Connelly
     30643816, # Anselme Grumbach
     30113222, # Qi Ma
     30878672, # Chris O'Neil
@@ -80,7 +73,7 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-4vcpu-8gb"
+  default = "s-2vcpu-4gb"
 }
 
 

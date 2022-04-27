@@ -4,23 +4,20 @@
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
-TESTNET_CHANNEL=$(terraform workspace show)
-
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+TESTNET_CHANNEL=$(terraform workspace show)
 
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
   # script cleanup here
 }
 
-# rm -rf logs/${TESTNET_CHANNEL}/* || true
 
-mkdir -p logs/${TESTNET_CHANNEL}
+# echo "pid for $TESTNET_CHANNEL nodes at ip:"
 for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-        rsync -r -P root@${ip}:~/logs logs/${TESTNET_CHANNEL}/${ip} &
-done
-wait
+  # echo "$ip"
+    pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$ip: ${pid}" &
 
-echo "Logs updated"
+done
 
 cleanup

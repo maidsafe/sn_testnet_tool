@@ -4,8 +4,6 @@
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
-TESTNET_CHANNEL=$(terraform workspace show)
-
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 cleanup() {
@@ -13,14 +11,17 @@ cleanup() {
   # script cleanup here
 }
 
-# rm -rf logs/${TESTNET_CHANNEL}/* || true
-
-mkdir -p logs/${TESTNET_CHANNEL}
-for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-        rsync -r -P root@${ip}:~/logs logs/${TESTNET_CHANNEL}/${ip} &
+count=0
+for line in $(<./tests/indexxx xargs); do
+      printf "  ===================== \n"
+      printf "safe cat-ting $line"
+      count=$((count+1))
+      cd $TMPDIR
+      time safe cat $line > "$TMPDIR/$count.jpg"
+      printf "\n dlded ==> $TMPDIR/$count.jpg \n\n"
 done
-wait
 
-echo "Logs updated"
+
+wait
 
 cleanup
