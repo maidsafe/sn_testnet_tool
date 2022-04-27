@@ -13,7 +13,7 @@ cleanup() {
   # script cleanup here
 }
 
-rm -rf logs/${TESTNET_CHANNEL}/* || true
+# rm -rf logs/${TESTNET_CHANNEL}/* || true
 
 mkdir -p logs/${TESTNET_CHANNEL}
 for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do

@@ -86,7 +86,7 @@ resource "digitalocean_droplet" "testnet_node" {
       on_failure = continue
       inline = [
         "echo 'Setting ENV vars'",
-        # "export RUST_LOG=sn_node=trace",
+        "export RUST_LOG=sn_node=trace",
         "export TOKIO_CONSOLE_BIND=${self.ipv4_address}:6669",
         "sleep 5",
         "echo \"Starting node...\"",
