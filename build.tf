@@ -4,14 +4,14 @@ resource "digitalocean_droplet" "node_builder" {
     name = "${terraform.workspace}-safe-node-builder"
     region = "lon1"
     size = var.build-size
-    private_networking = true
     ssh_keys = var.ssh_keys
 
     connection {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "10m"
+        timeout = "1m"
+        # agent=true
         private_key = file(var.pvt_key)
     }
 

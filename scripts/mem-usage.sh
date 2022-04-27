@@ -12,10 +12,17 @@ cleanup() {
   # script cleanup here
 }
 
-echo "Mem usage in mbs for $TESTNET_CHANNEL nodes at ip:"
-mkdir -p logs
+# echo "Mem usage in mbs for $TESTNET_CHANNEL nodes at ip:"
 for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
+  # echo "$ip"
     mb=$(ssh root@${ip} 'process=$(pgrep sn_node -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$ip:    ${mb}MB" &
+
+done
+
+# echo "Mem usage in mbs for $TESTNET_CHANNEL nodes at ip:"
+for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
+  # echo "$ip"
+    pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$ip: ${pid}" 
 
 done
 

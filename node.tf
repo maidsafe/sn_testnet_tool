@@ -5,7 +5,6 @@ resource "digitalocean_droplet" "testnet_node" {
     name = "${terraform.workspace}-safe-node-${count.index + 1}"
     region = var.region
     size = var.node-size
-    private_networking = true
     ssh_keys = var.ssh_keys
 
     connection {
@@ -14,6 +13,7 @@ resource "digitalocean_droplet" "testnet_node" {
         type = "ssh"
         timeout = "10m"
         private_key = file(var.pvt_key)
+        # agent=true
     }
 
     depends_on = [
@@ -86,16 +86,16 @@ resource "digitalocean_droplet" "testnet_node" {
       on_failure = continue
       inline = [
         "echo 'Setting ENV vars'",
-        # "export RUST_LOG=sn_node=trace",
+        "export RUST_LOG=sn_node=trace,sn_dysfuction=debug",
         "export TOKIO_CONSOLE_BIND=${self.ipv4_address}:6669",
         "sleep 5",
-        "echo \"Starting node...\"",
         "echo \" node command is: sn_node --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs &\"",
-        # "wait=$((${count.index}>4 ? ${count.index} : 4))",
-        "sleep ${count.index * 10}",
+        # sleep random number between 10 and 60s to not barrage dkg
+        "sleep $(shuf -i 10-90 -n 1)",
         "now=$(date)",
         "echo \"starting node at $now\"",
         "nohup ./sn_node --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
+        # wait 5s so node starts fully before we continue
         "sleep 5",
         "echo 'node ${count.index + 1} set up'"
       ]
