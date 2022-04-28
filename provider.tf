@@ -39,10 +39,6 @@ variable "node_bin_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
-variable "max_capacity" {
-  default = "1024 * 1024 * 1024 * 8"
-}
-
 variable "port" {
   type    = number
   default = 12000
@@ -78,7 +74,7 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-4vcpu-8gb"
+  default = "s-2vcpu-4gb"
 }
 
 
