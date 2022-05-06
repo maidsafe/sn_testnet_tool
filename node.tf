@@ -85,16 +85,15 @@ resource "digitalocean_droplet" "testnet_node" {
       inline = [
         "echo 'Setting ENV vars'",
         # "export RUST_LOG=sn_node=trace",
-        "MAX_CAPACITY=$((${var.max_capacity}))",
         "export TOKIO_CONSOLE_BIND=${self.ipv4_address}:6669",
         "sleep 5",
-        "echo \"Starting node w/ capacity $MAX_CAPACITY\"",
-        "echo \" node command is: sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs &\"",
+        "echo \"Starting node...\"",
+        "echo \" node command is: sn_node --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs &\"",
         # "wait=$((${count.index}>4 ? ${count.index} : 4))",
         "sleep ${count.index * 10}",
         "now=$(date)",
         "echo \"starting node at $now\"",
-        "nohup ./sn_node --max-capacity $MAX_CAPACITY --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
+        "nohup ./sn_node --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
         "sleep 5",
         "echo 'node ${count.index + 1} set up'"
       ]
