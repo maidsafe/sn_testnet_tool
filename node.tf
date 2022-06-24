@@ -44,11 +44,11 @@ resource "digitalocean_droplet" "testnet_node" {
 
     provisioner "local-exec" {
       command = <<EOH
-        if ! [ -f ${var.working_dir}/${terraform.workspace}-node_connection_info.config ]; then
-          echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-node_connection_info.config to ${var.working_dir}/${terraform.workspace}-node_connection_info.config"
+        if ! [ -f ${var.working_dir}/${terraform.workspace}-prefix-map ]; then
+          echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-prefix-map to ${var.working_dir}/${terraform.workspace}-prefix-map"
           aws s3 cp \
-            "s3://safe-testnet-tool/${terraform.workspace}-node_connection_info.config" \
-            "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
+            "s3://safe-testnet-tool/${terraform.workspace}-prefix-map" \
+            "${var.working_dir}/${terraform.workspace}-prefix-map"
         fi
         if ! [ -f ${var.working_dir}/${terraform.workspace}-ip-list ]; then
           echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-ip-list to ${var.working_dir}/${terraform.workspace}-ip-list"
@@ -66,16 +66,18 @@ resource "digitalocean_droplet" "testnet_node" {
     }
 
 
-    # upload the genesis node config
+    # upload the genesis node prefix map
     provisioner "file" {
-      source      = "${var.working_dir}/${terraform.workspace}-node_connection_info.config"
-      destination = "node_connection_info.config"
+      source      = "${var.working_dir}/${terraform.workspace}-prefix-map"
+      destination = "prefix-map"
     }
 
      provisioner "remote-exec" {
       inline = [
-        "echo moving node config to correct location",
-        "cp node_connection_info.config ~/.safe/node/node_connection_info.config"
+        "echo moving prefix_map to correct location",
+        "cp prefix-map ~/.safe/prefix_maps/prefix-map",
+        "echo Creating a symlink to default",
+        "ln -s ~/.safe/prefix_maps/prefix-map ~/.safe/prefix_maps/default"
       ]
 
     }
@@ -105,7 +107,6 @@ resource "digitalocean_droplet" "testnet_node" {
       touch ~/.ssh/known_hosts
       echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-      echo $(jq ".[1] += [\"${self.ipv4_address}:${var.port}\"]" ${var.working_dir}/${terraform.workspace}-node_connection_info.config) > ${var.working_dir}/${terraform.workspace}-node_connection_info.config
     EOH
   }
 }

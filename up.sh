@@ -77,13 +77,20 @@ function copy_ips_to_s3() {
         "$WORKING_DIR/$testnet_channel-genesis-ip" \
         "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
         --acl public-read
-    aws s3 cp \
-        "$WORKING_DIR/$testnet_channel-node_connection_info.config" \
-        "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config" \
-        --acl public-read
+}
+
+function pull_latest_prefix_map_from_genesis_and_copy_to_s3() {
+  genesis_ip=$(cat "$WORKING_DIR/$testnet_channel-genesis-ip")
+  echo "Pulling latest PrefixMap from Genesis node"
+  rsync root@$(cat "$WORKING_DIR/$testnet_channel-genesis-ip"):~/.safe/prefix_maps/$testnet_channel "$WORKING_DIR/$testnet_channel-prefix-map"
+  aws s3 cp \
+          "$WORKING_DIR/$testnet_channel-prefix-map" \
+          "s3://safe-testnet-tool/$testnet_channel-prefix-map" \
+          --acl public-read
 }
 
 
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
+pull_latest_prefix_map_from_genesis_and_copy_to_s3
