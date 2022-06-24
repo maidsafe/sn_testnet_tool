@@ -16,8 +16,8 @@ function copy_ips_from_s3() {
         "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
         "$WORKING_DIR/$testnet_channel-genesis-ip" 
     aws s3 cp \
-        "s3://safe-testnet-tool/$testnet_channel-node_connection_info.config" \
-        "$WORKING_DIR/$testnet_channel-node_connection_info.config" 
+        "s3://safe-testnet-tool/$testnet_channel-prefix-map" \
+        "$WORKING_DIR/$testnet_channel-prefix-map"
 }
 
 

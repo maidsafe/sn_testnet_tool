@@ -8,7 +8,7 @@ doctl*
 *logs/*
 *connection-infos/*
 data/*
-*node_connection_info.config
+*-prefix-map
 *.zip
 files/*
 addresses/*

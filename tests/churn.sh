@@ -97,15 +97,6 @@ echo "terraforming..."
 echo ""
 # put up 11 nodes
 ./up.sh ~/.ssh/sharing_rsa 11 $LOCAL_NODE_BUILD -auto-approve  >/dev/null || exit
-# Checking we're connected to the correct section info
-config_count=$(( $(cat ~/.safe/node/node_connection_info.config | wc -l) - 1))
-churn_ip_count=$(cat ./churn-ip-list | wc -l)
-
-
-if ! [ $config_count -eq $churn_ip_count ]
-    then
-    echo "Config is not the same length as our churn ip count!!! $config_count, $churn_ip_count"
-fi
 
 
 echo ""

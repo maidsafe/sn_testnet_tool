@@ -20,4 +20,4 @@ aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list"
 
 aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip"
 
-aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-node_connection_info.config"
+aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-prefix-map"
