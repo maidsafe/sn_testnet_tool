@@ -9,7 +9,7 @@ echo ""
 rm -rf ~/.safe/qp2p || true
 rm -rf "$HOME/.safe/prefix_maps/${TESTNET_CHANNEL}" || true
 mkdir -p ~/.safe/prefix_maps
-cp "${TESTNET_CHANNEL}-prefix-map" "$HOME/.safe/prefix_maps/${TESTNET_CHANNEL}-prefix-map"
-ln -s "$HOME/.safe/prefix_maps/${TESTNET_CHANNEL}-prefix-map" "$HOME/.safe/prefix_maps/${TESTNET_CHANNEL}"
+cp "${TESTNET_CHANNEL}-prefix-map" "$HOME/.safe/prefix_maps/default"
+
 
 echo "You are now ready to use the $TESTNET_CHANNEL network"
