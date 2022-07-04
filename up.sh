@@ -82,7 +82,7 @@ function copy_ips_to_s3() {
 function pull_latest_prefix_map_from_genesis_and_copy_to_s3() {
   genesis_ip=$(cat "$WORKING_DIR/$testnet_channel-genesis-ip")
   echo "Pulling latest PrefixMap from Genesis node"
-  rsync root@$(cat "$WORKING_DIR/$testnet_channel-genesis-ip"):~/.safe/prefix_maps/$testnet_channel "$WORKING_DIR/$testnet_channel-prefix-map"
+  rsync root@$(cat "$WORKING_DIR/$testnet_channel-genesis-ip"):~/.safe/prefix_maps/default "$WORKING_DIR/$testnet_channel-prefix-map"
   aws s3 cp \
           "$WORKING_DIR/$testnet_channel-prefix-map" \
           "s3://safe-testnet-tool/$testnet_channel-prefix-map" \

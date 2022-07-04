@@ -17,6 +17,7 @@ cleanup() {
 
 aws s3 cp "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list" "$TESTNET_CHANNEL-ip-list"
 aws s3 cp "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip" "$TESTNET_CHANNEL-genesis-ip"
+aws s3 cp "s3://safe-testnet-tool/$TESTNET_CHANNEL-prefix-map" "$TESTNET_CHANNEL-prefix-map"
 ./scripts/register_keys.sh
 
 cleanup
