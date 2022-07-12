@@ -1,5 +1,5 @@
 resource "digitalocean_droplet" "testnet_genesis" {
-    image = "ubuntu-18-04-x64"
+    image = "ubuntu-22-04-x64"
     name = "${terraform.workspace}-safe-node-genesis"
     region = var.region
     size = var.node-size
@@ -37,10 +37,28 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
     provisioner "remote-exec" {
       inline = [
+        "sudo apt-get install yarn gcc -y",
+        # get bytehound latest
+        "sudo apt-get install gdb heaptrack build-essential -y --fix-missing",
+        "wget https://github.com/koute/bytehound/releases/download/0.8.0/bytehound-x86_64-unknown-linux-gnu.tgz",
+        # unzip
+        "tar -xf bytehound-x86_64-unknown-linux-gnu.tgz",
+        "echo \"bytehound extracted\"",
+        "ls .",
+        # bytehound setup
+      ]
+      on_failure = fail
+    }
+
+
+    provisioner "remote-exec" {
+      inline = [
         "echo 'Setting ENV vars'",
+        # more bytehound config
         "export RUST_LOG=sn_node=trace,sn_dysfuction=debug",
         "export TOKIO_CONSOLE_BIND=${digitalocean_droplet.testnet_genesis.ipv4_address}:6669",
-        "nohup ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level} &",
+        # start with (lib)bytehound in place for mem profiling 
+        "nohup sh -c 'heaptrack ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level}' &",
         "sleep 5",
         "cp -H ~/.safe/prefix_maps/default ~/prefix-map",
       "sleep 5;"
