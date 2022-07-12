@@ -42,6 +42,13 @@ resource "digitalocean_droplet" "testnet_node" {
       on_failure = continue
     }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get install gdb heaptrack -y"
+    ]
+    on_failure = continue
+  }
+
     provisioner "local-exec" {
       command = <<EOH
         if ! [ -f ${var.working_dir}/${terraform.workspace}-prefix-map ]; then
@@ -94,7 +101,7 @@ resource "digitalocean_droplet" "testnet_node" {
         "sleep $(shuf -i 10-90 -n 1)",
         "now=$(date)",
         "echo \"starting node at $now\"",
-        "nohup ./sn_node --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
+        "nohup heaptrack ./sn_node --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
         # wait 5s so node starts fully before we continue
         "sleep 5",
         "echo 'node ${count.index + 1} set up'"

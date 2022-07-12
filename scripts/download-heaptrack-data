@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+#
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+TESTNET_CHANNEL=$(terraform workspace show)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+mkdir -p heaptrack/${TESTNET_CHANNEL}
+
+for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
+        echo "$ip"
+        ssh root@${ip} 'killall sn_node'
+        rsync -r -P root@${ip}:"~/heaptrack*" heaptrack/${TESTNET_CHANNEL}/${ip} &
+
+done
+
+cleanup

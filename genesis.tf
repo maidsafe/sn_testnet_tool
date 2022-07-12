@@ -37,10 +37,17 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
     provisioner "remote-exec" {
       inline = [
+        "sudo apt-get install gdb heaptrack -y"
+      ]
+      on_failure = fail
+    }
+
+    provisioner "remote-exec" {
+      inline = [
         "echo 'Setting ENV vars'",
         "export RUST_LOG=sn_node=trace,sn_dysfuction=debug",
         "export TOKIO_CONSOLE_BIND=${digitalocean_droplet.testnet_genesis.ipv4_address}:6669",
-        "nohup ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level} &",
+        "nohup heaptrack ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level} &",
         "sleep 5",
         "cp -H ~/.safe/prefix_maps/default ~/prefix-map",
       "sleep 5;"
