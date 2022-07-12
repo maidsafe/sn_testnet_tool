@@ -100,3 +100,8 @@ See continual network status:
 
 Will copy the current workspace prefix-map to your `~/.safe/prefix_maps/{testnet-channel}-prefix-map`
 
+##  Building for profiling
+
+the `./build` script will compile a _standard_ (non musl) version of `sn_node` which can be used with `heaptrack` for memory profiling.
+
+To get the profiles the node in question will need to be stopped for the file to be written to.

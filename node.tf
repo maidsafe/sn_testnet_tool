@@ -1,7 +1,7 @@
 resource "digitalocean_droplet" "testnet_node" {
     # count = 5
     count = var.number_of_nodes
-    image = "ubuntu-18-04-x64"
+    image = "ubuntu-22-04-x64"
     name = "${terraform.workspace}-safe-node-${count.index + 1}"
     region = var.region
     size = var.node-size
@@ -40,6 +40,22 @@ resource "digitalocean_droplet" "testnet_node" {
     provisioner "remote-exec" {
       script="scripts/ELK/install-and-run-metricbeat.sh"
       on_failure = continue
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "sudo apt-get install yarn -y",
+        # get bytehound latest
+        "wget https://github.com/koute/bytehound/releases/download/0.8.0/bytehound-x86_64-unknown-linux-gnu.tgz",
+        "sudo apt-get install gdb heaptrack build-essential -y --fix-missing",
+        # unzip
+        "tar -xf bytehound-x86_64-unknown-linux-gnu.tgz",
+        "echo \"bytehound extracted\"",
+        "ls .",
+        # bytehound setup
+        # "export MEMORY_PROFILER_LOG=warn",
+      ]
+      on_failure = fail
     }
 
     provisioner "local-exec" {
@@ -90,11 +106,10 @@ resource "digitalocean_droplet" "testnet_node" {
         "export TOKIO_CONSOLE_BIND=${self.ipv4_address}:6669",
         "sleep 5",
         "echo \" node command is: sn_node --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs &\"",
-        # sleep random number between 10 and 60s to not barrage dkg
-        "sleep $(shuf -i 10-90 -n 1)",
         "now=$(date)",
         "echo \"starting node at $now\"",
-        "nohup ./sn_node --root-dir ~/node_data --skip-auto-port-forwarding --log-dir ~/logs --local-addr ${self.ipv4_address}:${var.port} ${var.remote_log_level} &",
+        # start with (lib)bytehound in place for mem profiling 
+        "nohup sh -c 'heaptrack ./sn_node --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level}' &",
         # wait 5s so node starts fully before we continue
         "sleep 5",
         "echo 'node ${count.index + 1} set up'"

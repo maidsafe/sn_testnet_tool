@@ -1,6 +1,6 @@
 resource "digitalocean_droplet" "node_builder" {
     count = var.builder_count
-    image = "ubuntu-20-04-x64"
+    image = "ubuntu-22-04-x64"
     name = "${terraform.workspace}-safe-node-builder"
     region = "lon1"
     size = var.build-size
@@ -41,6 +41,7 @@ resource "digitalocean_droplet" "node_builder" {
             EOT
         ]
     }
+
     provisioner "remote-exec" {
         inline = [
         
@@ -50,9 +51,11 @@ resource "digitalocean_droplet" "node_builder" {
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
             "apt update",
-            "apt -qq install musl-tools build-essential -y",
-            "rustup target add x86_64-unknown-linux-musl",
-            "cargo -q build --release --target=x86_64-unknown-linux-musl",
+            # "apt -qq install musl-tools build-essential -y",
+            "apt -qq install build-essential -y",
+            # "rustup target add x86_64-unknown-linux-musl",
+            # "cargo -q build --release --target=x86_64-unknown-linux",
+            "cargo -q build --release -p sn_node",
         ]
     }
 
@@ -61,7 +64,7 @@ resource "digitalocean_droplet" "node_builder" {
             mkdir -p ~/.ssh/
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            rsync root@${self.ipv4_address}:/root/safe_network/target/x86_64-unknown-linux-musl/release/sn_node ${var.working_dir}
+            rsync root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ${var.working_dir}
         EOH
     }
 }
