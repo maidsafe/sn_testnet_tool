@@ -44,7 +44,8 @@ resource "digitalocean_droplet" "testnet_node" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get install gdb heaptrack -y"
+      "sudo apt-get install gdb heaptrack -y --fix-missing",
+      "echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope"
     ]
     on_failure = continue
   }
