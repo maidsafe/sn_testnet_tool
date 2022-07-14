@@ -6,17 +6,17 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 #
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 TESTNET_CHANNEL=$(terraform workspace show)
-TARGERT_NODE_IP=${1}
+TARGET_NODE_IP=$1
 
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
   # script cleanup here
 }
 
-mkdir -p heaptrack/${TESTNET_CHANNEL}
+mkdir -p memory-profiling/${TESTNET_CHANNEL}
 
-echo "Killing node and getting heaptrack from $TARGERT_NODE_IP"
-ssh root@${TARGERT_NODE_IP} 'killall sn_node'
-rsync -r -P root@${TARGERT_NODE_IP}:"~/heaptrack*" heaptrack/${TESTNET_CHANNEL}/${TARGERT_NODE_IP} &l
+echo "Killing node and getting memory-profiling from $TARGET_NODE_IP"
+# ssh root@${TARGET_NODE_IP} 'killall sn_node'
+rsync -r -P root@${TARGET_NODE_IP}:"~/heaptrack*" memory-profiling/${TESTNET_CHANNEL}/${TARGET_NODE_IP}/
 
 cleanup

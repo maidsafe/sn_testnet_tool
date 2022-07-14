@@ -14,9 +14,10 @@ cleanup() {
 
 echo "Sotrage space usage per nodes for $TESTNET_CHANNEL:"
 mkdir -p logs
-for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-    # mb=$(ssh root@${ip} 'process=$(pgrep sn_node -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$ip:    ${mb}MB" &
-    size=$(ssh root@${ip} 'du -sch node_data | tail -1' ) && echo "$ip: ${size}" &
+cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+  ip=$(echo $line | awk '{print $2}')
+  name=$(echo $line | awk '{print $1}')
+  size=$(ssh root@${ip} 'du -sch node_data | tail -1' ) && echo "$name: ${size}" &
 
 done
 

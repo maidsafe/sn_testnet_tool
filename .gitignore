@@ -1,4 +1,5 @@
 ip-list
+*-client-ip
 *-ip-list
 genesis-ip
 genesis-dbc
@@ -63,3 +64,5 @@ override.tf.json
 terraform.rc
 
 jq
+
+memory-profiling

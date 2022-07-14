@@ -15,6 +15,17 @@ resource "digitalocean_droplet" "node_builder" {
         private_key = file(var.pvt_key)
     }
 
+    # lets checkout the given commit first so we can fail fast if there's an issue
+    provisioner "remote-exec" {
+        inline = [
+        
+            "git clone https://github.com/${var.repo_owner}/safe_network -q",
+            "cd safe_network",
+            "git checkout ${var.commit_hash}",
+        ]
+    }
+
+
     provisioner "remote-exec" {
         inline = [
            "apt-get update",
@@ -44,10 +55,7 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
-        
-            "git clone https://github.com/${var.repo_owner}/safe_network -q",
             "cd safe_network",
-            "git checkout ${var.commit_hash}",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
             "apt update",
@@ -56,6 +64,7 @@ resource "digitalocean_droplet" "node_builder" {
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
             "cargo -q build --release -p sn_node",
+            # "cargo -q test --release --no-run -p sn_client",
         ]
     }
 
@@ -67,4 +76,5 @@ resource "digitalocean_droplet" "node_builder" {
             rsync root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ${var.working_dir}
         EOH
     }
+    # rsync root@${self.ipv4_address}:/root/safe_network/target/release/deps/sn_client* ${var.working_dir}
 }

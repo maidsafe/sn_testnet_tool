@@ -13,13 +13,3 @@
 
 # sudo apt-get install ripgrep
 # killall sn_node ||true && rm -rf ~/.safe/qp2p || true && rm -rf ~/.safe/node/local-test-network || true && RUST_LOG=safe_network=trace cargo run --release --bin testnet --features=always-joinable,test-utils && ./resources/scripts/network_is_ready_cli.sh
-
-# bytehound
-
-# sudo apt-get install yarn
-# wget https://github.com/koute/bytehound/releases/download/0.8.0/bytehound-x86_64-unknown-linux-gnu.tgz
-# tar -xf bytehound-x86_64-unknown-linux-gnu.tgz
-
-# $ export MEMORY_PROFILER_LOG=warn
-# $ LD_PRELOAD=./libbytehound.so ./your_application
-# $ ./bytehound server memory-profiling_*.dat

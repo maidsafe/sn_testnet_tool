@@ -14,11 +14,11 @@ cleanup() {
 
 mkdir -p memory-profiling/${TESTNET_CHANNEL}
 
-for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-        echo "$ip"
-        # ssh root@${ip} 'killall sn_node'
-        rsync -r -P root@${ip}:"~/memory-profiling*" memory-profiling/${TESTNET_CHANNEL}/${ip} &l
-
+cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+  ip=$(echo $line | awk '{print $2}')
+  name=$(echo $line | awk '{print $1}')
+  echo "$name @ $ip"
+  rsync -P root@${ip}:"~/heaptrack*" memory-profiling/${TESTNET_CHANNEL}/heaptrack.${name}___${ip}.zst &
 done
 
 cleanup

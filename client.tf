@@ -10,7 +10,7 @@ resource "digitalocean_droplet" "testnet_client" {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "10m"
+        timeout = "1m"
         private_key = file(var.pvt_key)
         # agent=true
     }
@@ -18,11 +18,6 @@ resource "digitalocean_droplet" "testnet_client" {
     depends_on = [
       digitalocean_droplet.testnet_genesis,
     ]
-
-    provisioner "remote-exec" {
-      inline= [ "curl -so- https://raw.githubusercontent.com/maidsafe/safe_network/master/resources/scripts/install.sh | sudo bash" ]
-    }
-
 
     provisioner "remote-exec" {
       script="scripts/ELK/install-and-run-metricbeat.sh"
@@ -33,32 +28,6 @@ resource "digitalocean_droplet" "testnet_client" {
       script="scripts/setup-node-dirs.sh"
     }
     
-    provisioner "remote-exec" {
-        inline = [
-           "apt-get update",
-            # don't add apt-install steps here. move them down before `cargo build` to prevent file locks
-            # "bash",
-            <<-EOT
-                while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/apt/lists/ >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                if [ -f /var/log/unattended-upgrades/unattended-upgrades.log ]; then
-                    while sudo fuser /var/log/unattended-upgrades/unattended-upgrades.log >/dev/null 2>&1 ; do
-                    sleep 1
-                    done
-                fi
-            EOT
-        ]
-    }
 
     provisioner "local-exec" {
       command = <<EOH
@@ -77,6 +46,17 @@ resource "digitalocean_droplet" "testnet_client" {
       source      = "${var.working_dir}/${terraform.workspace}-prefix-map"
       destination = "prefix-map"
     }
+    # upload run client test script
+    provisioner "file" {
+      source      = "./scripts/build_client_tests.sh"
+      destination = "build_client_tests.sh"
+    }
+
+    # upload loop client test script
+    provisioner "file" {
+      source      = "./scripts/loop_client_tests.sh"
+      destination = "loop_client_tests.sh"
+    }
 
      provisioner "remote-exec" {
       inline = [
@@ -92,15 +72,14 @@ resource "digitalocean_droplet" "testnet_client" {
       inline = [
       
           "git clone https://github.com/${var.repo_owner}/safe_network -q",
-          "cd safe_network",
+          "cd safe_network/sn_client",
           "git checkout ${var.commit_hash}",
           "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
           ". $HOME/.cargo/env",
           "apt update",
-          "apt -qq install build-essential -y",
-          # get those tests built first
-          "cargo -q test --release -p sn_client --no-run",
+          "apt -qq install build-essential ripgrep -y",
       ]
+      on_failure=continue
     }
   
 
@@ -109,7 +88,9 @@ resource "digitalocean_droplet" "testnet_client" {
       inline = [
         "echo 'Setting ENV vars'",
         "export RUST_LOG=sn_client=trace",
-        "cargo test --release > test.log",
+        "chmod +x ./build_client_tests.sh",
+        "chmod +x ./loop_client_tests.sh",
+        "./build_client_tests.sh"
       ]
   }
 
@@ -117,7 +98,7 @@ resource "digitalocean_droplet" "testnet_client" {
     command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
-      echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-client-ip
+      echo ${self.ipv4_address} > ${var.working_dir}/${terraform.workspace}-client-ip
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }

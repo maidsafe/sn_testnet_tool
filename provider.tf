@@ -77,7 +77,7 @@ variable "node-size" {
 }
 
 variable "client-size" {
-  default = "s-2vcpu-4gb"
+  default = "s-4vcpu-8gb" # bigger for faster builds
 }
 
 
