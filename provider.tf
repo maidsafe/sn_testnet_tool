@@ -76,6 +76,10 @@ variable "node-size" {
   default = "s-2vcpu-4gb"
 }
 
+variable "client-size" {
+  default = "s-2vcpu-4gb"
+}
+
 
 provider "digitalocean" {
   token = var.do_token
