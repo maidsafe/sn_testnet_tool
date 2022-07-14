@@ -11,7 +11,16 @@ cleanup() {
   # script cleanup here
 }
 
-mkdir -p data
+cd safe_network/sn_client
 
-head -c 1K </dev/urandom >data/1K-file
-head -c 5M </dev/urandom >data/5M-file
+# run 5 times, increment counter once per iter
+for i in {0..5..1}
+do
+  echo "iteration $i, time: $(data)"
+  RUST_LOG=sn_client cargo test --release -- --skip spent > ../../test-$i.log || true
+done
+
+cd -
+
+
+cleanup

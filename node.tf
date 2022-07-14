@@ -2,7 +2,7 @@ resource "digitalocean_droplet" "testnet_node" {
     # count = 5
     count = var.number_of_nodes
     image = "ubuntu-22-04-x64"
-    name = "${terraform.workspace}-safe-node-${count.index + 1}"
+    name = "${terraform.workspace}-safe-node-${count.index + 2}" // 2 because 0 index, and genesis is node 1
     region = var.region
     size = var.node-size
     ssh_keys = var.ssh_keys
@@ -11,7 +11,7 @@ resource "digitalocean_droplet" "testnet_node" {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "10m"
+        timeout = "1m"
         private_key = file(var.pvt_key)
         # agent=true
     }
@@ -44,18 +44,9 @@ resource "digitalocean_droplet" "testnet_node" {
 
     provisioner "remote-exec" {
       inline = [
-        "sudo apt-get install yarn -y",
-        # get bytehound latest
-        "wget https://github.com/koute/bytehound/releases/download/0.8.0/bytehound-x86_64-unknown-linux-gnu.tgz",
-        "sudo apt-get install gdb heaptrack build-essential -y --fix-missing",
-        # unzip
-        "tar -xf bytehound-x86_64-unknown-linux-gnu.tgz",
-        "echo \"bytehound extracted\"",
-        "ls .",
-        # bytehound setup
-        # "export MEMORY_PROFILER_LOG=warn",
+        "sudo apt update",
+        "sudo apt install heaptrack -y",
       ]
-      on_failure = fail
     }
 
     provisioner "local-exec" {
@@ -108,11 +99,11 @@ resource "digitalocean_droplet" "testnet_node" {
         "echo \" node command is: sn_node --root-dir ~/node_data --skip-auto-port-forwarding ${var.remote_log_level} --log-dir ~/logs &\"",
         "now=$(date)",
         "echo \"starting node at $now\"",
-        # start with (lib)bytehound in place for mem profiling 
+        # start with heaptrack in place for mem profiling 
         "nohup sh -c 'heaptrack ./sn_node --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level}' &",
         # wait 5s so node starts fully before we continue
         "sleep 5",
-        "echo 'node ${count.index + 1} set up'"
+        "echo 'node ${count.index + 2} set up'"
       ]
   }
 
@@ -120,7 +111,7 @@ resource "digitalocean_droplet" "testnet_node" {
     command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
-      echo ${self.ipv4_address} >> ${var.working_dir}/${terraform.workspace}-ip-list
+      echo "node-${count.index + 2} ${self.ipv4_address}" >> ${var.working_dir}/${terraform.workspace}-ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }

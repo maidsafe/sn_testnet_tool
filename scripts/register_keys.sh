@@ -9,9 +9,9 @@ WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
 echo "Registering node keys w/ system"
 mkdir -p ~/.ssh
 touch ~/.ssh/known_hosts
-while read -r ip; do
+for ip in $(cat ${TESTNET_CHANNEL}-ip-list | awk '{print $2}'); do
     ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
-done < ${WORKING_DIR}/${TESTNET_CHANNEL}-ip-list
+done
 wait
 
 echo "Keys registered"

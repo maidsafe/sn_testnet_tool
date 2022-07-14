@@ -14,9 +14,10 @@ cleanup() {
 
 
 # echo "pid for $TESTNET_CHANNEL nodes at ip:"
-for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-  # echo "$ip"
-    pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$ip: ${pid}" &
+cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+  ip=$(echo $line | awk '{print $2}')
+  name=$(echo $line | awk '{print $1}')  # echo "$ip"
+  pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$name w $ip has PID: ${pid}" &
 
 done
 
