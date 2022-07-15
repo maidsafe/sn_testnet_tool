@@ -1,7 +1,9 @@
 ip-list
 *-ip-list
 genesis-ip
+genesis-dbc
 *-genesis-ip
+*-genesis-dbc
 elders-ip-list
 adults-ip-list
 doctl*
