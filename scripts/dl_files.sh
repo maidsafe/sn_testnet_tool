@@ -13,14 +13,13 @@ cleanup() {
 
 count=0
 for line in $(<./tests/indexxx xargs); do
-      printf "  ===================== \n"
-      printf "safe cat-ting $line"
-      count=$((count+1))
-      cd $TMPDIR
-      time safe cat $line > "$TMPDIR/$count.jpg"
-      printf "\n dlded ==> $TMPDIR/$count.jpg \n\n"
+  printf "  ===================== \n"
+  printf "safe cat-ting $line"
+  count=$((count+1))
+  cd $TMPDIR
+  time safe cat $line > "$TMPDIR/$count.jpg"
+  printf "\n dlded ==> $TMPDIR/$count.jpg \n\n"
 done
-
 
 wait
 
