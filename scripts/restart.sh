@@ -9,7 +9,6 @@ GENESIS_IP=$( cat ${TESTNET_CHANNEL}-genesis-ip)
 # HARD_CODED_CONTACTS="[\"${GENESIS_IP}:12000\"]"
 HARD_CODED_CONTACTS='[\"'$GENESIS_IP':12000\"]'
 
-
 echo "restarting genesis node"
 
 ssh root@$GENESIS_IP 'pkill -f sn_node & rm ~/nohup.out || true && nohup 2>&1 ./sn_node --first '$GENESIS_IP':12000 --skip-igd --root-dir ~/node_data -vvvvv &' 
@@ -23,14 +22,12 @@ echo "Restarting all nodes w/ system"
 echo $MAX_CAPACITY
 echo $HARD_CODED_CONTACTS
 for ip in $(<${TESTNET_CHANNEL}-ip-list xargs); do
-
-    if [ "$ip" == "$GENESIS_IP" ]; then
-        echo "Not restarting genesis node again. Doing nothing here"
-    else
-        echo "restarting node at $ip"
-        ssh root@${ip} 'pkill -f sn_node & rm ~/nohup.out || true && nohup 2>&1 ./sn_node --max-capacity '$MAX_CAPACITY' --root-dir ~/node_data --hard-coded-contacts '$HARD_CODED_CONTACTS' -vvvvv --skip-igd &' &
-    fi
-
+  if [ "$ip" == "$GENESIS_IP" ]; then
+    echo "Not restarting genesis node again. Doing nothing here"
+  else
+    echo "restarting node at $ip"
+    ssh root@${ip} 'pkill -f sn_node & rm ~/nohup.out || true && nohup 2>&1 ./sn_node --max-capacity '$MAX_CAPACITY' --root-dir ~/node_data --hard-coded-contacts '$HARD_CODED_CONTACTS' -vvvvv --skip-igd &' &
+  fi
 done
 
 echo "All ${TESTNET_CHANNEL} Nodes restarted."

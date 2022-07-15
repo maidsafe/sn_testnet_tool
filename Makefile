@@ -15,7 +15,7 @@ alpha:
 	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
 	rm -f ~/.safe/prefix_maps/alpha-prefix-map
 	cp alpha-prefix-map ~/.safe/prefix_maps/alpha-prefix-map
-	ln -s "$HOME/.safe/prefix_maps/alpha-prefix-map" "$HOME/.safe/prefix_maps/alpha"
+	ln -s "$$HOME/.safe/prefix_maps/alpha-prefix-map" "$$HOME/.safe/prefix_maps/alpha"
 
 clean-alpha:
 	terraform workspace select alpha
@@ -34,7 +34,7 @@ beta:
 	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
 	rm -f ~/.safe/prefix_maps/beta-prefix-map
 	cp beta-prefix-map ~/.safe/prefix_maps/beta-prefix-map
-	ln -s "$HOME/.safe/prefix_maps/beta-prefix-map" "$HOME/.safe/prefix_maps/beta"
+	ln -s "$$HOME/.safe/prefix_maps/beta-prefix-map" "$$HOME/.safe/prefix_maps/beta"
 
 clean-beta:
 	terraform workspace select beta

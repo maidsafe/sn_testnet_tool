@@ -1,15 +1,15 @@
 #!/bin/bash
 
 function register_hosts {
-        while read -r ip
-        do
-                ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
-        done < ip-list
+  while read -r ip
+  do
+    ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
+  done < ip-list
 }
 
 function clear_safe_data {
-        for ip in $(<ip-list xargs); do
-                ssh -o "BatchMode yes" root@${ip} "pkill sn_node; rm -rf node_data; rm sn_node*" 1>"logs/$ip.log" 2>&1 &
-        done
-        wait
+  for ip in $(<ip-list xargs); do
+    ssh -o "BatchMode yes" root@${ip} "pkill sn_node; rm -rf node_data; rm sn_node*" 1>"logs/$ip.log" 2>&1 &
+  done
+  wait
 }
