@@ -39,6 +39,15 @@ resource "digitalocean_droplet" "testnet_client" {
         fi
       EOH
     }
+   
+    provisioner "local-exec" {
+      command = <<EOH
+          echo "Downloading test-data from s3://safe-test-data to ${var.working_dir}/test-data"
+          aws s3 cp \
+            "s3://safe-test-data" \
+            "${var.working_dir}/test-data"
+      EOH
+    }
 
 
     # upload the genesis node prefix map
