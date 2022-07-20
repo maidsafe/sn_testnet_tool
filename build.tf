@@ -63,7 +63,7 @@ resource "digitalocean_droplet" "node_builder" {
             "apt -qq install build-essential -y",
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
-            "cargo -q build --release -p sn_node",
+            "RUSTFLAGS=\"-C debuginfo=1\" cargo -q build --release -p sn_node",
             # "cargo -q test --release --no-run -p sn_client",
         ]
     }
