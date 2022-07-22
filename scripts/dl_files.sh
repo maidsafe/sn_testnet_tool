@@ -12,13 +12,24 @@ cleanup() {
 }
 
 count=0
-for line in $(<./tests/indexxx xargs); do
-  printf "  ===================== \n"
-  printf "safe cat-ting $line"
+cat ./tests/indexxx | while read line; do
+
+  type=$(echo $line | awk '{print $1}')
+  url=$(echo $line | awk '{print $2}')
+  printf "\n==> Getting a $type file from $url \n"
+  printf "\n...................\n\n"
+
+  printf "safe cat-ting..."
   count=$((count+1))
   cd $TMPDIR
-  time safe cat $line > "$TMPDIR/$count.jpg"
-  printf "\n dlded ==> $TMPDIR/$count.jpg \n\n"
+  time safe cat $url > "$TMPDIR/$count.$type"
+  printf "\n................... \n\n"
+  filesize=$(ls -lh $TMPDIR/$count.$type  | awk '{print  $5}')
+  printf "File downloaded to ==> $TMPDIR/$count.$type \n\n"
+  printf "File size is ==> $filesize \n\n"
+
+  printf "...................\n\n"
+  
 done
 
 wait

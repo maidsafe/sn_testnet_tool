@@ -6,21 +6,27 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
+LOOP_COUNT=${1:-5}
+
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
   # script cleanup here
 }
 
-cd safe_network/sn_client
+run_test_loop() {
 
-# run 5 times, increment counter once per iter
-for i in {0..5..1}
-do
-  echo "iteration $i, time: $(data)"
-  RUST_LOG=sn_client cargo test --release -- --skip spent > ../../test-$i.log || true
-done
+  cd safe_network/sn_client
 
-cd -
+  # run LOOP_COUNT times, increment counter once per iter
+  for i in {0..$LOOP_COUNT..1}
+  do
+    echo "iteration $i, time:"
+    RUST_LOG=sn_client cargo test --release -- --skip spent > ../../test-$i.log || true
+  done
 
+  cd -
+}
+
+nohup run_test_loop &
 
 cleanup
