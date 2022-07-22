@@ -2,13 +2,14 @@
 
 set -e
 
+SN_NODE_URL_PREFIX="https://sn-node.s3.eu-west-2.amazonaws.com"
+
 SSH_KEY_PATH=${1}
-NODE_OF_NODES=${2:-1}
-NODE_BIN=${3}
+NODE_COUNT=${2:-1}
+NODE_BIN_PATH=${3}
 NODE_VERSION=${4}
-AUTO_APPROVE=${5}
-DEFAULT_WORKING_DIR="."
-WORKING_DIR="${WORKING_DIR:-$DEFAULT_WORKING_DIR}"
+CLIENT_COUNT=${5}
+AUTO_APPROVE=${6}
 
 testnet_channel=$(terraform workspace show)
 
@@ -40,48 +41,56 @@ function check_dependencies() {
     echo "The AWS_DEFAULT_REGION env variable must be set. Default is usually eu-west-2."
     exit 1
   fi
-  if [[ ! -z "${NODE_VERSION}" && ! -z "${NODE_BIN}" ]]; then
-    echo "Both NODE_VERSION and NODE_BIN cannot be set at the same time."
+  if [[ ! -z "${NODE_VERSION}" && ! -z "${NODE_BIN_PATH}" ]]; then
+    echo "Both NODE_VERSION and NODE_BIN_PATH cannot be set at the same time."
     echo "Please use one or the other."
     exit 1
   fi
 }
 
 function run_terraform_apply() {
-  local node_bin_path="${NODE_BIN}"
+  local node_url="$SN_NODE_URL_PREFIX/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
   if [[ ! -z "${NODE_VERSION}" ]]; then
-    (
-      cd /tmp
-      rm -rf sn_node-${NODE_VERSION}
-      mkdir sn_node-${NODE_VERSION}
-      aws s3 cp s3://sn-node/sn_node-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz .
-      tar -C sn_node-${NODE_VERSION} -xvf sn_node-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz
-    )
-    node_bin_path="/tmp/sn_node-${NODE_VERSION}/sn_node"
+    node_url="${SN_NODE_URL_PREFIX}/sn_node-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+  elif [[ ! -z "${NODE_BIN_PATH}" ]]; then
+    if [[ -d "${NODE_BIN_PATH}" ]]; then
+      echo "The node bin path must be a file"
+      exit 1
+    fi
+    # The term 'custom' is used here rather than 'musl' because a locally built binary may not
+    # be a musl build.
+    local path=$(dirname "${NODE_BIN_PATH}")
+    archive_name="sn_node-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
+    node_url="${SN_NODE_URL_PREFIX}/$archive_name"
+    archive_path="/tmp/$archive_name"
+    echo "Creating $archive_path..."
+    tar -C $path -zcvf $archive_path sn_node
+    echo "Uploading $archive_path to S3..."
+    aws s3 cp $archive_path s3://sn-node --acl public-read
   fi
   terraform apply \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=${SSH_KEY_PATH}" \
-    -var "number_of_nodes=${NODE_OF_NODES}" \
-    -var "node_bin=${node_bin_path}" \
-    -var "working_dir=${WORKING_DIR}" \
+    -var "number_of_nodes=${NODE_COUNT}" \
+    -var "node_url=${node_url}" \
+    -var "client_count=${CLIENT_COUNT}" \
     --parallelism 15 ${AUTO_APPROVE}
 }
 
 function copy_ips_to_s3() {
   aws s3 cp \
-    "$WORKING_DIR/$testnet_channel-ip-list" \
+    "$testnet_channel-ip-list" \
     "s3://safe-testnet-tool/$testnet_channel-ip-list" \
     --acl public-read
   aws s3 cp \
-    "$WORKING_DIR/$testnet_channel-genesis-ip" \
+    "$testnet_channel-genesis-ip" \
     "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
     --acl public-read
 }
 
 function pull_prefix_map_and_copy_to_s3() {
-  genesis_ip=$(cat "$WORKING_DIR/$testnet_channel-genesis-ip")
-  prefix_map_path="$WORKING_DIR/$testnet_channel-prefix-map"
+  genesis_ip=$(cat "$testnet_channel-genesis-ip")
+  prefix_map_path="$testnet_channel-prefix-map"
   echo "Pulling PrefixMap from Genesis node"
   rsync root@"$genesis_ip":~/.safe/prefix_maps/default "$prefix_map_path"
   aws s3 cp \
@@ -91,8 +100,8 @@ function pull_prefix_map_and_copy_to_s3() {
 }
 
 function pull_genesis_dbc_and_copy_to_s3() {
-  genesis_ip=$(cat "$WORKING_DIR/$testnet_channel-genesis-ip")
-  genesis_dbc_path="$WORKING_DIR/$testnet_channel-genesis-dbc"
+  genesis_ip=$(cat "$testnet_channel-genesis-ip")
+  genesis_dbc_path="$testnet_channel-genesis-dbc"
   echo "Pulling Genesis DBC from Genesis node"
   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
   aws s3 cp \

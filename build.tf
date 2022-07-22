@@ -25,7 +25,6 @@ resource "digitalocean_droplet" "node_builder" {
         ]
     }
 
-
     provisioner "remote-exec" {
         inline = [
            "apt-get update",
@@ -73,7 +72,7 @@ resource "digitalocean_droplet" "node_builder" {
             mkdir -p ~/.ssh/
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            rsync root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ${var.working_dir}
+            rsync root@${self.ipv4_address}:/root/safe_network/target/release/sn_node .
         EOH
     }
     # rsync root@${self.ipv4_address}:/root/safe_network/target/release/deps/sn_client* ${var.working_dir}
