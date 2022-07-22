@@ -1,71 +1,44 @@
 resource "digitalocean_droplet" "testnet_genesis" {
-    image = "ubuntu-22-04-x64"
-    name = "${terraform.workspace}-safe-node-1"
-    region = var.region
-    size = var.node-size
-    ssh_keys = var.ssh_keys
+  image    = "ubuntu-22-04-x64"
+  name     = "${terraform.workspace}-safe-node-1"
+  region   = var.region
+  size     = var.node-size
+  ssh_keys = var.ssh_keys
 
-    connection {
-        host = self.ipv4_address
-        user = "root"
-        type = "ssh"
-        timeout = "1m"
-        # agent=true
-        private_key = file(var.pvt_key)
-    }
+  connection {
+    host        = self.ipv4_address
+    user        = "root"
+    type        = "ssh"
+    timeout     = "1m"
+    private_key = file(var.pvt_key)
+  }
 
+  provisioner "file" {
+    source       = "scripts/init-node.sh"
+    destination  = "/tmp/init-node.sh"
+  }
 
-
-    provisioner "remote-exec" {
-      script=  var.node_bin == "" ? "scripts/download-node.sh" : "./single-machine-testnet.sh"
-    }
-
-    provisioner "file" {
-      # if no bin defined, we put up (existing 'single-machine-testnet.sh'), which we dont use... it's just some placeholder and we dont need it hereafter
-      source      = var.node_bin == "" ? "single-machine-testnet.sh" : var.node_bin
-      destination = var.node_bin == "" ? "single-machine-testnet.sh" : "sn_node"
-    }
-
-    provisioner "remote-exec" {
-      script="scripts/setup-node-dirs.sh"
-    }
-
-    provisioner "remote-exec" {
-      script="scripts/ELK/install-and-run-metricbeat.sh"
-      on_failure = continue
-    }
-
-    provisioner "remote-exec" {
-      inline = [
-        "sudo apt update",
-        "sudo apt install heaptrack -y",
-      ]
-    }
-
-
-    provisioner "remote-exec" {
-      inline = [
-        "echo 'Setting ENV vars'",
-        "export RUST_LOG=sn_node=trace,sn_dysfuction=debug",
-        "export TOKIO_CONSOLE_BIND=${digitalocean_droplet.testnet_genesis.ipv4_address}:6669",
-        # start with heaptrack in place for mem profiling 
-        "nohup sh -c 'heaptrack ./sn_node --first --local-addr ${digitalocean_droplet.testnet_genesis.ipv4_address}:${var.port} --skip-auto-port-forwarding --root-dir ~/node_data --log-dir ~/logs ${var.remote_log_level}' &",
-        "sleep 5",
-        "cp -H ~/.safe/prefix_maps/default ~/prefix-map",
-      "sleep 5;"
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/init-node.sh",
+      "/tmp/init-node.sh \"${var.node_url}\" true \"${self.ipv4_address}\" \"${digitalocean_droplet.testnet_genesis.ipv4_address}\" \"${var.port}\" \"${var.remote_log_level}\"",
     ]
   }
 
-   provisioner "local-exec" {
+  provisioner "remote-exec" {
+    script      = "scripts/ELK/install-and-run-metricbeat.sh"
+    on_failure  = continue
+  }
+
+  provisioner "local-exec" {
     command = <<EOH
-      echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > ${var.working_dir}/${terraform.workspace}-ip-list
-      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${var.working_dir}/${terraform.workspace}-genesis-ip
-      rm ${var.working_dir}/${terraform.workspace}-prefix-map || true
+      echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > ${terraform.workspace}-ip-list
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
+      rm ${terraform.workspace}-prefix-map || true
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
-      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/prefix-map ${var.working_dir}/${terraform.workspace}-prefix-map
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/prefix-map ${terraform.workspace}-prefix-map
     EOH
-         
   }
 }

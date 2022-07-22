@@ -24,19 +24,8 @@ variable "testnet_channel" {
   default = "public"
 }
 
-variable "working_dir" {}
-
-
-variable "node_bin" {
-  default = ""
-}
-
 variable "remote_log_level" {
   default = "-vvvv"
-}
-
-variable "node_bin_url" {
-  default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-$node_version-x86_64-unknown-linux-musl.tar.gz"
 }
 
 variable "port" {
@@ -80,7 +69,6 @@ variable "client-size" {
   default = "s-4vcpu-8gb" # bigger for faster builds
 }
 
-
 provider "digitalocean" {
   token = var.do_token
 }
@@ -95,4 +83,12 @@ variable "repo_owner" {
 
 variable "commit_hash" {
   default = "."
+}
+
+variable "client_count" {
+  default = "1"
+}
+
+variable "node_url" {
+  default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
 }

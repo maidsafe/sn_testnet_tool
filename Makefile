@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 SN_TESTNET_SSH_KEY_PATH := ~/.ssh/id_rsa
-SN_TESTNET_NO_OF_NODES := 15
+SN_TESTNET_NODE_COUNT := 15
+SN_TESTNET_CLIENT_COUNT := 0
 
 alpha:
 	rm -rf .terraform
@@ -8,14 +9,14 @@ alpha:
 	terraform workspace select alpha
 	./up.sh \
 		"${SN_TESTNET_SSH_KEY_PATH}" \
-		"${SN_TESTNET_NO_OF_NODES}" \
-		"${SN_TESTNET_NODE_BIN}" \
+		"${SN_TESTNET_NODE_COUNT}" \
+		"${SN_TESTNET_NODE_BIN_PATH}" \
 		"${SN_TESTNET_NODE_VERSION}" \
+		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
 	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
 	rm -f ~/.safe/prefix_maps/alpha-prefix-map
-	cp alpha-prefix-map ~/.safe/prefix_maps/alpha-prefix-map
-	ln -s "$$HOME/.safe/prefix_maps/alpha-prefix-map" "$$HOME/.safe/prefix_maps/alpha"
+	cp alpha-prefix-map ~/.safe/prefix_maps/default
 
 clean-alpha:
 	terraform workspace select alpha
@@ -27,14 +28,14 @@ beta:
 	terraform workspace select beta
 	./up.sh \
 		"${SN_TESTNET_SSH_KEY_PATH}" \
-		"${SN_TESTNET_NO_OF_NODES}" \
-		"${SN_TESTNET_NODE_BIN}" \
+		"${SN_TESTNET_NODE_COUNT}" \
+		"${SN_TESTNET_NODE_BIN_PATH}" \
 		"${SN_TESTNET_NODE_VERSION}" \
+		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
 	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
 	rm -f ~/.safe/prefix_maps/beta-prefix-map
-	cp beta-prefix-map ~/.safe/prefix_maps/beta-prefix-map
-	ln -s "$$HOME/.safe/prefix_maps/beta-prefix-map" "$$HOME/.safe/prefix_maps/beta"
+	cp beta-prefix-map ~/.safe/prefix_maps/default
 
 clean-beta:
 	terraform workspace select beta
