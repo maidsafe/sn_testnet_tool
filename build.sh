@@ -56,7 +56,6 @@ function check_dependencies() {
 function run_terraform_apply() {
     terraform apply \
          -var "do_token=${DO_PAT}" \
-         -var "working_dir=${WORKING_DIR}" \
          -var "builder_count=1" \
          -var "pvt_key=${SSH_KEY_PATH}" -auto-approve \
          -var "repo_owner=${REPO_OWNER}" \
@@ -64,7 +63,6 @@ function run_terraform_apply() {
          -target=digitalocean_droplet.node_builder
     terraform destroy \
          -var "do_token=${DO_PAT}" \
-         -var "working_dir=${WORKING_DIR}" \
          -var "pvt_key=${SSH_KEY_PATH}" -auto-approve \
          -target=digitalocean_droplet.node_builder
 }
