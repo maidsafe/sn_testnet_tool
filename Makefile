@@ -4,6 +4,7 @@ SN_TESTNET_NODE_COUNT := 15
 SN_TESTNET_CLIENT_COUNT := 0
 
 alpha:
+	rm -f alpha-*
 	rm -rf .terraform
 	terraform init
 	terraform workspace select alpha
@@ -14,15 +15,17 @@ alpha:
 		"${SN_TESTNET_NODE_VERSION}" \
 		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
-	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
-	rm -f ~/.safe/prefix_maps/alpha-prefix-map
+	rm -rf ~/.safe
+	mkdir -p ~/.safe/prefix_maps
 	cp alpha-prefix-map ~/.safe/prefix_maps/default
+	cp alpha-genesis-dbc ~/.safe/genesis_dbc
 
 clean-alpha:
 	terraform workspace select alpha
 	./down.sh "${SN_TESTNET_SSH_KEY_PATH}" "-auto-approve"
 
 beta:
+	rm -f beta-*
 	rm -rf .terraform
 	terraform init
 	terraform workspace select beta
@@ -33,9 +36,10 @@ beta:
 		"${SN_TESTNET_NODE_VERSION}" \
 		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
-	[[ ! -d "~/.safe/prefix_maps" ]] && mkdir -p ~/.safe/prefix_maps
-	rm -f ~/.safe/prefix_maps/beta-prefix-map
+	rm -rf ~/.safe
+	mkdir -p ~/.safe/prefix_maps
 	cp beta-prefix-map ~/.safe/prefix_maps/default
+	cp beta-genesis-dbc ~/.safe/genesis_dbc
 
 clean-beta:
 	terraform workspace select beta
