@@ -43,12 +43,12 @@ function install_heaptrack() {
   # Other times, the heaptrack package won't be available because it seems to
   # be some kind of timing issue: if you run the install command too quickly
   # after the update command, apt will complain it can't find the package.
-  sudo apt update
+  sudo apt update > /dev/null 2>&1
   retry_count=1
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    sudo apt install heaptrack -y
+    sudo apt install heaptrack -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "heaptrack installed successfully"
@@ -60,7 +60,7 @@ function install_heaptrack() {
     ((retry_count++))
     sleep 10
     # Without running this again there are times when it will just fail on every retry.
-    sudo apt update
+    sudo apt update > /dev/null 2>&1
   done
   if [[ "$heaptrack_installed" == "false" ]]; then
     echo "Failed to install heaptrack"

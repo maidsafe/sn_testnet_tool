@@ -9,7 +9,9 @@ echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://arti
 
 # Update and install metricbeat
 echo "Installing Metricbeat"
-sudo apt-get update && sudo apt-get install metricbeat && sudo apt-get install rpl
+sudo apt-get update > /dev/null 2>&1
+sudo apt-get install metricbeat > /dev/null 2>&1
+sudo apt-get install rpl > /dev/null 2>&1
 
 # Remove default config
 rm -rf /etc/metricbeat/metricbeat.yml
