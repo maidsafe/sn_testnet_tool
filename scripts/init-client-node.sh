@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 repo_owner="$1"
 if [[ -z "$repo_owner" ]]; then
   echo "A repo owner must be passed to initialise the node."
@@ -15,12 +16,13 @@ fi
 function setup_build_tools() {
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y
-  sudo apt update
+# avoid modals for kernel upgrades hanging setup
+  sudo DEBIAN_FRONTEND=noninteractive apt update
   build_tools_installed="true"
   retry_count=1
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install build tools..."
-    sudo apt install build-essential ripgrep -y -qq
+    sudo DEBIAN_FRONTEND=noninteractive apt install build-essential ripgrep -y -qq
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "build tools installed successfully"
@@ -32,7 +34,7 @@ function setup_build_tools() {
     ((retry_count++))
     sleep 10
     # Without running this again there are times when it will just fail on every retry.
-    sudo apt update
+    sudo DEBIAN_FRONTEND=noninteractive apt update
   done
   if [[ "$build_tools_installed" == "false" ]]; then
     echo "Failed to install build tools."
