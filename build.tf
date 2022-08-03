@@ -27,6 +27,7 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
+            "export DEBIAN_FRONTEND=noninteractive",
            "apt-get update",
             # don't add apt-install steps here. move them down before `cargo build` to prevent file locks
             # "bash",
@@ -54,6 +55,8 @@ resource "digitalocean_droplet" "node_builder" {
 
     provisioner "remote-exec" {
         inline = [
+            # avoid modals for kernel upgrades hanging setup
+            "export DEBIAN_FRONTEND=noninteractive",
             "cd safe_network",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable --profile minimal -y",
             ". $HOME/.cargo/env",
