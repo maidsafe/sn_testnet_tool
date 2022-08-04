@@ -89,8 +89,8 @@ function copy_ips_to_s3() {
 }
 
 function pull_prefix_map_and_copy_to_s3() {
-  genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  prefix_map_path="$testnet_channel-prefix-map"
+  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
+  local prefix_map_path="$testnet_channel-prefix-map"
   echo "Pulling PrefixMap from Genesis node"
   rsync root@"$genesis_ip":~/.safe/prefix_maps/default "$prefix_map_path"
   aws s3 cp \
@@ -100,8 +100,8 @@ function pull_prefix_map_and_copy_to_s3() {
 }
 
 function pull_genesis_dbc_and_copy_to_s3() {
-  genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  genesis_dbc_path="$testnet_channel-genesis-dbc"
+  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
+  local genesis_dbc_path="$testnet_channel-genesis-dbc"
   echo "Pulling Genesis DBC from Genesis node"
   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
   aws s3 cp \
@@ -110,8 +110,20 @@ function pull_genesis_dbc_and_copy_to_s3() {
     --acl public-read
 }
 
+function pull_genesis_key_and_copy_to_s3() {
+  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
+  local genesis_key_path="$testnet_channel-genesis-key"
+  echo "Pulling Genesis key from Genesis node"
+  rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
+  aws s3 cp \
+    "$genesis_key_path" \
+    "s3://safe-testnet-tool/$testnet_channel-genesis-key" \
+    --acl public-read
+}
+
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
 pull_prefix_map_and_copy_to_s3
 pull_genesis_dbc_and_copy_to_s3
+pull_genesis_key_and_copy_to_s3

@@ -15,7 +15,3 @@ terraform destroy \
   -var "pvt_key=${1}" \
   --parallelism 15 ${AUTO_APPROVE} && \
   rm ${TESTNET_CHANNEL}-ip-list || true
-
-aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-ip-list"
-aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-genesis-ip"
-aws s3 rm "s3://safe-testnet-tool/$TESTNET_CHANNEL-prefix-map"
