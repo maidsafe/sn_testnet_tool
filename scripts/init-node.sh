@@ -44,7 +44,6 @@ function install_heaptrack() {
   # be some kind of timing issue: if you run the install command too quickly
   # after the update command, apt will complain it can't find the package.
   sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
-  sudo DEBIAN_FRONTEND=noninteractive apt-get update -y
   retry_count=1
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
@@ -104,6 +103,11 @@ function run_node() {
     nohup sh -c "$node_cmd" &
     sleep 5
     cp -H ~/.safe/prefix_maps/default ~/prefix-map
+    (
+      cd ~/logs
+      grep --extended-regexp --only-matching --no-filename ".*Genesis node started.*" sn_node.log* |
+        awk -F ':' '{ print $2 }' | xargs > ~/genesis-key
+    )
     sleep 5
   else
     node_cmd=$(printf '%s' \

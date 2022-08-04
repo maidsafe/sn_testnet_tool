@@ -3,8 +3,10 @@ ip-list
 *-ip-list
 genesis-ip
 genesis-dbc
+genesis-key
 *-genesis-ip
 *-genesis-dbc
+*-genesis-key
 elders-ip-list
 adults-ip-list
 doctl*

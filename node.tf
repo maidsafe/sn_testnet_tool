@@ -45,29 +45,6 @@ resource "digitalocean_droplet" "testnet_node" {
 
   provisioner "local-exec" {
     command = <<EOH
-      if ! [ -f ${terraform.workspace}-prefix-map ]; then
-        echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-prefix-map to ${terraform.workspace}-prefix-map"
-        aws s3 cp \
-          "s3://safe-testnet-tool/${terraform.workspace}-prefix-map" \
-          "${terraform.workspace}-prefix-map"
-      fi
-      if ! [ -f ${terraform.workspace}-ip-list ]; then
-        echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-ip-list to ${terraform.workspace}-ip-list"
-        aws s3 cp \
-          "s3://safe-testnet-tool/${terraform.workspace}-ip-list" \
-          "${terraform.workspace}-ip-list"
-      fi
-      if ! [ -f ${terraform.workspace}-genesis-ip ]; then
-      echo "Downloading from s3://safe-testnet-tool/${terraform.workspace}-genesis-ip to ${terraform.workspace}-genesis-ip"
-        aws s3 cp \
-          "s3://safe-testnet-tool/${terraform.workspace}-genesis-ip" \
-          "${terraform.workspace}-genesis-ip"
-      fi
-    EOH
-  }
-
-  provisioner "local-exec" {
-    command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       echo "node-${count.index + 2} ${self.ipv4_address}" >> ${terraform.workspace}-ip-list
