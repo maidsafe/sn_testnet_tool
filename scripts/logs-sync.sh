@@ -11,11 +11,16 @@ if [[ -z "$testnet_channel" ]]; then
   exit 1
 fi
 
+mkdir -p ~/.ssh/
+touch ~/.ssh/known_hosts
 mkdir -p logs/${testnet_channel}
-
 cat ${testnet_channel}-ip-list | while read line; do
   name=$(echo $line | awk '{print $1}')
   ip=$(echo $line | awk '{print $2}')
   echo "Getting $name logs from $ip"
-  rsync -v -r root@${ip}:~/logs logs/${testnet_channel}/${name}___${ip}
+  rsync \
+    --rsh="ssh -o StrictHostKeyChecking=no" \
+    --verbose \
+    --recursive \
+    root@${ip}:~/logs logs/${testnet_channel}/${name}___${ip}
 done

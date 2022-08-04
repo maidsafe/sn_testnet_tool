@@ -78,6 +78,7 @@ function run_terraform_apply() {
 }
 
 function copy_ips_to_s3() {
+  # This is only really used for debugging the nightly run.
   aws s3 cp \
     "$testnet_channel-ip-list" \
     "s3://safe-testnet-tool/$testnet_channel-ip-list" \
