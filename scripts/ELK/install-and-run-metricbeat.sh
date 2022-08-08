@@ -24,7 +24,7 @@ wget ${metric_beat_url} -O /etc/metricbeat/metricbeat.yml
 name=$(hostname)
 
 # Search and replace hostname in config
-rpl "name:" "name: ${name}" /etc/metricbeat/metricbeat.yml
+rpl "<MACHINE-NAME>" "${name}" /etc/metricbeat/metricbeat.yml
 
 # Start the service
 systemctl start metricbeat
