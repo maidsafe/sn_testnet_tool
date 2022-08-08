@@ -92,7 +92,7 @@ function pull_prefix_map_and_copy_to_s3() {
   local genesis_ip=$(cat "$testnet_channel-genesis-ip")
   local prefix_map_path="$testnet_channel-prefix-map"
   echo "Pulling PrefixMap from Genesis node"
-  rsync root@"$genesis_ip":~/.safe/prefix_maps/default "$prefix_map_path"
+  rsync root@"$genesis_ip":~/prefix-map "$prefix_map_path"
   aws s3 cp \
     "$prefix_map_path" \
     "s3://safe-testnet-tool/$testnet_channel-prefix-map" \
