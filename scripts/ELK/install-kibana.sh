@@ -19,7 +19,7 @@ sudo apt-get install kibana -y > /dev/null 2>&1
 
 # Write customised config over default config
 echo "Pull config from S3"
-wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/kibana.yml -O /etc/kibana/kibana.yml
+wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/kibana.yml -O kibana.yml
 
 # Get public IP
 echo "Fetching Public IP"
@@ -27,8 +27,10 @@ ip=$(curl ident.me)
 
 # Replace the IP placeholder with host's public IP
 echo "Replacing placeholders with Public IPs of Elastic"
-sed -i "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC}/g" /etc/kibana/kibana.yml
-sed -i "s/<KIBANA-MACHINE-PUBLIC-IP>/${ip}/g" /etc/kibana/kibana.yml
+sed -e "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC}/g" -e "s/<KIBANA-MACHINE-PUBLIC-IP>/${ip}/g" kibana.yml > /etc/kibana/kibana.yml
+
+# Cleanup residual config
+rm kibana.yml
 
 # Start the service
 systemctl start kibana

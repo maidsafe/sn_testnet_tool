@@ -17,7 +17,7 @@ sudo apt-get install elasticsearch -y > /dev/null 2>&1
 
 # Write customised config over default config
 echo "Pull config from S3"
-wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/elasticsearch.yml -O /etc/elasticsearch/elasticsearch.yml
+wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/elasticsearch.yml -O elasticsearch.yml
 
 # Get public IP
 echo "Fetching Public IP"
@@ -25,7 +25,10 @@ ip=$(curl ident.me)
 
 # Replace the IP placeholder with host's public IP
 echo "Replacing placeholder with Public IP"
-sed -i "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ip}/g" /etc/elasticsearch/elasticsearch.yml
+sed -e "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ip}/g" elasticsearch.yml > /etc/elasticsearch/elasticsearch.yml
+
+# Cleanup residual config
+rm elasticsearch.yml
 
 # Start the service
 echo "Starting ElasticSearch service"
