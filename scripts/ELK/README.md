@@ -1,24 +1,46 @@
-# ELK for testnets
+# Elastic Stack for SAFE Network Testnets
 
-The scripts in this directory allow us to start metricbeat services along with every node that we start with the `up.sh` script.
+## Overview
 
-## Pre-requisites:
-* At the moment, the setup of Elastic and Kibana servers are manual. So for our metricbeat instances to communicate, it is given that we already have instances of Elastic and Kibana servers up and running at the time of running `up.sh` script.
+#### Elastic and Kibana
+Elastic Stack is a set of free and open tools for data ingestion, enrichment, storage, analysis, and visualization. Elasticsearch is the central component of the stack and raw 
+data flows into Elasticsearch from a variety of sources including process and system logs, system metrics, and custom data from web applications. Data ingestion is the process by 
+which this raw data is parsed, normalized, and enriched before it is indexed in Elasticsearch. 
+
+Once indexed in Elasticsearch, users can run complex queries against their data and use aggregations to retrieve complex summaries of their data. Kibana is the aptly glorified 
+front-end for Elastic, users can create powerful visualizations of their data, share dashboards, and manage the Elastic Stack all from Kibana. Elastic also it includes a rich 
+collection of lightweight data and metrics shipping agents known as Beats for sending data to Elasticsearch.
 
 
-* To set up metricbeat instances automatically, all the nodes pull their `metricbeat.yml` configuration from Maidsafe's Amazon S3 bucket.
-Therefore, it is also a given that the `metricbeat.yml` file must also be uploaded with the correct Elastic and Kibana IPs manually before running `up.sh`.
-  
-Note: All the scripts and files should also be available in `https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/ELK/`    
+#### Beats(MetricBeat)
 
-### To set up an Elastic Server
-* Start a DigitalOcean droplet with at least 16GB RAM and 4 vCPUs. This is because ElasticSearch is a resource heavy process and can sometimes crash due to OOM or slowdown due to lack of CPU power.
-* SSH into the machine and execute the `install-elasticsearch.sh` script to install the latest ElasticSearch package.
-* Replace ElasticSearch's YAML config file at `/etc/elasticsearch/elasticsearch.yml` with the config in `templates/elasticsearch.yml`
-* Update the `<ELASTIC-MACHINE-PUBLIC-IP>` in the YAML file to the machine's Public IP.
-* Run `systemctl start elasticsearch` to start the process.
+Beats is a free and open platform for single-purpose data shippers. They are services that send specific data from the machines that they run in, to Elasticsearch which is capable 
+of storing and indexing hundereds/thousands of such instances. MetricBeat collects metrics from systems and services. From CPU to memory, Redis to NGINX, and much more, Metricbeat 
+is a lightweight way to send system and service statistics to ELK stack.
 
-To verify if the setup went fine: Open `http://<ELASTIC-MACHINE-PUBLIC-IP>:9200` in a web browser to get an output similar to:
+## Setup for monintoring testnets
+
+### Elastic
+
+Elastic is the first service that needs to be setup. This is also where we would need to set up security(API keys, HTTPs/TLS certifications etc) for the stack in case we choose to 
+share our dashboards to external users. 
+
+* We first need to spin up a capable machine with atlest a 4-core CPU and 8GB RAM
+* Run the following command from [sn_testnet_tool](https://github.com/maidsafe/sn_testnet_tool) repository(local) to copy the script to the Elastic node:
+```
+scp ./scripts/ELK/install-elasticsearch.sh root@<ELASTIC-MACHINE-PUBLIC-IP>:~/.
+```
+* Then SSH into the Elastic node and execute the script with `./install-elasticsearch.sh`
+* The script will perform the below steps:
+    * Pull the basic config for setting up ElasticSearch from the following URL  and place it at host's `/etc/elasticsearch/elasticsearch.yml`: 
+https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/elasticsearch.yml
+    * Update the IP placeholder to point to the hosts's public IP.
+    * Start the elastic service by running `systemctl start elasticsearch` as root
+    
+Note(optional): The config can be tweaked to setup security if necesary in the future
+
+This will start an Elasticsearch service at: `<ELASTIC-MACHINE-PUBLIC-IP>:9200`. To verify if ElasticSearch is succesfully up and running, open 
+`http://<ELASTIC-MACHINE-PUBLIC-IP>:9200` in a web browser to get an output similar to:
 
 ```
 {
@@ -40,28 +62,68 @@ To verify if the setup went fine: Open `http://<ELASTIC-MACHINE-PUBLIC-IP>:9200`
 }
 ```
 
-### To set up a Kibana Server
-* Start a DigitalOcean droplet with at least 8GB RAM and 4 vCPUs. This is because Kibana is a resource heavy process and can sometimes crash due to OOM or slowdown due to lack of CPU power.
-* SSH into the machine and execute the `install-kibana.sh` script to install the latest Kibana package.
-* Replace Kibana's YAML config file at `/etc/kibana/kibana.yml` with the config in `templates/kibana.yml`
-* Update the `<ELASTIC-MACHINE-PUBLIC-IP>` in the YAML file to ElasticSearch Server's Public IP.
-* Update the `<KIBANA-MACHINE-PUBLIC-IP>` in the YAML file to the host machine's Public IP.
-* Run `systemctl start kibana` to start the process.
+### Kibana
 
-To verify if the setup went fine: Open `http://<KIBANA-MACHINE-PUBLIC-IP>:5601` in a web browser to see Kibana's homepage.
+Once elasticsearch service is successfully setup and running, we can now start up the front-end service Kibana(just like elasticsearch): 
 
-## Running
+* Spin up a machine with a minimum of 4-core CPU and 8GB of RAM.
+* Run the following command from [sn_testnet_tool](https://github.com/maidsafe/sn_testnet_tool) repository(local) to copy script to the Kibana node.
+```
+scp ./scripts/ELK/install-kibana.sh root@<KIBANA-MACHINE-PUBLIC-IP>:~/.
+```  
+* Then SSH into the Kibana node. 
+* The copied script takes ElasticSearch machine's IP as an argument to setup Kibana config, therefore run the script in the following format:
+```
+./install-kibana.sh <ELASTIC-MACHINE-PUBLIC-IP>
+```
+* On execution, the script will perform the below steps:
+    * Pull the basic config for setting up Kibana from the following URL and place it at host's `/etc/kibana/kibana.yml`: 
+https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/kibana.yml
+    * Update the IP field to point to the hosts's public.
+    * Start the elastic service by running `systemctl start kibana` as root
 
-The `install-and-run-metricbeat.sh` script is hooked onto `genesis.tf` and `node.tf` file in the root dir. Therefore, we can directly call `up.sh` to start a testnet with metricbeat instances automatically getting setup and enabled alongside every node that is spun-up.
+Note(optional): The config can be tweaked to setup security if necessary in the future
 
-## License
+Kibana usually takes a couple of minutes to start it's serivce, therefore please allow some wait time before proceeding.
 
-This SAFE Network library is dual-licensed under the Modified BSD ([LICENSE-BSD](LICENSE-BSD) https://opensource.org/licenses/BSD-3-Clause) or the MIT license ([LICENSE-MIT](LICENSE-MIT) https://opensource.org/licenses/MIT) at your option.
+Likewise with ElasticSearch, this will start a Kibana instance at `<KIBANA-MACHINE-PUBLIC-IP>:5601`. To verify if the setup went fine: open 
+`http://<KIBANA-MACHINE-PUBLIC-IP>:5601` in a web browser to see Kibana's homepage.
 
-## Contributing
+### Metricbeat
 
-Want to contribute? Great :tada:
+Metricbeat is automatically hooked onto to all our D.O. nodes via terraform using the `install-and-run-metricbeat.sh` script at 
+https://github.com/maidsafe/sn_testnet_tool/blob/main/scripts/ELK/install-and-run-metricbeat.sh.
 
-There are many ways to give back to the project, whether it be writing new code, fixing bugs, or just reporting errors. All forms of contributions are encouraged!
+**The only pre-requisite for metricbeat to work is to have a valid metricbeat config at https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml**. The template for a 
+valid config is at https://github.com/maidsafe/sn_testnet_tool/blob/main/scripts/ELK/templates/metricbeat.yml. The config needs to be updated with the public IPs for Elastic and 
+Kibana services that we have started above and needs to be placed at the aforementioned S3 storage location(https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml). 
+This will then be picked up by all nodes that get spun-up with the sn_testnet_tool to start their metricbeat services.
 
-For instructions on how to contribute, see our [Guide to contributing](https://github.com/maidsafe/QA/blob/master/CONTRIBUTING.md).
+All of the above is done by the `upload-metricbeat-config.sh` script at: https://github.com/Yoga07/sn_testnet_tool/blob/auto-start/scripts/ELK/upload-metricbeat-config.sh
+
+Note: This makes use of AWS, therefore requires the user's AWS keys to be set in the env vars.
+
+The script expects two arguments:
+1. ElasticSearch's IP
+2. Kibana's IP
+
+Therefore run the script in the following format
+```
+./upload-metricbeat-config.sh <ELASTIC-MACHINE-PUBLIC-IP> <KIBANA-MACHINE-PUBLIC-IP>
+```
+
+This will upload the updated config to S3 that will be used by testnet nodes on network startup to connect to the ELK stack.
+
+
+## Ready-made visualizations
+
+- There is a readily availabe dashboard provided by metricbeat at `http://<KIBANA-IP>:5601/app/dashboards#/view/Metricbeat-system-overview-ecs` that gives us an overview of all 
+the metricbeat nodes that are connected to the ELK stack. 
+- Another place to mointor the nodes is at `http://<KIBANA-IP>:5601/app/metrics/inventory` where we can scrutinize all the nodes individually using filters and look into their 
+details.
+
+
+## Futher optimizations
+
+The whole setup process can be automated via using Ansible to provision machines and take note of their IPs to furnish the configs such that metricbeat setup does not have to rely 
+on S3 locations to fetch configs.
