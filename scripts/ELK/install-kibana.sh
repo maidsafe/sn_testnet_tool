@@ -8,7 +8,6 @@ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearm
 
 echo "Installing required libs"
 sudo apt-get install apt-transport-https -y > /dev/null 2>&1
-sudo apt-get install rpl -y > /dev/null 2>&1
 
 # Write to source
 echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
@@ -28,8 +27,8 @@ ip=$(curl ident.me)
 
 # Replace the IP placeholder with host's public IP
 echo "Replacing placeholders with Public IPs of Elastic"
-rpl "<ELASTIC-MACHINE-PUBLIC-IP>" "${ELASTIC-IP}" /etc/kibana/kibana.yml
-rpl "<KIBANA-MACHINE-PUBLIC-IP>" "${ip}" /etc/kibana/kibana.yml
+sed -i "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC-IP}/g" /etc/kibana/kibana.yml
+sed -i "s/<KIBANA-MACHINE-PUBLIC-IP>/${ip}/g" /etc/kibana/kibana.yml
 
 # Start the service
 systemctl start kibana
