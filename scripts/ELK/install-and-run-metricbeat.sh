@@ -17,13 +17,16 @@ rm -rf /etc/metricbeat/metricbeat.yml
 
 # Pull metricbeat config file from s3
 metric_beat_url="https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml"
-wget ${metric_beat_url} -O /etc/metricbeat/metricbeat.yml
+wget ${metric_beat_url} -O metricbeat.yml
 
 # Get hostname
 name=$(hostname)
 
 # Search and replace hostname in config
-sed -i "s/<MACHINE-NAME>/${name}/g" /etc/metricbeat/metricbeat.yml
+sed -e "s/<MACHINE-NAME>/${name}/g" metricbeat.yml > /etc/metricbeat/metricbeat.yml
+
+# Cleanup residual config
+rm metricbeat.yml
 
 # Start the service
 systemctl start metricbeat
