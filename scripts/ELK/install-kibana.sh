@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ELASTIC-IP=${1}
+ELASTIC=${1}
 
 # Add gpg keys and install Kibana
 echo "Setting up gpg keys"
@@ -19,7 +19,7 @@ sudo apt-get install kibana -y > /dev/null 2>&1
 
 # Write customised config over default config
 echo "Pull config from S3"
-wget https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/ELK/templates/kibana.yml -O /etc/kibana/kibana.yml
+wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/kibana.yml -O /etc/kibana/kibana.yml
 
 # Get public IP
 echo "Fetching Public IP"
@@ -27,7 +27,7 @@ ip=$(curl ident.me)
 
 # Replace the IP placeholder with host's public IP
 echo "Replacing placeholders with Public IPs of Elastic"
-sed -i "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC-IP}/g" /etc/kibana/kibana.yml
+sed -i "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC}/g" /etc/kibana/kibana.yml
 sed -i "s/<KIBANA-MACHINE-PUBLIC-IP>/${ip}/g" /etc/kibana/kibana.yml
 
 # Start the service
