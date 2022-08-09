@@ -11,7 +11,6 @@ echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://arti
 echo "Installing Metricbeat"
 sudo apt-get update > /dev/null 2>&1
 sudo apt-get install metricbeat > /dev/null 2>&1
-sudo apt-get install rpl > /dev/null 2>&1
 
 # Remove default config
 rm -rf /etc/metricbeat/metricbeat.yml
@@ -24,7 +23,7 @@ wget ${metric_beat_url} -O /etc/metricbeat/metricbeat.yml
 name=$(hostname)
 
 # Search and replace hostname in config
-rpl "<MACHINE-NAME>" "${name}" /etc/metricbeat/metricbeat.yml
+sed -i "s/<MACHINE-NAME>/${name}/g" /etc/metricbeat/metricbeat.yml
 
 # Start the service
 systemctl start metricbeat
