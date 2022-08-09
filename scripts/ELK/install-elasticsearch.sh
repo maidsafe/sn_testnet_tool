@@ -17,7 +17,7 @@ sudo apt-get install elasticsearch -y > /dev/null 2>&1
 
 # Write customised config over default config
 echo "Pull config from S3"
-wget https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/ELK/templates/elasticsearch.yml -O /etc/elasticsearch/elasticsearch.yml
+wget https://raw.githubusercontent.com/maidsafe/sn_testnet_tool/main/scripts/ELK/templates/elasticsearch.yml -O /etc/elasticsearch/elasticsearch.yml
 
 # Get public IP
 echo "Fetching Public IP"
