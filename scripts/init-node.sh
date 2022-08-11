@@ -111,7 +111,7 @@ function run_node() {
   else
     node_cmd=$(printf '%s' \
       "heaptrack ./sn_node " \
-      "--network-contacts-file ~/.safe/prefix_map " \
+      "--network-contacts-file ~/.safe/prefix-map " \
       "--skip-auto-port-forwarding " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \
