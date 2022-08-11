@@ -74,6 +74,7 @@ function install_node() {
   tar xf $archive_name
   chmod +x sn_node
   mkdir -p ~/node_data
+  mkdir -p ~/.safe/prefix_maps
   mkdir -p ~/.safe/node
   mkdir -p ~/logs
 }
