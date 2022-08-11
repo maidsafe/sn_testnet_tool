@@ -3,8 +3,6 @@
 # This is mainly intended to be used for debugging the nightly run.
 # It's expecting the ip list file to be in the same directory the script is running from.
 
-set -e
-
 testnet_channel="$1"
 if [[ -z "$testnet_channel" ]]; then
   echo "The name of the testnet must be provided"
