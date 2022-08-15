@@ -65,7 +65,7 @@ Example using a local `sn_node` binary:
 Note: both [node bin] and [node version] can't be set at the same time. You must use one or the other (or neither).
 Note 2: the absolute path to the node binary must be supplied.
 
-There's also a utility Makefile, so you can launch a testnet with `make alpha` or `make beta` using a set of defaults. Set any of `SN_TESTNET_SSH_KEY_PATH`, `SN_TESTNET_NODE_COUNT`, `SN_TESTNET_NODE_BIN_PATH` or `SN_TESTNET_NODE_VERSION` to use custom versions of any of these. This launches the testnet with 20 nodes by default (to support file put/get), and also copies the connection information to `~/.safe/prefix_maps/{channel}-prefix-map`.
+There's also a utility Makefile, so you can launch a testnet with `make alpha` or `make beta` using a set of defaults. Set any of `SN_TESTNET_SSH_KEY_PATH`, `SN_TESTNET_NODE_COUNT`, `SN_TESTNET_NODE_BIN_PATH` or `SN_TESTNET_NODE_VERSION` to use custom versions of any of these. This launches the testnet with 20 nodes by default (to support file put/get), and also copies the connection information to `~/.safe/network_contacts/{channel}-network-contacts`.
 
 Bring down a network:
 
@@ -99,7 +99,7 @@ See continual network status:
 ./scripts/use-network
 ```
 
-Will copy the current workspace prefix-map to your `~/.safe/prefix_maps/{testnet-channel}-prefix-map`
+Will copy the current workspace network-contacts to your `~/.safe/network_contacts/{testnet-channel}-network-contacts`
 
 ##  Building for profiling
 

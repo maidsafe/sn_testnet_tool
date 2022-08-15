@@ -74,14 +74,14 @@ function install_node() {
   tar xf $archive_name
   chmod +x sn_node
   mkdir -p ~/node_data
-  mkdir -p ~/.safe/prefix_maps
+  mkdir -p ~/.safe/network_contacts
   mkdir -p ~/.safe/node
   mkdir -p ~/logs
 }
 
-function setup_prefix_map() {
+function setup_network_contacts() {
   if [[ "$is_genesis" == "false" ]]; then
-    cp prefix-map ~/.safe/prefix-map
+    cp network-contacts ~/.safe/network-contacts
   fi
 }
 
@@ -101,7 +101,7 @@ function run_node() {
     echo "Launching node with: $node_cmd"
     nohup sh -c "$node_cmd" &
     sleep 5
-    cp ~/node_data/prefix_map ~/prefix-map
+    cp ~/node_data/section_tree ~/network-contacts
     (
       cd ~/logs
       grep --extended-regexp --only-matching --no-filename ".*Genesis node started.*" sn_node.log* |
@@ -111,7 +111,7 @@ function run_node() {
   else
     node_cmd=$(printf '%s' \
       "heaptrack ./sn_node " \
-      "--network-contacts-file ~/.safe/prefix-map " \
+      "--network-contacts-file ~/.safe/network-contacts " \
       "--skip-auto-port-forwarding " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \
@@ -125,5 +125,5 @@ function run_node() {
 
 install_heaptrack
 install_node
-setup_prefix_map
+setup_network_contacts
 run_node

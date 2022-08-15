@@ -34,11 +34,11 @@ resource "digitalocean_droplet" "testnet_genesis" {
     command = <<EOH
       echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > ${terraform.workspace}-ip-list
       echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
-      rm -f ${terraform.workspace}-prefix-map
+      rm -f ${terraform.workspace}-network-contacts
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
-      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/prefix-map ${terraform.workspace}-prefix-map
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/network-contacts ${terraform.workspace}-network-contacts
       rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/genesis-key ${terraform.workspace}-genesis-key
     EOH
   }
