@@ -16,8 +16,8 @@ alpha:
 		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
 	rm -rf ~/.safe
-	mkdir -p ~/.safe/prefix_maps
-	cp alpha-prefix-map ~/.safe/prefix_maps/default
+	mkdir -p ~/.safe/network_contacts
+	cp alpha-network-contacts ~/.safe/network_contacts/default
 	cp alpha-genesis-dbc ~/.safe/genesis_dbc
 
 clean-alpha:
@@ -37,8 +37,8 @@ beta:
 		"${SN_TESTNET_CLIENT_COUNT}" \
 		"-auto-approve"
 	rm -rf ~/.safe
-	mkdir -p ~/.safe/prefix_maps
-	cp beta-prefix-map ~/.safe/prefix_maps/default
+	mkdir -p ~/.safe/network_contacts
+	cp beta-network-contacts ~/.safe/network_contacts/default
 	cp beta-genesis-dbc ~/.safe/genesis_dbc
 
 clean-beta:

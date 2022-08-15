@@ -18,10 +18,10 @@ resource "digitalocean_droplet" "testnet_client" {
     digitalocean_droplet.testnet_genesis,
   ]
 
-  # upload the genesis node prefix map
+  # upload the genesis node network contacts
   provisioner "file" {
-    source      = "${terraform.workspace}-prefix-map"
-    destination = "prefix-map"
+    source      = "${terraform.workspace}-network-contacts"
+    destination = "network-contacts"
   }
 
   provisioner "file" {
