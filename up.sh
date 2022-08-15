@@ -89,14 +89,14 @@ function copy_ips_to_s3() {
     --acl public-read
 }
 
-function pull_prefix_map_and_copy_to_s3() {
+function pull_network_contacts_and_copy_to_s3() {
   local genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  local prefix_map_path="$testnet_channel-prefix-map"
-  echo "Pulling PrefixMap from Genesis node"
-  rsync root@"$genesis_ip":~/prefix-map "$prefix_map_path"
+  local network_contacts_path="$testnet_channel-network-contacts"
+  echo "Pulling network contacts file from Genesis node"
+  rsync root@"$genesis_ip":~/network-contacts "$network_contacts_path"
   aws s3 cp \
-    "$prefix_map_path" \
-    "s3://safe-testnet-tool/$testnet_channel-prefix-map" \
+    "$network_contacts_path" \
+    "s3://safe-testnet-tool/$testnet_channel-network-contacts" \
     --acl public-read
 }
 
@@ -125,6 +125,6 @@ function pull_genesis_key_and_copy_to_s3() {
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
-pull_prefix_map_and_copy_to_s3
+pull_network_contacts_and_copy_to_s3
 pull_genesis_dbc_and_copy_to_s3
 pull_genesis_key_and_copy_to_s3

@@ -46,13 +46,13 @@ function init_node_dirs() {
   chmod +x ./loop_client_tests.sh
   mkdir -p ~/node_data
   mkdir -p ~/.safe/node
-  mkdir -p ~/.safe/prefix_maps
+  mkdir -p ~/.safe/network_contacts
   mkdir -p ~/logs
 }
 
-function setup_prefix_map() {
-  cp prefix-map ~/.safe/prefix_maps/prefix-map
-  ln -s ~/.safe/prefix_maps/prefix-map ~/.safe/prefix_maps/default
+function setup_network_contacts() {
+  cp network_contacts ~/.safe/network_contacts/network_contacts
+  ln -s ~/.safe/network_contacts/network_contacts ~/.safe/network_contacts/default
 }
 
 function build_client_tests() {
@@ -73,5 +73,5 @@ function build_client_tests() {
 
 setup_build_tools
 init_node_dirs
-setup_prefix_map
+setup_network_contacts
 build_client_tests

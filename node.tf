@@ -20,8 +20,8 @@ resource "digitalocean_droplet" "testnet_node" {
 
   # upload the genesis node prefix map
   provisioner "file" {
-    source      = "${terraform.workspace}-prefix-map"
-    destination = "prefix-map"
+    source      = "${terraform.workspace}-network-contacts"
+    destination = "network-contacts"
   }
 
   provisioner "file" {
