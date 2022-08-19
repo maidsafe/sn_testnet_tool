@@ -10,7 +10,7 @@ resource "digitalocean_droplet" "testnet_client" {
     host        = self.ipv4_address
     user        = "root"
     type        = "ssh"
-    timeout     = "1m"
+    timeout     = "5m"
     private_key = file(var.pvt_key)
   }
 

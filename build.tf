@@ -10,7 +10,7 @@ resource "digitalocean_droplet" "node_builder" {
         host = self.ipv4_address
         user = "root"
         type = "ssh"
-        timeout = "1m"
+        timeout = "5m"
         # agent=true
         private_key = file(var.pvt_key)
     }
