@@ -51,8 +51,8 @@ function init_node_dirs() {
 }
 
 function setup_network_contacts() {
-  cp network_contacts ~/.safe/network_contacts/network_contacts
-  ln -s ~/.safe/network_contacts/network_contacts ~/.safe/network_contacts/default
+  cp our-contacts ~/.safe/network_contacts/our-contacts
+  ln -s ~/.safe/network_contacts/our-contacts ~/.safe/network_contacts/default
 }
 
 function build_client_tests() {
