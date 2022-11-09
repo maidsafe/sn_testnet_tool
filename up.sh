@@ -81,11 +81,11 @@ function copy_ips_to_s3() {
   # This is only really used for debugging the nightly run.
   aws s3 cp \
     "$testnet_channel-ip-list" \
-    "s3://safe-testnet-tool/$testnet_channel-ip-list" \
+    "s3://sn_node/testnet_tool/$testnet_channel-ip-list" \
     --acl public-read
   aws s3 cp \
     "$testnet_channel-genesis-ip" \
-    "s3://safe-testnet-tool/$testnet_channel-genesis-ip" \
+    "s3://sn_node/testnet_tool/$testnet_channel-genesis-ip" \
     --acl public-read
 }
 
@@ -96,7 +96,7 @@ function pull_network_contacts_and_copy_to_s3() {
   rsync root@"$genesis_ip":~/network-contacts "$network_contacts_path"
   aws s3 cp \
     "$network_contacts_path" \
-    "s3://safe-testnet-tool/$testnet_channel-network-contacts" \
+    "s3://sn_node/testnet_tool/$testnet_channel-network-contacts" \
     --acl public-read
 }
 
@@ -107,7 +107,7 @@ function pull_genesis_dbc_and_copy_to_s3() {
   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
   aws s3 cp \
     "$genesis_dbc_path" \
-    "s3://safe-testnet-tool/$testnet_channel-genesis-dbc" \
+    "s3://sn_node/testnet_tool/$testnet_channel-genesis-dbc" \
     --acl public-read
 }
 
@@ -118,7 +118,7 @@ function pull_genesis_key_and_copy_to_s3() {
   rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
   aws s3 cp \
     "$genesis_key_path" \
-    "s3://safe-testnet-tool/$testnet_channel-genesis-key" \
+    "s3://sn_node/testnet_tool/$testnet_channel-genesis-key" \
     --acl public-read
 }
 
