@@ -6,8 +6,8 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "safe-testnet-tool"
-    key    = "terraform.tfstate"
+    bucket = "maidsafe-org-infra-tfstate"
+    key    = "testnet_tool_terraform.tfstate"
     region = "eu-west-2"
   }
 }
