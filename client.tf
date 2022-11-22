@@ -21,7 +21,7 @@ resource "digitalocean_droplet" "testnet_client" {
   # upload the genesis node network contacts
   provisioner "file" {
     source      = "${terraform.workspace}-network-contacts"
-    destination = "network-contacts"
+    destination = "network_contacts"
   }
 
   provisioner "file" {
