@@ -33,15 +33,15 @@ resource "digitalocean_droplet" "testnet_client" {
     source      = "./scripts/loop_client_tests.sh"
     destination = "loop_client_tests.sh"
   }
-
-  provisioner "local-exec" {
-    command = <<EOH
-      echo "Downloading test-data from s3://safe-test-data to test-data"
-      aws s3 cp \
-        "s3://sn_node/test-data" \
-        "test-data"
-    EOH
-  }
+  # TODO: readd once we have this set up again
+  # provisioner "local-exec" {
+  #   command = <<EOH
+  #     echo "Downloading test-data from s3://safe-test-data to test-data"
+  #     aws s3 cp \
+  #       "s3://sn_node/test-data" \
+  #       "test-data"
+  #   EOH
+  # }
 
   provisioner "remote-exec" {
     inline = [
