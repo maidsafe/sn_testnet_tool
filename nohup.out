@@ -1,0 +1,142 @@
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/rsync.c(244) [generator=2.6.9]
+rsync error: received SIGUSR1 (code 19) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/main.c(1201) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.40.63: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@138.68.163.102: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.169: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.212: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.40.13: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.40.66: Permission denied (publickey).
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.143: Permission denied (publickey).
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.153: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.216: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@157.245.42.196: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.135: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.148: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.108: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.32.226: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.53: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@159.65.54.140: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.15: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.207: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.47: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.21: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.84: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.200: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.62: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.37: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@209.97.136.176: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@161.35.36.18: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@188.166.170.155: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
+sign_and_send_pubkey: signing failed for RSA "SSH Key" from agent: agent refused operation
+no such identity: /Users/josh/.ssh/github_rsa: No such file or directory
+root@178.62.93.70: Permission denied (publickey).
+rsync: connection unexpectedly closed (0 bytes received so far) [receiver]
+rsync error: unexplained error (code 255) at /AppleInternal/Library/BuildRoots/a0876c02-1788-11ed-b9c4-96898e02b808/Library/Caches/com.apple.xbs/Sources/rsync/rsync/io.c(453) [receiver=2.6.9]
