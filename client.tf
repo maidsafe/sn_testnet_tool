@@ -38,7 +38,7 @@ resource "digitalocean_droplet" "testnet_client" {
   #   command = <<EOH
   #     echo "Downloading test-data from s3://safe-test-data to test-data"
   #     aws s3 cp \
-  #       "s3://sn_node/test-data" \
+  #       "s3://sn-node/test-data" \
   #       "test-data"
   #   EOH
   # }

@@ -34,7 +34,7 @@ fi
 sed -e "s/<ELASTIC-MACHINE-PUBLIC-IP>/${ELASTIC}/g" -e "s/<KIBANA-MACHINE-PUBLIC-IP>/${KIBANA}/g" ./scripts/ELK/templates/metricbeat.yml > metricbeat.yml
 
 # Upload the updated config to s3 for nodes to use
-aws s3 cp metricbeat.yml s3://sn_node/testnet_tool/metricbeat.yml --acl public-read
+aws s3 cp metricbeat.yml s3://sn-node/testnet_tool/metricbeat.yml --acl public-read
 
 # Remove the backup file that is created by using sed
 rm metricbeat.yml
