@@ -81,7 +81,7 @@ function install_node() {
 
 function setup_network_contacts() {
   if [[ "$is_genesis" == "false" ]]; then
-    cp network_contacts ~/.safe/network_contacts
+    cp network-contacts ~/.safe/network-contacts
   fi
 }
 

@@ -24,24 +24,29 @@ resource "digitalocean_droplet" "testnet_client" {
     destination = "network_contacts"
   }
 
+  provisioner "remote-exec"  {
+    script     = "./scripts/ELK/install-and-run-metricbeat.sh"
+  }
+
   provisioner "file" {
     source      = "./scripts/init-client-node.sh"
     destination = "/tmp/init-client-node.sh"
   }
 
-  provisioner "file" {
+
+  provisioner "file"  {
     source      = "./scripts/loop_client_tests.sh"
     destination = "loop_client_tests.sh"
   }
-  # TODO: readd once we have this set up again
-  # provisioner "local-exec" {
-  #   command = <<EOH
-  #     echo "Downloading test-data from s3://safe-test-data to test-data"
-  #     aws s3 cp \
-  #       "s3://sn-node/test-data" \
-  #       "test-data"
-  #   EOH
-  # }
+  
+  provisioner "file" {
+    source      = "./tests/index"
+    destination = "index"
+  }
+  provisioner "file" {
+    source      = "./scripts/dl_files.sh"
+    destination = "dl_files.sh"
+  }
 
   provisioner "remote-exec" {
     inline = [
@@ -49,11 +54,28 @@ resource "digitalocean_droplet" "testnet_client" {
       "/tmp/init-client-node.sh \"${var.repo_owner}\" \"${var.commit_hash}\"",
     ]
   }
+  provisioner "file" {
+    source      = "./safe"
+    destination = "safe"
+  }
+
 
   provisioner "remote-exec" {
-    script     = "scripts/ELK/install-and-run-metricbeat.sh"
-    on_failure = continue
+    inline = [
+     " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
+      "apt install wget unzip -y",
+      "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
+      "unzip ./the-test-data.zip",
+      "chmod +x ./safe",
+      "cp ./safe /usr/local/bin/safe",
+      "nohup time safe files put -r test-data &",
+      "nohup ./loop_client_tests &",
+      "sleep 5" # this helps nohup start properly
+    ]
   }
+  
+
+
 
   provisioner "local-exec" {
     command = <<EOH

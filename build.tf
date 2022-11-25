@@ -65,7 +65,8 @@ resource "digitalocean_droplet" "node_builder" {
             "apt -qq install build-essential -y",
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
-            "RUSTFLAGS=\"-C debuginfo=1\" cargo -q build --release -p sn_node",
+            "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bin sn_node",
+            "cargo build --release --bin safe",
             # "cargo -q test --release --no-run -p sn_client",
         ]
     }
@@ -75,7 +76,8 @@ resource "digitalocean_droplet" "node_builder" {
             mkdir -p ~/.ssh/
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            rsync root@${self.ipv4_address}:/root/safe_network/target/release/sn_node .
+            scp root@${self.ipv4_address}:/root/safe_network/target/release/safe .
+            scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node .
         EOH
     }
     # rsync root@${self.ipv4_address}:/root/safe_network/target/release/deps/sn_client* ${var.working_dir}

@@ -19,7 +19,7 @@ mkdir -p logs/${TESTNET_CHANNEL}
 cat ${TESTNET_CHANNEL}-ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
-  rsync root@${ip}:~/logs/sn_node.log logs/${TESTNET_CHANNEL}/${name} &
+  rsync -P root@${ip}:~/logs/sn_node.log logs/${TESTNET_CHANNEL}/sn_node.log
 done
 wait
 
