@@ -16,7 +16,7 @@ sudo apt-get install metricbeat > /dev/null 2>&1
 rm -rf /etc/metricbeat/metricbeat.yml
 
 # Pull metricbeat config file from s3
-metric_beat_url="https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml"
+metric_beat_url="https://sn-node.s3.eu-west-2.amazonaws.com/testnet_tool/metricbeat.yml"
 wget ${metric_beat_url} -O metricbeat.yml
 
 # Get hostname

@@ -94,25 +94,11 @@ Likewise with ElasticSearch, this will start a Kibana instance at `<KIBANA-MACHI
 Metricbeat is automatically hooked onto to all our D.O. nodes via terraform using the `install-and-run-metricbeat.sh` script at 
 https://github.com/maidsafe/sn_testnet_tool/blob/main/scripts/ELK/install-and-run-metricbeat.sh.
 
-**The only pre-requisite for metricbeat to work is to have a valid metricbeat config at https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml**. The template for a 
+**The only pre-requisite for metricbeat to work is to have a valid metricbeat config at https://sn-node.s3.eu-west-2.amazonaws.com/testnet_tool/metricbeat.yml**. The template for a 
 valid config is at https://github.com/maidsafe/sn_testnet_tool/blob/main/scripts/ELK/templates/metricbeat.yml. The config needs to be updated with the public IPs for Elastic and 
-Kibana services that we have started above and needs to be placed at the aforementioned S3 storage location(https://safe-testnet-tool.s3.eu-west-2.amazonaws.com/metricbeat.yml). 
+Kibana services that we have started above and needs to be placed at the aforementioned S3 storage location(https://sn-node.s3.eu-west-2.amazonaws.com/testnet_tool/metricbeat.yml). 
 This will then be picked up by all nodes that get spun-up with the sn_testnet_tool to start their metricbeat services.
 
-All of the above is done by the `upload-metricbeat-config.sh` script at: https://github.com/Yoga07/sn_testnet_tool/blob/auto-start/scripts/ELK/upload-metricbeat-config.sh
-
-Note: This makes use of AWS, therefore requires the user's AWS keys to be set in the env vars.
-
-The script expects two arguments:
-1. ElasticSearch's IP
-2. Kibana's IP
-
-Therefore run the script in the following format
-```
-./upload-metricbeat-config.sh <ELASTIC-MACHINE-PUBLIC-IP> <KIBANA-MACHINE-PUBLIC-IP>
-```
-
-This will upload the updated config to S3 that will be used by testnet nodes on network startup to connect to the ELK stack.
 
 
 ## Ready-made visualizations
