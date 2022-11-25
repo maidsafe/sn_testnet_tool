@@ -64,9 +64,9 @@ function run_terraform_apply() {
     node_url="${SN_NODE_URL_PREFIX}/$archive_name"
     archive_path="/tmp/$archive_name"
     echo "Creating $archive_path..."
-    tar -C $path -zcvf $archive_path sn_node
-    echo "Uploading $archive_path to S3..."
-    aws s3 cp $archive_path s3://sn-node --acl public-read
+    # tar -C $path -zcvf $archive_path sn_node
+    # echo "Uploading $archive_path to S3..."
+    # aws s3 cp $archive_path s3://sn-node --acl public-read
   fi
   terraform apply \
     -var "do_token=${DO_PAT}" \

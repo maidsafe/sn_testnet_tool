@@ -11,8 +11,10 @@ cleanup() {
   # script cleanup here
 }
 
+export TMPDIR=~/tests
+
 count=0
-cat ./tests/indexxx | while read line; do
+cat ./tests/index | while read line; do
 
   type=$(echo $line | awk '{print $1}')
   url=$(echo $line | awk '{print $2}')

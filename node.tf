@@ -21,7 +21,7 @@ resource "digitalocean_droplet" "testnet_node" {
   # upload the genesis node prefix map
   provisioner "file" {
     source      = "${terraform.workspace}-network-contacts"
-    destination = "network_contacts"
+    destination = "network-contacts"
   }
 
   provisioner "file" {
@@ -40,7 +40,6 @@ resource "digitalocean_droplet" "testnet_node" {
 
   provisioner "remote-exec" {
     script      = "scripts/ELK/install-and-run-metricbeat.sh"
-    on_failure  = continue
   }
 
   provisioner "local-exec" {

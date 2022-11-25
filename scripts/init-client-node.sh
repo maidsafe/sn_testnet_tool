@@ -44,10 +44,13 @@ function setup_build_tools() {
 
 function init_node_dirs() {
   chmod +x ./loop_client_tests.sh
+  chmod +x ./dl_files.sh
   mkdir -p ~/node_data
   mkdir -p ~/.safe/node
+  mkdir -p ~/tests
   mkdir -p ~/.safe/network_contacts
   mkdir -p ~/logs
+  mv index tests/index
 }
 
 function setup_network_contacts() {
@@ -65,9 +68,26 @@ function build_client_tests() {
   client_test_cmd=$(printf '%s' \
     "cd safe_network/sn_client && " \
     "source $HOME/.cargo/env && " \
-    "cargo test --release -- --skip spent" \
+    "cargo test --release --no-run" \
   )
+
   nohup bash -c "$client_test_cmd" &
+  
+  sleep 5 # For some reason this is necessary for the persistence of the process launched by nohup.
+}
+
+
+function put_test_data() {
+
+  export RUST_LOG=sn_client,sn_cli
+  
+  put_data_cmd=$(printf '%s' \
+    "safe -V && " \
+    "safe files put -r test-data" \
+  )
+  
+  nohup bash -c "$put_data_cmd" &
+  
   sleep 5 # For some reason this is necessary for the persistence of the process launched by nohup.
 }
 
@@ -75,3 +95,4 @@ setup_build_tools
 init_node_dirs
 setup_network_contacts
 build_client_tests
+put_test_data

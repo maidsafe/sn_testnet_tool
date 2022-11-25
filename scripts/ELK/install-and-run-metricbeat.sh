@@ -28,6 +28,9 @@ sed -e "s/<MACHINE-NAME>/${name}/g" metricbeat.yml > /etc/metricbeat/metricbeat.
 # Cleanup residual config
 rm metricbeat.yml
 
+# small wait to avoid missing file errors starting up
+sleep 5
+
 # Start the service
 systemctl start metricbeat
 systemctl enable metricbeat

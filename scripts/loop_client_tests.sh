@@ -14,8 +14,8 @@ cleanup() {
 
 cd safe_network/sn_client
 
-# run 10 times, increment counter once per iter
-for i in {0..10..1}
+# run 50 times, increment counter once per iter
+for i in {0..50..1}
 do
   echo "iteration $i, time:"
   RUST_LOG=sn_client cargo test --release -- --skip spent > ../../test-$i.log || true

@@ -57,7 +57,8 @@ variable "region" {
 variable "build-size" {
   # default = "s-1vcpu-1gb"
   # default = "s-4vcpu-8gb"
-  default = "s-8vcpu-16gb"
+  # default = "s-8vcpu-16gb"
+  default = "c-16"
 }
 
 variable "node-size" {
