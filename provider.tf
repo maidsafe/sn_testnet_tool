@@ -40,7 +40,6 @@ variable "ssh_keys" {
     19315097, # Stephen Coyle
     29201567, # Josh Wilson
     29586082, # Gabriel Viganotti
-    29690435, # Yogeshwar Murugan
     29690776, # Edward Holst
     30643816, # Anselme Grumbach
     30113222, # Qi Ma
