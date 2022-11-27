@@ -15,10 +15,10 @@ cleanup() {
 
 # source "$script_dir/../scripts/droplet-operations"
 
-aws s3 cp "s3://sn_node/testnet_tool/$TESTNET_CHANNEL-ip-list" "$TESTNET_CHANNEL-ip-list"
-aws s3 cp "s3://sn_node/testnet_tool/$TESTNET_CHANNEL-ip-list" "$TESTNET_CHANNEL-client-ip"
-aws s3 cp "s3://sn_node/testnet_tool/$TESTNET_CHANNEL-genesis-ip" "$TESTNET_CHANNEL-genesis-ip"
-aws s3 cp "s3://sn_node/testnet_tool/$TESTNET_CHANNEL-network-contacts" "$TESTNET_CHANNEL-network-contacts"
+aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-ip-list" "$TESTNET_CHANNEL-ip-list"
+aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-ip-list" "$TESTNET_CHANNEL-client-ip"
+aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-genesis-ip" "$TESTNET_CHANNEL-genesis-ip"
+aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-network-contacts" "$TESTNET_CHANNEL-network-contacts"
 ./scripts/register_keys.sh
 
 cleanup
