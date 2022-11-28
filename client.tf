@@ -69,13 +69,9 @@ resource "digitalocean_droplet" "testnet_client" {
       "chmod +x ./safe",
       "cp ./safe /usr/local/bin/safe",
       "nohup time safe files put -r test-data &",
-      "nohup ./loop_client_tests &",
-      "sleep 5" # this helps nohup start properly
     ]
   }
   
-
-
 
   provisioner "local-exec" {
     command = <<EOH
@@ -83,6 +79,7 @@ resource "digitalocean_droplet" "testnet_client" {
       touch ~/.ssh/known_hosts
       echo ${self.ipv4_address} > ${terraform.workspace}-client-ip
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
+      ./scripts/run_client_tests_for_workspace.sh
     EOH
   }
 }
