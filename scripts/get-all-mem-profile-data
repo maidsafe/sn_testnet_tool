@@ -12,13 +12,13 @@ cleanup() {
   # script cleanup here
 }
 
-mkdir -p memory-profiling/${TESTNET_CHANNEL}
+mkdir -p workspace/${TESTNET_CHANNEL}/memory-profiling/
 
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   echo "$name @ $ip"
-  rsync -P root@${ip}:"~/heaptrack*" memory-profiling/${TESTNET_CHANNEL}/heaptrack.${name}___${ip}.zst &
+  rsync -P root@${ip}:"~/heaptrack*" workspace/${TESTNET_CHANNEL}/memory-profiling/heaptrack.${name}___${ip}.zst &
 done
 
 cleanup

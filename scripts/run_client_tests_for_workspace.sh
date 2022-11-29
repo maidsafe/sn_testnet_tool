@@ -13,6 +13,6 @@ cleanup() {
 }
 
 echo "Running client tests from ${TESTNET_CHANNEL} client node"
-ssh root@$(cat ${TESTNET_CHANNEL}-client-ip) 'nohup ./loloop_client_tests.sh'
+ssh root@$(cat workspace/${TESTNET_CHANNEL}/client-ip) 'nohup ./loop_client_tests.sh &'
 
 cleanup

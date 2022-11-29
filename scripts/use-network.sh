@@ -9,7 +9,7 @@ echo ""
 rm -rf ~/.safe/qp2p || true
 rm -rf "$HOME/.safe/network_contacts/${TESTNET_CHANNEL}" || true
 mkdir -p ~/.safe/network_contacts
-cp "${TESTNET_CHANNEL}-network-contacts" "$HOME/.safe/network_contacts/default"
+cp "workspace/${TESTNET_CHANNEL}/network-contacts" "$HOME/.safe/network_contacts/default"
 
 
 echo "You are now ready to use the $TESTNET_CHANNEL network"

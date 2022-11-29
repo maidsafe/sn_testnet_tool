@@ -32,14 +32,14 @@ resource "digitalocean_droplet" "testnet_genesis" {
 
   provisioner "local-exec" {
     command = <<EOH
-      echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > ${terraform.workspace}-ip-list
-      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > ${terraform.workspace}-genesis-ip
-      rm -f ${terraform.workspace}-network-contacts
+      echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > workspace/${terraform.workspace}/ip-list
+      echo ${digitalocean_droplet.testnet_genesis.ipv4_address} > workspace/${terraform.workspace}/genesis-ip
+      rm -f workspace/${terraform.workspace}-network-contacts
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       ssh-keyscan -H ${digitalocean_droplet.testnet_genesis.ipv4_address} >> ~/.ssh/known_hosts
-      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/network-contacts ${terraform.workspace}-network-contacts
-      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/genesis-key ${terraform.workspace}-genesis-key
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/network-contacts workspace/${terraform.workspace}/network-contacts
+      rsync root@${digitalocean_droplet.testnet_genesis.ipv4_address}:~/genesis-key workspace/${terraform.workspace}/genesis-key
     EOH
   }
 }

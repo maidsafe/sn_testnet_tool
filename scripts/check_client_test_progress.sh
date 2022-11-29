@@ -13,6 +13,6 @@ cleanup() {
 }
 
 echo "Client node tests info: $TESTNET_CHANNEL:"
-stats=$(ssh root@$(cat ${TESTNET_CHANNEL}-client-ip) 'rg " passed;" *.log --stats' ) && echo "${stats}" &
+stats=$(ssh root@$(cat workspace/${TESTNET_CHANNEL}/client-ip) 'rg " passed;" *.log --stats' ) && echo "${stats}" &
 
 cleanup

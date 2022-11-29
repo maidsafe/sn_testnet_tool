@@ -59,14 +59,15 @@ function run_terraform_apply() {
     fi
     # The term 'custom' is used here rather than 'musl' because a locally built binary may not
     # be a musl build.
-    local path=$(dirname "${NODE_BIN_PATH}")
+    local path=$(dirname "./workspace/${testnet_channel}/sn_node")
+    echo "Using node from $path"
     archive_name="sn_node-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
     node_url="${SN_NODE_URL_PREFIX}/$archive_name"
     archive_path="/tmp/$archive_name"
-    echo "Creating $archive_path..."
-    # tar -C $path -zcvf $archive_path sn_node
-    # echo "Uploading $archive_path to S3..."
-    # aws s3 cp $archive_path s3://sn-node --acl public-read
+    echo "Creating $archive_path from ./workspace/${testnet_channel}-sn_node..."
+    tar -C $path -zcvf $archive_path sn_node
+    echo "Uploading $archive_path to S3..."
+    aws s3 cp $archive_path s3://sn-node --acl public-read
   fi
   terraform apply \
     -var "do_token=${DO_PAT}" \
@@ -80,40 +81,40 @@ function run_terraform_apply() {
 function copy_ips_to_s3() {
   # This is only really used for debugging the nightly run.
   aws s3 cp \
-    "$testnet_channel-ip-list" \
+    "./workspace/$testnet_channel-ip-list" \
     "s3://sn-node/testnet_tool/$testnet_channel-ip-list" \
     --acl public-read
   aws s3 cp \
-    "$testnet_channel-genesis-ip" \
+    "./workspace/$testnet_channel-genesis-ip" \
     "s3://sn-node/testnet_tool/$testnet_channel-genesis-ip" \
     --acl public-read
 }
 
 function pull_network_contacts_and_copy_to_s3() {
-  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  local network_contacts_path="$testnet_channel-network-contacts"
+  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
+  local network_contacts_path="./workspace/$testnet_channel/network-contacts"
   echo "Pulling network contacts file from Genesis node"
   rsync root@"$genesis_ip":~/network-contacts "$network_contacts_path"
   aws s3 cp \
     "$network_contacts_path" \
-    "s3://sn-node/testnet_tool/$testnet_channel-network-contacts" \
+    "s3://sn-node/testnet_tool/$testnet_channel/network-contacts" \
     --acl public-read
 }
 
 function pull_genesis_dbc_and_copy_to_s3() {
-  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  local genesis_dbc_path="$testnet_channel-genesis-dbc"
+  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
+  local genesis_dbc_path="./workspace/$testnet_channel/genesis-dbc"
   echo "Pulling Genesis DBC from Genesis node"
   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
   aws s3 cp \
     "$genesis_dbc_path" \
-    "s3://sn-node/testnet_tool/$testnet_channel-genesis-dbc" \
+    "s3://sn-node/testnet_tool/$testnet_channel/genesis-dbc" \
     --acl public-read
 }
 
 function pull_genesis_key_and_copy_to_s3() {
-  local genesis_ip=$(cat "$testnet_channel-genesis-ip")
-  local genesis_key_path="$testnet_channel-genesis-key"
+  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
+  local genesis_key_path="./workspace/$testnet_channel/genesis-key"
   echo "Pulling Genesis key from Genesis node"
   rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
   aws s3 cp \

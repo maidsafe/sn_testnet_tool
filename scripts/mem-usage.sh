@@ -13,7 +13,7 @@ cleanup() {
 }
 
 # echo "Mem usage in mbs for $TESTNET_CHANNEL nodes at ip:"
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')  # echo "$ip"
   mb=$(ssh root@${ip} 'process=$(pgrep sn_node -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$name: ${mb}MB" &
@@ -21,7 +21,7 @@ cat ${TESTNET_CHANNEL}-ip-list | while read line; do
 done
 
 # echo "Mem usage in mbs for $TESTNET_CHANNEL nodes at ip:"
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   # echo "$ip"

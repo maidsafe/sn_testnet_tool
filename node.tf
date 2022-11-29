@@ -20,7 +20,7 @@ resource "digitalocean_droplet" "testnet_node" {
 
   # upload the genesis node prefix map
   provisioner "file" {
-    source      = "${terraform.workspace}-network-contacts"
+    source      = "workspace/${terraform.workspace}/network-contacts"
     destination = "network-contacts"
   }
 
@@ -46,7 +46,7 @@ resource "digitalocean_droplet" "testnet_node" {
     command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
-      echo "node-${count.index + 2} ${self.ipv4_address}" >> ${terraform.workspace}-ip-list
+      echo "node-${count.index + 2} ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }
