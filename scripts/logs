@@ -13,13 +13,13 @@ cleanup() {
   # script cleanup here
 }
 
-mkdir -p logs/${TESTNET_CHANNEL}
+mkdir -p workspace/${TESTNET_CHANNEL}/logs
 
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   name=$(echo $line | awk '{print $1}')
   ip=$(echo $line | awk '{print $2}')
   echo "Getting $name logs from $ip"
-  rsync -r root@${ip}:~/logs logs/${TESTNET_CHANNEL}/${name}___${ip} &
+  rsync -r root@${ip}:~/logs workspace/${TESTNET_CHANNEL}/logs/${name}___${ip} &
 done
 wait
 

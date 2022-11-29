@@ -18,7 +18,6 @@ resource "digitalocean_droplet" "node_builder" {
     # lets checkout the given commit first so we can fail fast if there's an issue
     provisioner "remote-exec" {
         inline = [
-        
             "git clone https://github.com/${var.repo_owner}/safe_network -q",
             "cd safe_network",
             "git checkout ${var.commit_hash}",
@@ -74,11 +73,11 @@ resource "digitalocean_droplet" "node_builder" {
     provisioner "local-exec" {
         command = <<EOH
             mkdir -p ~/.ssh/
+            mkdir -p ~/workspace/${terraform.workspace}
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            scp root@${self.ipv4_address}:/root/safe_network/target/release/safe .
-            scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node .
+            scp root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe
+            scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node
         EOH
     }
-    # rsync root@${self.ipv4_address}:/root/safe_network/target/release/deps/sn_client* ${var.working_dir}
 }

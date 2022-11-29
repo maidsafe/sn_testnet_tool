@@ -15,14 +15,14 @@ cleanup() {
 
 # rm -rf logs/${TESTNET_CHANNEL}/* || true
 
-mkdir -p logs/${TESTNET_CHANNEL}
+mkdir -p workspace/${TESTNET_CHANNEL}/logs
 cat ${TESTNET_CHANNEL}-ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
-  rsync -P root@${ip}:~/logs/sn_node.log logs/${TESTNET_CHANNEL}/sn_node.log
+  rsync -P root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/latest-sn_node_${name}.log &
 done
 wait
 
-echo "Logs updated"
+echo "Logs updating..."
 
 cleanup

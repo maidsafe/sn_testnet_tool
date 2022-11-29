@@ -20,5 +20,5 @@ cat ${testnet_channel}-ip-list | while read line; do
     --rsh="ssh -o StrictHostKeyChecking=no" \
     --verbose \
     --recursive \
-    root@${ip}:~/logs logs/${testnet_channel}/${name}___${ip}
+    root@${ip}:~/logs workspace/${testnet_channel}/logs/${name}___${ip}
 done

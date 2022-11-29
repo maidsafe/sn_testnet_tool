@@ -29,13 +29,15 @@ test-data
 *.envrc
 
 # incase of uploading the node itself from this folder, lets keep it out of git
-sn_node
-safe
+*sn_node
+*safe
 *.log
 .DS_Store
 
 # Local .terraform directories
 **/.terraform/*
+
+workspace/**
 
 # .tfstate files
 *.tfstate

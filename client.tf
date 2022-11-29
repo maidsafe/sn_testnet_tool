@@ -20,13 +20,13 @@ resource "digitalocean_droplet" "testnet_client" {
 
   # upload the genesis node network contacts
   provisioner "file" {
-    source      = "${terraform.workspace}-network-contacts"
+    source      = "workspace/${terraform.workspace}/network-contacts"
     destination = "network_contacts"
   }
 
-  provisioner "remote-exec"  {
-    script     = "./scripts/ELK/install-and-run-metricbeat.sh"
-  }
+  # provisioner "remote-exec"  {
+  #   script     = "./scripts/ELK/install-and-run-metricbeat.sh"
+  # }
 
   provisioner "file" {
     source      = "./scripts/init-client-node.sh"
@@ -55,7 +55,7 @@ resource "digitalocean_droplet" "testnet_client" {
     ]
   }
   provisioner "file" {
-    source      = "./safe"
+    source      = "./workspace/${terraform.workspace}/safe"
     destination = "safe"
   }
 
@@ -68,18 +68,20 @@ resource "digitalocean_droplet" "testnet_client" {
       "unzip ./the-test-data.zip",
       "chmod +x ./safe",
       "cp ./safe /usr/local/bin/safe",
-      "nohup time safe files put -r test-data &",
+      // allow some time for the network to get up and running before we attempt to store data
+      "nohup $(sleep 60 && time safe files put -r test-data) &",
+      "nohup $(sleep 60 && ./loop_client_tests.sh) &"
     ]
   }
   
 
   provisioner "local-exec" {
     command = <<EOH
-      mkdir -p ~/.ssh/
+      mkdir -p ~/.ssh
       touch ~/.ssh/known_hosts
-      echo ${self.ipv4_address} > ${terraform.workspace}-client-ip
+      echo ${self.ipv4_address} > workspace/${terraform.workspace}/client-ip
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-      ./scripts/run_client_tests_for_workspace.sh
+      # ./scripts/run_client_tests_for_workspace.sh
     EOH
   }
 }

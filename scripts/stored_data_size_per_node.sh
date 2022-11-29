@@ -14,7 +14,7 @@ cleanup() {
 
 echo "Sotrage space usage per nodes for $TESTNET_CHANNEL:"
 mkdir -p logs
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   size=$(ssh root@${ip} 'du -sch node_data | tail -1' ) && echo "$name: ${size}" &

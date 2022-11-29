@@ -13,10 +13,10 @@ cleanup() {
   # script cleanup here
 }
 
-mkdir -p memory-profiling/${TESTNET_CHANNEL}
+mkdir -p workspace/${TESTNET_CHANNEL}/memory-profiling/
 
 echo "Killing node and getting memory-profiling from $TARGET_NODE_IP"
 # ssh root@${TARGET_NODE_IP} 'killall sn_node'
-rsync -r -P root@${TARGET_NODE_IP}:"~/heaptrack*" memory-profiling/${TESTNET_CHANNEL}/${TARGET_NODE_IP}/
+rsync -r -P root@${TARGET_NODE_IP}:"~/heaptrack*" workspace/${TESTNET_CHANNEL}/memory-profiling/${TARGET_NODE_IP}/
 
 cleanup
