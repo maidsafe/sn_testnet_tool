@@ -49,7 +49,7 @@ function check_dependencies() {
 }
 
 function run_terraform_apply() {
-  local node_url="$SN_NODE_URL_PREFIX/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
+  local node_url="${SN_NODE_URL_PREFIX}/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
   if [[ ! -z "${NODE_VERSION}" ]]; then
     node_url="${SN_NODE_URL_PREFIX}/sn_node-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz"
   elif [[ ! -z "${NODE_BIN_PATH}" ]]; then
@@ -57,18 +57,24 @@ function run_terraform_apply() {
       echo "The node bin path must be a file"
       exit 1
     fi
+    local path=$(dirname "${NODE_BIN_PATH}")
+  elif [[ -f "./workspace/${testnet_channel}/sn_node" ]]; then
+    local path=$(dirname "./workspace/${testnet_channel}/sn_node")
+  fi
+
+  if [[ ! -z "${path}" ]]; then
+    echo "Using node from $path"
     # The term 'custom' is used here rather than 'musl' because a locally built binary may not
     # be a musl build.
-    local path=$(dirname "./workspace/${testnet_channel}/sn_node")
-    echo "Using node from $path"
     archive_name="sn_node-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
-    node_url="${SN_NODE_URL_PREFIX}/$archive_name"
     archive_path="/tmp/$archive_name"
-    echo "Creating $archive_path from ./workspace/${testnet_channel}-sn_node..."
+    node_url="${SN_NODE_URL_PREFIX}/$archive_name"
+    echo "Creating $archive_path..."
     tar -C $path -zcvf $archive_path sn_node
     echo "Uploading $archive_path to S3..."
     aws s3 cp $archive_path s3://sn-node --acl public-read
   fi
+
   terraform apply \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=${SSH_KEY_PATH}" \
@@ -81,11 +87,11 @@ function run_terraform_apply() {
 function copy_ips_to_s3() {
   # This is only really used for debugging the nightly run.
   aws s3 cp \
-    "./workspace/$testnet_channel-ip-list" \
+    "./workspace/$testnet_channel/ip-list" \
     "s3://sn-node/testnet_tool/$testnet_channel-ip-list" \
     --acl public-read
   aws s3 cp \
-    "./workspace/$testnet_channel-genesis-ip" \
+    "./workspace/$testnet_channel/genesis-ip" \
     "s3://sn-node/testnet_tool/$testnet_channel-genesis-ip" \
     --acl public-read
 }
