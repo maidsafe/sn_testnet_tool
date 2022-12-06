@@ -73,11 +73,15 @@ resource "digitalocean_droplet" "node_builder" {
     provisioner "local-exec" {
         command = <<EOH
             mkdir -p ~/.ssh/
-            mkdir -p ~/workspace/${terraform.workspace}
+            mkdir -p workspace/${terraform.workspace}
             touch ~/.ssh/known_hosts
             ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
-            scp root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe
-            scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node
         EOH
+    }
+    provisioner "local-exec" {
+        command = "scp root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe"
+    }
+    provisioner "local-exec" {
+        command = "scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node"
     }
 }

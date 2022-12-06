@@ -11,7 +11,7 @@ cleanup() {
   # script cleanup here
 }
 
-export TMPDIR=~/tests
+export TMPDIR=$(pwd)/tests
 
 count=0
 cat ./tests/index | while read line; do
@@ -24,7 +24,7 @@ cat ./tests/index | while read line; do
   printf "safe cat-ting..."
   count=$((count+1))
   cd $TMPDIR
-  time safe cat $url > "$TMPDIR/$count.$type"
+  time RUST_LOG=sn_client safe cat $url > "$TMPDIR/$count.$type"
   printf "\n................... \n\n"
   filesize=$(ls -lh $TMPDIR/$count.$type  | awk '{print  $5}')
   printf "File downloaded to ==> $TMPDIR/$count.$type \n\n"
