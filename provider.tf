@@ -36,6 +36,7 @@ variable "port" {
 variable "ssh_keys" {
   type    = list(number)
   default = [
+    36983288, # David Rusu
     36971807, # Roland Sherwin
     36971688, # Dirvine
     19315097, # Stephen Coyle
