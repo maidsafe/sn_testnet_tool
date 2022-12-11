@@ -106,3 +106,10 @@ Will copy the current workspace network-contacts to your `~/.safe/network_contac
 the `./build` script will compile a _standard_ (non musl) version of `sn_node` which can be used with `heaptrack` for memory profiling.
 
 To get the profiles the node in question will need to be stopped for the file to be written to.
+
+
+## Scripts
+
+### Check client progress
+
+Ssh into client node and `rg` for `passed;` , display the output of the `sn_client` test runs. 
