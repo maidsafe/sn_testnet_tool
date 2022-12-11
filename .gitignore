@@ -23,6 +23,8 @@ addresses/*
 .vscode/
 
 test-data
+tests/*.jpg
+tests/*.mp4
 
 #dont sotre any env vars with passes etc
 *.env

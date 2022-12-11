@@ -48,7 +48,7 @@ function install_heaptrack() {
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    sudo DEBIAN_FRONTEND=noninteractive apt install heaptrack -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "heaptrack installed successfully"
