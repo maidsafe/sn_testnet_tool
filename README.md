@@ -162,9 +162,13 @@ get mem usage using `pgrep` and print to console
 
 a pre run of `ssh-keyscan` so other scripts can run more smoothly. Adds `workspace/<workspace>/ip-list`
 
-### show-pids
+### get-pids
 
-ssh into each machine and print PID. Another way of saying: `are all nodes still runnning?`
+ssh into each machine and store the PID in `workspace/<workspace>/pids`. A follow up of `show-broken-nodes` to see droplets where a process could not be found.
+
+### show-broken-nodes
+
+checks `workspace/<workspace>/pids` for "not found"` text, indicating a process is not running there
 
 ### stored-data-size-per-node
 

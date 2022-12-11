@@ -12,13 +12,14 @@ cleanup() {
   # script cleanup here
 }
 
+mkdir -p workspace/${TESTNET_CHANNEL}/pids
 
 # echo "pid for $TESTNET_CHANNEL nodes at ip:"
 cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')  # echo "$ip"
-  pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$name w $ip has PID: ${pid}" &
-
+  pid="remote process not found" && echo ${pid} > workspace/${TESTNET_CHANNEL}/pids/${name}__${ip}
+  pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo ${pid} > workspace/${TESTNET_CHANNEL}/pids/${name}__${ip} &
 done
 
 cleanup
