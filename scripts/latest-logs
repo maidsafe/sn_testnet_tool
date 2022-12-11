@@ -1,28 +1,15 @@
 #!/bin/bash
 
-# https://betterdev.blog/minimal-safe-bash-script-template/
-set -Eeuo pipefail
-trap cleanup SIGINT SIGTERM ERR EXIT
-
 TESTNET_CHANNEL=$(terraform workspace show)
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-
-cleanup() {
-  trap - SIGINT SIGTERM ERR EXIT
-  # script cleanup here
-}
-
-# rm -rf logs/${TESTNET_CHANNEL}/* || true
 
 mkdir -p workspace/${TESTNET_CHANNEL}/logs
-cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
-  rsync -P root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/latest-sn_node_${name}.log &
+  mkdir -p workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}
+  scp root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}/sn_node__latest.log &
 done
 wait
 
 echo "Logs updating..."
-
-cleanup
