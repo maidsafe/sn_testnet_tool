@@ -174,6 +174,10 @@ checks `workspace/<workspace>/pids` for "not found"` text, indicating a process 
 
 ssh in and checks the size of `node_data` folder
 
+### ssh-into-node <node number>
+
+eg `./scripts/ssh-into-node.sh 5` will ssh into the node 5 for you (using the `workspace/<workspace>/ip-list`)
+
 ### update-network-contacts
 
 gets latest network contacts file from genesis (useful if there's beena split), stores it at `workspace/<workspace>/network-contacts`

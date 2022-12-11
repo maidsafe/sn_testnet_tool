@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+NODE=${1}
+TESTNET_CHANNEL=$(terraform workspace show)
+target_node="node-$NODE"
+
+mkdir -p workspace/${TESTNET_CHANNEL}/logs
+
+cat ${TESTNET_CHANNEL}-ip-list | while read line; do
+  ip=$(echo $line | awk '{print $2}')
+  name=$(echo $line | awk '{print $1}')
+  if [ $name == $target_node ]; then 
+    rsync -P root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/latest-sn_node_${name}.log &
+  fi
+
+done
