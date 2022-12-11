@@ -113,3 +113,67 @@ To get the profiles the node in question will need to be stopped for the file to
 ### Check client progress
 
 Ssh into client node and `rg` for `passed;` , display the output of the `sn_client` test runs. 
+
+### Dl Files
+
+Attempt to download files in `tests/index` using the `safe` bin.
+
+### Do delete droplets
+
+Should use digital ocean api to remove droplets matching a `name`. _Does not work on mac_
+
+### get-all-mem-profile-data
+
+ssh into each machine and grab the heaptrack data. Stores it in `workspace/<workspace>/memory-profiling`
+
+### get-node-mem-profile-data
+
+ssh into a specific machine and grab the heaptrack data. Stores it in `workspace/<workspace>/memory-profiling`
+
+### get-ips
+
+Grabs <workspace> genesis/nodes/client ip info from `aws`, and then `register_keys`
+
+### init-client-node
+
+Used during client node setup, grabs and builds code
+
+### init-node
+
+Used during network setup to get `sn_node` runninng on nodes, with `heaptrack` and other tooling installed
+
+### logs
+
+rsync the `logs` dir of each machine to `workspace/<workspace>/logs/<node>`
+
+### latest-logs
+
+rsync the latest `logs/sn_node.log` dir of each machine to `workspace/<workspace>/logs/<node>`
+
+### loop-client-tests
+
+Copied to the client node during init. Can be run on that machine to... loop client tests. Best run as `nohup ./loop_client_tests.sh &`.
+
+### mem-usage
+
+get mem usage using `pgrep` and print to console
+
+### register-keys
+
+a pre run of `ssh-keyscan` so other scripts can run more smoothly. Adds `workspace/<workspace>/ip-list`
+
+### show-pids
+
+ssh into each machine and print PID. Another way of saying: `are all nodes still runnning?`
+
+### stored-data-size-per-node
+
+ssh in and checks the size of `node_data` folder
+
+### update-network-contacts
+
+gets latest network contacts file from genesis (useful if there's beena split), stores it at `workspace/<workspace>/network-contacts`
+
+### use-network
+
+Sets your local `network-contacts` to be that of `workspace/<workspace>/network-contacts`

@@ -13,8 +13,6 @@ cleanup() {
   # script cleanup here
 }
 
-# source "$script_dir/../scripts/droplet-operations"
-
 aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-ip-list" "workspace/$TESTNET_CHANNEL/ip-list"
 aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-ip-list" "workspace/$TESTNET_CHANNEL/client-ip"
 aws s3 cp "s3://sn-node/testnet_tool/$TESTNET_CHANNEL-genesis-ip" "workspace/$TESTNET_CHANNEL/genesis-ip"
