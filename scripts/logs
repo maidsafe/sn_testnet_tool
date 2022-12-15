@@ -19,7 +19,8 @@ cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   name=$(echo $line | awk '{print $1}')
   ip=$(echo $line | awk '{print $2}')
   echo "Getting $name logs from $ip"
-  rsync -r root@${ip}:~/logs workspace/${TESTNET_CHANNEL}/logs/${name}___${ip} &
+  ssh root@${ip} 'zip -r ~/logs.zip ~/logs'
+  rsync -r root@${ip}:~/logs.zip workspace/${TESTNET_CHANNEL}/logs/${name}___${ip} &
 done
 wait
 
