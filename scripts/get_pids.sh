@@ -12,6 +12,7 @@ cleanup() {
   # script cleanup here
 }
 
+rm -rf workspace/${TESTNET_CHANNEL}/pids
 mkdir -p workspace/${TESTNET_CHANNEL}/pids
 
 # echo "pid for $TESTNET_CHANNEL nodes at ip:"
