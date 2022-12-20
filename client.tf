@@ -68,9 +68,6 @@ resource "digitalocean_droplet" "testnet_client" {
       "unzip ./the-test-data.zip",
       "chmod +x ./safe",
       "cp ./safe /usr/local/bin/safe",
-      // allow some time for the network to get up and running before we attempt to store data
-      "nohup $(sleep 60 && time safe files put -r test-data) &",
-      "nohup $(sleep 60 && ./loop_client_tests.sh) &"
     ]
   }
   
