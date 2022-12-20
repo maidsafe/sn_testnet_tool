@@ -129,9 +129,22 @@ function pull_genesis_key_and_copy_to_s3() {
     --acl public-read
 }
 
+function kick_off_client() {
+  echo "Kicking off client tests..."
+  ip=$(cat workspace/${testnet_channel}/client-ip)
+  echo "Safe cli version is:"
+  ssh root@${ip} 'safe -V'
+  ssh root@${ip} 'safe files put loop_client_tests.sh'
+  ssh root@${ip} 'nohup ~/.loop_client_tests.sh & sleep 5'
+  echo "Client tests should now be building/looping"
+  ssh root@${ip} 'time safe files put -r test-data'
+  echo "Test data should now exist"
+}
+
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
 pull_network_contacts_and_copy_to_s3
 pull_genesis_dbc_and_copy_to_s3
 pull_genesis_key_and_copy_to_s3
+kick_off_client
