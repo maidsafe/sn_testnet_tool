@@ -137,8 +137,8 @@ function kick_off_client() {
   ssh root@${ip} 'safe files put loop_client_tests.sh'
   ssh root@${ip} 'nohup ./loop_client_tests.sh & sleep 5'
   echo "Client tests should now be building/looping"
-  ssh root@${ip} 'time safe files put -r test-data'
-  echo "Test data should now exist"
+  # ssh root@${ip} 'time safe files put -r test-data'
+  # echo "Test data should now exist"
 }
 
 check_dependencies
