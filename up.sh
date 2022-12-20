@@ -135,7 +135,7 @@ function kick_off_client() {
   echo "Safe cli version is:"
   ssh root@${ip} 'safe -V'
   ssh root@${ip} 'safe files put loop_client_tests.sh'
-  ssh root@${ip} 'nohup ~/.loop_client_tests.sh & sleep 5'
+  ssh root@${ip} 'nohup ./loop_client_tests.sh & sleep 5'
   echo "Client tests should now be building/looping"
   ssh root@${ip} 'time safe files put -r test-data'
   echo "Test data should now exist"

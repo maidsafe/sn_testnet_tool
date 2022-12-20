@@ -79,9 +79,9 @@ resource "digitalocean_droplet" "node_builder" {
         EOH
     }
     provisioner "local-exec" {
-        command = "scp root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe"
+        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe"
     }
     provisioner "local-exec" {
-        command = "scp root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node"
+        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node"
     }
 }
