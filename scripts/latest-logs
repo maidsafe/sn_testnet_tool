@@ -8,7 +8,7 @@ cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   mkdir -p workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}
-  scp root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}/sn_node__latest.log &
+  rsync -rz root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}/sn_node__latest.log &
 done
 wait
 
