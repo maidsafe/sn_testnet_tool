@@ -134,14 +134,14 @@ function kick_off_client() {
   ip=$(cat workspace/${testnet_channel}/client-ip)
   echo "Safe cli version is:"
   ssh root@${ip} 'safe -V'
-  ssh root@${ip} 'safe files put loop_client_tests.sh'
-  # ssh root@${ip} 'nohup ./loop_client_tests.sh & sleep 5'
-  # echo "Client tests should now be building/looping"
 
   FILE=workspace/${testnet_channel}/client-data-exists
   if test -f "$FILE"; then
       echo "Client data has already been put onto $testnet_channel."
   else 
+    ssh root@${ip} 'safe files put loop_client_tests.sh'
+    ssh root@${ip} 'bash -ic "nohup ./loop_client_tests.sh &; bash"'
+    echo "Client tests should now be building/looping"
     ssh root@${ip} 'time safe files put -r test-data'
     echo "Test data should now exist"
     echo "data exists" > workspace/${testnet_channel}/client-data-put
