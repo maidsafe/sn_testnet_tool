@@ -137,8 +137,16 @@ function kick_off_client() {
   ssh root@${ip} 'safe files put loop_client_tests.sh'
   # ssh root@${ip} 'nohup ./loop_client_tests.sh & sleep 5'
   # echo "Client tests should now be building/looping"
-  ssh root@${ip} 'time safe files put -r test-data'
-  echo "Test data should now exist"
+
+  FILE=workspace/${testnet_channel}/client-data-exists
+  if test -f "$FILE"; then
+      echo "Client data has already been put onto $testnet_channel."
+  else 
+    ssh root@${ip} 'time safe files put -r test-data'
+    echo "Test data should now exist"
+    echo "data exists" > workspace/${testnet_channel}/client-data-put
+  fi
+
 }
 
 check_dependencies
