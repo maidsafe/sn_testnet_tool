@@ -12,6 +12,7 @@ CLIENT_COUNT=${5}
 AUTO_APPROVE=${6}
 
 testnet_channel=$(terraform workspace show)
+client_data_exists_file=workspace/${testnet_channel}/client-data-exists
 
 function check_dependencies() {
   set +e
@@ -69,10 +70,15 @@ function run_terraform_apply() {
     archive_name="sn_node-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
     archive_path="/tmp/$archive_name"
     node_url="${SN_NODE_URL_PREFIX}/$archive_name"
-    echo "Creating $archive_path..."
-    tar -C $path -zcvf $archive_path sn_node
-    echo "Uploading $archive_path to S3..."
-    aws s3 cp $archive_path s3://sn-node --acl public-read
+
+    if test -f "$client_data_exists_file"; then
+        echo "Using preexisting bing from AWS for $testnet_channel."
+    else 
+      echo "Creating $archive_path..."
+      tar -C $path -zcvf $archive_path sn_node
+      echo "Uploading $archive_path to S3..."
+      aws s3 cp $archive_path s3://sn-node --acl public-read
+    fi
   fi
 
   terraform apply \
@@ -135,16 +141,15 @@ function kick_off_client() {
   echo "Safe cli version is:"
   ssh root@${ip} 'safe -V'
 
-  FILE=workspace/${testnet_channel}/client-data-exists
-  if test -f "$FILE"; then
+  if test -f "$client_data_exists_file"; then
       echo "Client data has already been put onto $testnet_channel."
   else 
     ssh root@${ip} 'safe files put loop_client_tests.sh'
-    ssh root@${ip} 'bash -ic "nohup ./loop_client_tests.sh &; bash"'
-    echo "Client tests should now be building/looping"
+    # ssh root@${ip} 'bash -ic "nohup ./loop_client_tests.sh &; bash"'
+    # echo "Client tests should now be building/looping"
     ssh root@${ip} 'time safe files put -r test-data'
     echo "Test data should now exist"
-    echo "data exists" > workspace/${testnet_channel}/client-data-put
+    echo "data exists" > workspace/${testnet_channel}/client-data-exists
   fi
 
 }
