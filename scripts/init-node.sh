@@ -86,7 +86,7 @@ function setup_network_contacts() {
 }
 
 function run_node() {
-  export RUST_LOG=sn_node=trace,sn_dysfuction=debug,sn_interface=trace
+  export RUST_LOG=sn_node=trace,sn_fault_detection=trace,sn_interface=trace
   export TOKIO_CONSOLE_BIND="${bind_ip_address}:6669",
   if [[ "$is_genesis" == "true" ]]; then
     node_cmd=$(printf '%s' \
