@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     digitalocean = {
-      source = "digitalocean/digitalocean"
+      source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
   }
@@ -94,4 +94,8 @@ variable "client_count" {
 
 variable "node_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
+}
+
+variable "otlp_collector_endpoint" {
+    default = ""
 }

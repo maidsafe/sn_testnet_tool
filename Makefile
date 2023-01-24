@@ -15,7 +15,8 @@ alpha:
 		"${SN_TESTNET_NODE_BIN_PATH}" \
 		"${SN_TESTNET_NODE_VERSION}" \
 		"${SN_TESTNET_CLIENT_COUNT}" \
-		"-auto-approve"
+		"-auto-approve" \
+		"${SN_TESTNET_OTLP_COLLECTOR_ENDPOINT}"
 	rm -rf ~/.safe
 	mkdir -p ~/.safe/network_contacts
 	cp workspace/alpha/network-contacts ~/.safe/network_contacts/default
@@ -37,7 +38,8 @@ beta:
 		"${SN_TESTNET_NODE_BIN_PATH}" \
 		"${SN_TESTNET_NODE_VERSION}" \
 		"${SN_TESTNET_CLIENT_COUNT}" \
-		"-auto-approve"
+		"-auto-approve" \
+		"${SN_TESTNET_OTLP_COLLECTOR_ENDPOINT}"
 	rm -rf ~/.safe
 	mkdir -p ~/.safe/network_contacts
 	cp workspace/beta/network-contacts ~/.safe/network_contacts/default
