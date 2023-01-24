@@ -10,6 +10,7 @@ NODE_BIN_PATH=${3}
 NODE_VERSION=${4}
 CLIENT_COUNT=${5}
 AUTO_APPROVE=${6}
+OTLP_COLLECTOR_ENDPOINT=${7}
 
 testnet_channel=$(terraform workspace show)
 client_data_exists_file=workspace/${testnet_channel}/client-data-exists
@@ -87,6 +88,7 @@ function run_terraform_apply() {
     -var "number_of_nodes=${NODE_COUNT}" \
     -var "node_url=${node_url}" \
     -var "client_count=${CLIENT_COUNT}" \
+    -var "otlp_collector_endpoint=${OTLP_COLLECTOR_ENDPOINT}" \
     --parallelism 15 ${AUTO_APPROVE}
 }
 

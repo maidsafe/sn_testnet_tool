@@ -36,6 +36,18 @@ if [[ -z "$log_level" ]]; then
   exit 1
 fi
 
+node_name="$7"
+if [[ -z "$node_name" ]]; then
+  echo "The node name must be passed to initialize the node."
+  exit 1
+fi
+
+otlp_collector_endpoint="$8"
+if [[ -z "$otlp_collector_endpoint" ]]; then
+  echo "The OpenTelementry Collector endpoint must be provided to export the traces."
+  exit 1
+fi
+
 function install_heaptrack() {
   # This is the first package we attempt to install. There are issues with apt
   # when the machine is initially used. Sometimes it is still running in the
@@ -87,6 +99,9 @@ function setup_network_contacts() {
 
 function run_node() {
   export RUST_LOG=sn_node=trace,sn_fault_detection=trace,sn_interface=trace
+  export RUST_LOG_OTLP=sn_node=trace,sn_fault_detection=trace,sn_interface=trace
+  export OTLP_SERVICE_NAME="${node_name}"
+  export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
   export TOKIO_CONSOLE_BIND="${bind_ip_address}:6669",
   if [[ "$is_genesis" == "true" ]]; then
     node_cmd=$(printf '%s' \

@@ -34,7 +34,7 @@ resource "digitalocean_droplet" "testnet_node" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/init-node.sh",
-      "/tmp/init-node.sh \"${var.node_url}\" false \"${self.ipv4_address}\" \"\" \"${var.port}\" \"${var.remote_log_level}\"",
+      "/tmp/init-node.sh \"${var.node_url}\" false \"${self.ipv4_address}\" \"\" \"${var.port}\" \"${var.remote_log_level}\" \"${terraform.workspace}-safe-node-${count.index + 2}\" \"${var.otlp_collector_endpoint}\"",
     ]
   }
 
