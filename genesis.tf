@@ -26,11 +26,6 @@ resource "digitalocean_droplet" "testnet_genesis" {
     ]
   }
 
-  provisioner "remote-exec" {
-    script      = "scripts/ELK/install-and-run-metricbeat.sh"
-    on_failure  = continue
-  }
-
   provisioner "local-exec" {
     command = <<EOH
       echo "node-1 ${digitalocean_droplet.testnet_genesis.ipv4_address}" > workspace/${terraform.workspace}/ip-list
