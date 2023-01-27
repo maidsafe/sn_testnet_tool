@@ -38,10 +38,6 @@ resource "digitalocean_droplet" "testnet_node" {
     ]
   }
 
-  provisioner "remote-exec" {
-    script      = "scripts/ELK/install-and-run-metricbeat.sh"
-  }
-
   provisioner "local-exec" {
     command = <<EOH
       mkdir -p ~/.ssh/

@@ -2,6 +2,7 @@ SHELL := /bin/bash
 SN_TESTNET_SSH_KEY_PATH := ~/.ssh/id_rsa
 SN_TESTNET_NODE_COUNT := 15
 SN_TESTNET_CLIENT_COUNT := 0
+SN_TESTNET_OTLP_COLLECTOR_ENDPOINT := http://dev-testnet-infra-543e2a753f964a15.elb.eu-west-2.amazonaws.com:4317
 
 alpha:
 	rm -rf workspace/alpha
