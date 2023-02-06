@@ -98,8 +98,8 @@ function setup_network_contacts() {
 }
 
 function run_node() {
-  export RUST_LOG=sn_node=trace,sn_fault_detection=trace,sn_interface=trace
-  export RUST_LOG_OTLP=sn_node=trace,sn_fault_detection=trace,sn_interface=trace
+  export RUST_LOG=sn_node=debug,sn_fault_detection=info,sn_interface=info
+  export RUST_LOG_OTLP=sn_node=debug,sn_fault_detection=info,sn_interface=info
   export OTLP_SERVICE_NAME="${node_name}"
   export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
   export TOKIO_CONSOLE_BIND="${bind_ip_address}:6669",
