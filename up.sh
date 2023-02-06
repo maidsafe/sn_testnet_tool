@@ -10,7 +10,7 @@ NODE_BIN_PATH=${3}
 NODE_VERSION=${4}
 CLIENT_COUNT=${5}
 AUTO_APPROVE=${6}
-OTLP_COLLECTOR_ENDPOINT=${7}
+OTLP_COLLECTOR_ENDPOINT=${7:-"http://dev-testnet-infra-543e2a753f964a15.elb.eu-west-2.amazonaws.com:4317"}
 
 testnet_channel=$(terraform workspace show)
 client_data_exists_file=workspace/${testnet_channel}/client-data-exists
