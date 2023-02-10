@@ -1,0 +1,7 @@
+---
+plugin: aws_ec2
+regions:
+  - eu-west-2
+strict: False
+filters:
+  tag:Environment: dev

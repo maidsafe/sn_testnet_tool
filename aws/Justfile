@@ -9,12 +9,17 @@ init name:
     echo "Creating new Terraform workspace for the testnet..."
     terraform workspace new {{name}}
   )
+
   cp ansible/inventory/dev_genesis_inventory_aws_ec2.yml \
     ansible/inventory/.{{name}}_genesis_inventory_aws_ec2.yml
   sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_genesis_inventory_aws_ec2.yml
   cp ansible/inventory/dev_node_inventory_aws_ec2.yml \
     ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
   sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
+  cp ansible/inventory/dev_inventory_aws_ec2.yml \
+    ansible/inventory/.{{name}}_inventory_aws_ec2.yml
+  sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_inventory_aws_ec2.yml
+
   pub_key=$(cat $SSH_PUBLIC_KEY_PATH | base64 -w0 | xargs)
   echo "Creating new key pair for the testnet..."
   aws ec2 import-key-pair \
@@ -94,6 +99,47 @@ testnet name node_count node_bin_path="":
     fi
   )
 
+network-contacts name:
+  #!/usr/bin/env bash
+  (
+    cd ansible
+    ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
+      --private-key $SSH_PRIVATE_KEY_PATH \
+      --user ubuntu \
+      network_contacts.yml
+  )
+
+ssh-details name:
+  @ansible-inventory --inventory ansible/inventory/.{{name}}_inventory_aws_ec2.yml --list | \
+    jq -r '._meta.hostvars | to_entries[] | [.value.tags.Name, .value.public_dns_name] | @tsv' | \
+    column -t | \
+    sort
+
+logs name:
+  #!/usr/bin/env bash
+  (
+    cd ansible
+    rm -rf logs
+    mkdir logs
+    ansible-playbook --inventory inventory/.{{name}}_inventory_aws_ec2.yml \
+      --private-key $SSH_PRIVATE_KEY_PATH \
+      --user ubuntu \
+      logs.yml
+  )
+  (
+    cd ansible/logs
+    for tar_file in *.tar.gz
+    do
+      dir_name="${tar_file%.tar.*}"
+      mkdir $dir_name
+      tar xvf $tar_file -C $dir_name
+      rm $tar_file
+    done
+    find . -type d -name "logs" -depth -exec rm -rf "{}" \;
+  )
+  rm -rf logs
+  mv ansible/logs .
+
 clean name:
   #!/usr/bin/env bash
   set -e
@@ -121,3 +167,4 @@ clean name:
   fi
   rm -f ansible/inventory/.{{name}}_genesis_inventory_aws_ec2.yml
   rm -f ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
+  rm -f ansible/inventory/.{{name}}_inventory_aws_ec2.yml
