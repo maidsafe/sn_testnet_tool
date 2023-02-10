@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: False
+  tasks:
+    - name: copy network contacts locally
+      fetch:
+        src: /home/{{ ansible_user }}/node_data/section_tree
+        dest: network-contacts
+        flat: yes

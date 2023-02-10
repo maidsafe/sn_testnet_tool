@@ -1,0 +1,65 @@
+---
+- fail:
+    msg: "a value such us /dev/sdb must be supplied for block_device"
+  when: block_device is not defined
+
+- fail:
+    msg: "a mount_info dictionary must be supplied"
+  when: mount_info is not defined
+
+- name: 'copy partitioning script (ubuntu)'
+  copy:
+    src: create_disk_partition.sh
+    dest: /tmp/create_disk_partition.sh
+    mode: 0744
+    owner: root
+    group: root
+  when: ansible_distribution == 'Ubuntu'
+
+- name: 'copy partitioning script (centos)'
+  copy:
+    src: create_disk_partition-centos.sh
+    dest: /tmp/create_disk_partition.sh
+    mode: 0744
+    owner: root
+    group: root
+  when: ansible_distribution == 'CentOS'
+
+- name: 'create mount point'
+  file:
+    name: "{{ mount_info.name }}"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: 'run partitioning script (ubuntu)'
+  command: /tmp/create_disk_partition.sh "{{ block_device }}"
+  when: ansible_distribution == 'Ubuntu'
+
+- name: 'run mount script (centos)'
+  command: /tmp/create_disk_partition.sh "{{ block_device }}" "{{ mount_info.name }}"
+  when: ansible_distribution == 'CentOS'
+
+- name: 'get uuid for {{ block_device }}1'
+  shell: blkid -o export {{ block_device }}1 | grep "^UUID=.*" | sed 's/UUID=//g'
+  register: uuid
+
+- name: 'mount {{ block_device }}1 to {{ mount_info.name }}'
+  mount:
+    name: "{{ mount_info.name }}"
+    src: "UUID={{ uuid.stdout }}"
+    fstype: ext4
+    state: mounted
+    fstab: /etc/fstab
+
+# This needs to take place here rather than when the directory is created.
+# It seems that doing the actual mount changes the permissions to the root user
+# so they need to be changed back after the mount.
+- name: 'change mount point permissions'
+  file:
+    name: "{{ mount_info.name }}"
+    owner: "{{ mount_info.owner }}"
+    group: "{{ mount_info.group }}"
+    mode: 0755
+    state: directory

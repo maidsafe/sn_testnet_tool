@@ -1,0 +1,27 @@
+[Unit]
+Description=Safe Node
+
+[Service]
+{% if is_genesis == "true" %}
+ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
+  --first \
+  --local-addr {{ ansible_default_ipv4.address }}:{{ node_port }} \
+  --skip-auto-port-forwarding \
+  --root-dir {{ node_data_dir_path }} \
+  --log-dir {{ node_logs_dir_path }}
+{% else %}
+ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
+  --local-addr {{ ansible_default_ipv4.address }}:{{ node_port }} \
+  --network-contacts-file {{ network_contacts_path }} \
+  --skip-auto-port-forwarding \
+  --root-dir {{ node_data_dir_path }} \
+  --log-dir {{ node_logs_dir_path }}
+{% endif %}
+Environment=RUST_LOG={{ rust_log_setting }} \
+  RUST_LOG_OTLP={{ rust_log_otlp_setting }} \
+  OTLP_SERVICE_NAME={{ instance_name }} \
+  OTEL_EXPORTER_OTLP_ENDPOINT={{ otlp_endpoint }}
+User={{ ansible_user }}
+
+[Install]
+WantedBy=multi-user.target

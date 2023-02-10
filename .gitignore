@@ -17,6 +17,9 @@ data/*
 *.zip
 files/*
 addresses/*
+aws/ansible/network-contacts
+aws/ansible/inventory/.*
+aws/.env
 
 # IDE
 .idea/

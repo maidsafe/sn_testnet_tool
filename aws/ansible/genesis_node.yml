@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: False
+  roles:
+    - role: prerequisites
+      become: True
+    - {
+        role: format_disk,
+        become: True,
+        block_device: "/dev/xvdb",
+        mount_info:
+          { name: "/mnt/node_logs", owner: "root", group: "root", mode: 0755 },
+      }
+    - node
