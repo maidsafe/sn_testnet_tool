@@ -1,0 +1,71 @@
+---
+- name: store secret in a variable
+  set_fact:
+    aws_secret_key: "{{ lookup('file', 'files/ec2_read_only_secret_access_key') }}"
+
+# This IP points to the EC2 metadata service that is running on the EC2 instance. For some reason though the service doesn't make the tags available.
+- name: get current instance id
+  shell: wget -q -O - http://169.254.169.254/latest/meta-data/instance-id
+  register: instance_id_cmd
+
+- name: get ec2 instance facts
+  ec2_instance_info:
+    region: eu-west-2
+    aws_access_key: AKIAVVODCRMSHXHMIPV2
+    aws_secret_key: "{{ aws_secret_key }}"
+    instance_ids:
+      - "{{ instance_id_cmd.stdout }}"
+  register: instance_facts
+
+# The `instance_name` is then used in the service definition file.
+- name: get the name tag value
+  set_fact:
+    instance_name: "{{ instance_facts.instances[0].tags['Name'] }}"
+
+# The `instance_public_ip` is also used in the service definition file.
+- name: get the public IP for the instance
+  set_fact:
+    instance_public_ip: "{{ instance_facts.instances[0].network_interfaces[0].association.public_ip }}"
+
+- name: get the latest version of the node
+  ansible.builtin.get_url:
+    url: "{{ node_archive_url }}"
+    dest: /tmp/{{ node_archive_filename }}
+
+- name: extract the node binary to /usr/local/bin
+  become: True
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ node_archive_filename }}"
+    dest: "{{ node_archive_dest_path }}"
+    remote_src: True
+
+- name: create the data directory
+  ansible.builtin.file:
+    path: "{{ node_data_dir_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+
+- name: create the logs directory
+  become: True
+  ansible.builtin.file:
+    path: "{{ node_logs_dir_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+
+- name: copy service file
+  become: True
+  template:
+    src: sn_node.service.j2
+    dest: /etc/systemd/system/sn_node.service
+
+- name: reload the system manager configuration
+  become: True
+  command: systemctl daemon-reload
+
+- name: start the node service
+  become: True
+  service:
+    name: sn_node
+    state: started

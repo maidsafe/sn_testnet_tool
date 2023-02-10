@@ -1,0 +1,30 @@
+---
+- name: copy network contacts to nodes
+  hosts: all
+  tasks:
+    - name: ensure .safe directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.safe"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        state: directory
+    - name: copy network contacts to nodes
+      copy:
+        src: network-contacts
+        dest: /home/{{ ansible_user }}/.safe/network-contacts
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+- name: deploy safe node
+  hosts: all
+  become: False
+  roles:
+    - role: prerequisites
+      become: True
+    - {
+        role: format_disk,
+        become: True,
+        block_device: "/dev/xvdb",
+        mount_info:
+          { name: "/mnt/node_logs", owner: "root", group: "root", mode: 0755 },
+      }
+    - node
