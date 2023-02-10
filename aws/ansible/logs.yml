@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: False
+  tasks:
+    - name: tar the logs directory
+      shell: "tar --transform='s,.*/,,g' -czvf /tmp/{{ inventory_hostname }}.tar.gz /mnt/node_logs/logs"
+    - name: copy node logs locally
+      ansible.builtin.fetch:
+        src: "/tmp/{{ inventory_hostname }}.tar.gz"
+        dest: "logs/"
+        flat: true

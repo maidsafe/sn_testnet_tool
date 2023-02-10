@@ -11,6 +11,7 @@
     - heaptrack
     - python3
     - python3-pip
+    - zip
 
 - name: install boto3
   ansible.builtin.pip:
