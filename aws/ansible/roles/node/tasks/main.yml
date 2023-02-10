@@ -27,10 +27,19 @@
   set_fact:
     instance_public_ip: "{{ instance_facts.instances[0].network_interfaces[0].association.public_ip }}"
 
+- name: copy the custom node binary from the local machine
+  become: True
+  ansible.builtin.copy:
+    src: "{{ node_bin_path }}"
+    dest: "{{ node_archive_dest_path }}"
+    mode: 0755
+  when: node_bin_path is defined and node_bin_path != ""
+
 - name: get the latest version of the node
   ansible.builtin.get_url:
     url: "{{ node_archive_url }}"
     dest: /tmp/{{ node_archive_filename }}
+  when: node_bin_path is not defined or node_bin_path == ""
 
 - name: extract the node binary to /usr/local/bin
   become: True
@@ -38,6 +47,7 @@
     src: "/tmp/{{ node_archive_filename }}"
     dest: "{{ node_archive_dest_path }}"
     remote_src: True
+  when: node_bin_path is not defined or node_bin_path == ""
 
 - name: create the data directory
   ansible.builtin.file:

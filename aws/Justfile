@@ -20,7 +20,7 @@ init name:
   aws ec2 import-key-pair \
     --key-name testnet-{{name}} --public-key-material $pub_key
 
-testnet name node_count:
+testnet name node_count node_bin_path="":
   #!/usr/bin/env bash
   set -e
   (
@@ -37,12 +37,28 @@ testnet name node_count:
   (
     # Provision the genesis node
     cd ansible
-    ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
-      --private-key $SSH_PRIVATE_KEY_PATH \
-      --user ubuntu \
-      --extra-vars is_genesis=true \
-      --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-      genesis_node.yml
+    if [[ -z "{{node_bin_path}}" ]]; then
+      echo "Using the latest node binary release"
+      ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
+        --private-key $SSH_PRIVATE_KEY_PATH \
+        --user ubuntu \
+        --extra-vars is_genesis=true \
+        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+        genesis_node.yml
+    else
+      if [[ ! -f "{{node_bin_path}}" ]]; then
+        echo "The custom node binary path does not refer to an existing file."
+        exit 1
+      fi
+      echo "Using custom node binary at {{node_bin_path}}"
+      ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
+        --private-key $SSH_PRIVATE_KEY_PATH \
+        --user ubuntu \
+        --extra-vars is_genesis=true \
+        --extra-vars node_bin_path={{node_bin_path}} \
+        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+        genesis_node.yml
+    fi
   )
   (
     # Obtain the network contacts file from the genesis node
@@ -55,12 +71,27 @@ testnet name node_count:
   (
     # Provision the nodes
     cd ansible
-    ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
-      --private-key $SSH_PRIVATE_KEY_PATH \
-      --user ubuntu \
-      --extra-vars is_genesis=true \
-      --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-      nodes.yml
+    if [[ -z "{{node_bin_path}}" ]]; then
+      echo "Using the latest node binary release"
+      ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
+        --private-key $SSH_PRIVATE_KEY_PATH \
+        --user ubuntu \
+        --extra-vars is_genesis=true \
+        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+        nodes.yml
+    else
+      if [[ ! -f "{{node_bin_path}}" ]]; then
+        echo "The custom node binary path does not refer to an existing file."
+        exit 1
+      fi
+      echo "Using custom node binary at {{node_bin_path}}"
+      ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
+        --private-key $SSH_PRIVATE_KEY_PATH \
+        --user ubuntu \
+        --extra-vars is_genesis=true \
+        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+        nodes.yml
+    fi
   )
 
 clean name:
