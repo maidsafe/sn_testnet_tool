@@ -81,7 +81,7 @@ testnet name node_count node_bin_path="":
       ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
         --private-key $SSH_PRIVATE_KEY_PATH \
         --user ubuntu \
-        --extra-vars is_genesis=true \
+        --extra-vars is_genesis=false \
         --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
         nodes.yml
     else
@@ -93,7 +93,7 @@ testnet name node_count node_bin_path="":
       ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
         --private-key $SSH_PRIVATE_KEY_PATH \
         --user ubuntu \
-        --extra-vars is_genesis=true \
+        --extra-vars is_genesis=false \
         --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
         nodes.yml
     fi
