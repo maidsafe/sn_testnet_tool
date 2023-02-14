@@ -6,14 +6,12 @@ Description=Safe Node
 ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
   --first \
   --local-addr {{ ansible_default_ipv4.address }}:{{ node_port }} \
-  --skip-auto-port-forwarding \
   --root-dir {{ node_data_dir_path }} \
   --log-dir {{ node_logs_dir_path }}
 {% else %}
 ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
   --local-addr {{ ansible_default_ipv4.address }}:{{ node_port }} \
   --network-contacts-file {{ network_contacts_path }} \
-  --skip-auto-port-forwarding \
   --root-dir {{ node_data_dir_path }} \
   --log-dir {{ node_logs_dir_path }}
 {% endif %}
