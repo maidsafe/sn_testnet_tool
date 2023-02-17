@@ -127,6 +127,7 @@ clean name:
   set -e
   (
     cd terraform
+    terraform workspace select {{name}}
     terraform destroy -auto-approve \
       -var key_pair_name=testnet-{{name}} \
       -var vpc_subnet_id="$SN_TESTNET_DEV_SUBNET_ID" \
