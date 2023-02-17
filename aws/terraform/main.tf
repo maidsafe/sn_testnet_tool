@@ -56,3 +56,19 @@ module "node_ec2_instances" {
     Type        = "node"
   }
 }
+
+module "client_ec2_instance" {
+  count                  = var.enable_client ? 1 : 0
+  source                 = "terraform-aws-modules/ec2-instance/aws"
+  version                = "~> 3.0"
+  name                   = "${terraform.workspace}-client"
+  ami                    = var.client_ami_id
+  instance_type          = var.client_instance_type
+  key_name               = var.key_pair_name
+  vpc_security_group_ids = [var.vpc_security_group_id]
+  subnet_id              = var.vpc_subnet_id
+  tags = {
+    Environment = terraform.workspace
+    Type        = "client"
+  }
+}

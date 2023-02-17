@@ -42,6 +42,14 @@ If you want to use a local node binary, use `just testnet alpha 30 "<path>"`, wh
 
 Terraform will run to create the instances then Ansible will be used to provision them.
 
+Run `just --set enable_client=true testnet <name> <node_count>` to create a testnet with an additional machine from which you can run client tests. Ansible will clone the `safe_network` repo and kick off a build of the client tests in the background. You can see if the job has completed by inspecting `~/sn_client.log` when you SSH in. This machine is the same as the one we use in CI. When using it, remember to set the following in your shell session:
+```
+export CARGO_HOME=/mnt/data/cargo
+export TMPDIR=/mnt/data/tmp
+```
+
+This makes use of the additional disk since the default disk has hardly any space on it.
+
 ## Working with a Testnet
 
 There are various utility targets that can be called:

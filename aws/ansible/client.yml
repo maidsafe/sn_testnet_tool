@@ -1,0 +1,68 @@
+---
+- name: mount the 50gb disk for cargo home
+  become: True
+  hosts: all
+  tasks:
+    - name: mount the 50gb disk for cargo home
+      ansible.builtin.shell: |
+        #!/bin/bash
+        if df /dev/nvme1n1 >/dev/null 2>&1; then exit 0; fi
+
+        output=$(file -b -s /dev/nvme1n1)
+        count=0
+        until [ "$output" == "data" ] || [ $count -ge 10 ]
+        do
+            echo "$output"
+            echo "disk still not mounted..."
+            output=$(file -b -s /dev/nvme1n1)
+            count=$((count + 1))
+            sleep 1
+        done
+
+        mkfs -t ext4 /dev/nvme1n1
+        mkdir /mnt/data
+        mount /dev/nvme1n1 /mnt/data
+
+        mkdir /mnt/data/tmp
+        chmod 0777 /mnt/data/tmp
+
+        mkdir /mnt/data/cargo
+        chown ubuntu:ubuntu /mnt/data/cargo
+        echo "CARGO_HOME=/mnt/data/cargo" >> /etc/environment
+- name: copy network contacts to nodes
+  hosts: all
+  tasks:
+    - name: update apt cache
+      become: True
+      apt:
+        update_cache: yes
+    - name: ensure .safe directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.safe/network_contacts"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        state: directory
+    - name: copy network contacts to nodes
+      copy:
+        src: network-contacts
+        dest: /home/{{ ansible_user }}/.safe/network_contacts/default
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+    - name: clone safe_network repo
+      ansible.builtin.git:
+        repo: https://github.com/maidsafe/safe_network
+        dest: /home/{{ ansible_user }}/safe_network
+    - name: build the client tests in the background
+      stat:
+        path: /home/ubuntu/sn_client.log
+      register: log_stat
+    - name: build the client tests in the background
+      ansible.builtin.shell: |
+        #!/bin/bash
+        cd ~/safe_network
+        nohup cargo test --no-run --release --features check-replicas --package sn_client > \
+          /home/ubuntu/sn_client.log 2>&1 &
+      environment:
+        CARGO_HOME: /mnt/data/cargo
+        TMPDIR: /mnt/data/tmp
+      when: not log_stat.stat.exists
