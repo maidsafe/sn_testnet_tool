@@ -1,5 +1,6 @@
 #!/usr/bin/env just --justfile
 set dotenv-load := true
+enable_client := "false"
 
 init name:
   #!/usr/bin/env bash
@@ -16,6 +17,9 @@ init name:
   cp ansible/inventory/dev_node_inventory_aws_ec2.yml \
     ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
   sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
+  cp ansible/inventory/dev_client_inventory_aws_ec2.yml \
+    ansible/inventory/.{{name}}_client_inventory_aws_ec2.yml
+  sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_client_inventory_aws_ec2.yml
   cp ansible/inventory/dev_inventory_aws_ec2.yml \
     ansible/inventory/.{{name}}_inventory_aws_ec2.yml
   sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_inventory_aws_ec2.yml
@@ -24,6 +28,41 @@ init name:
   echo "Creating new key pair for the testnet..."
   aws ec2 import-key-pair \
     --key-name testnet-{{name}} --public-key-material $pub_key
+
+run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
+  #!/usr/bin/env bash
+  set -e
+  if [[ "{{is_genesis}}" == "true" ]]; then
+    playbook="genesis_node.yml"
+    inventory_path="inventory/.{{name}}_genesis_inventory_aws_ec2.yml"
+    extra_vars="is_genesis={{is_genesis}}"
+  else
+    playbook="nodes.yml"
+    inventory_path="inventory/.{{name}}_node_inventory_aws_ec2.yml"
+    extra_vars="is_genesis={{is_genesis}}"
+  fi
+  if [[ ! -z "{{node_bin_path}}" ]]; then
+    if [[ ! -f "{{node_bin_path}}" ]]; then
+      echo "The custom node binary path does not refer to an existing file."
+      exit 1
+    fi
+    echo "Using custom node binary at {{node_bin_path}}"
+    extra_vars="{'is_genesis': '{{is_genesis}}', 'node_bin_path': '{{node_bin_path}}'}"
+  fi
+  just run-ansible "$inventory_path" "$playbook" "$extra_vars"
+
+run-ansible inventory_path="" playbook="" extra_vars="{}":
+  #!/usr/bin/env bash
+  set -e
+  (
+    cd ansible
+    ansible-playbook --inventory {{inventory_path}} \
+      --private-key $SSH_PRIVATE_KEY_PATH \
+      --user ubuntu \
+      --extra-vars "{{extra_vars}}" \
+      --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+      {{playbook}}
+  )
 
 testnet name node_count node_bin_path="":
   #!/usr/bin/env bash
@@ -37,77 +76,20 @@ testnet name node_count node_bin_path="":
       -var node_count={{node_count}} \
       -var key_pair_name=testnet-{{name}} \
       -var vpc_subnet_id="$SN_TESTNET_DEV_SUBNET_ID" \
-      -var vpc_security_group_id="$SN_TESTNET_DEV_SECURITY_GROUP_ID"
+      -var vpc_security_group_id="$SN_TESTNET_DEV_SECURITY_GROUP_ID" \
+      -var enable_client={{enable_client}}
   )
-  (
-    # Provision the genesis node
-    cd ansible
-    if [[ -z "{{node_bin_path}}" ]]; then
-      echo "Using the latest node binary release"
-      ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
-        --private-key $SSH_PRIVATE_KEY_PATH \
-        --user ubuntu \
-        --extra-vars is_genesis=true \
-        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-        genesis_node.yml
-    else
-      if [[ ! -f "{{node_bin_path}}" ]]; then
-        echo "The custom node binary path does not refer to an existing file."
-        exit 1
-      fi
-      echo "Using custom node binary at {{node_bin_path}}"
-      ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
-        --private-key $SSH_PRIVATE_KEY_PATH \
-        --user ubuntu \
-        --extra-vars is_genesis=true \
-        --extra-vars node_bin_path={{node_bin_path}} \
-        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-        genesis_node.yml
-    fi
-  )
-  (
-    # Obtain the network contacts file from the genesis node
-    cd ansible
-    ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
-      --private-key $SSH_PRIVATE_KEY_PATH \
-      --user ubuntu \
-      network_contacts.yml
-  )
-  (
-    # Provision the nodes
-    cd ansible
-    if [[ -z "{{node_bin_path}}" ]]; then
-      echo "Using the latest node binary release"
-      ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
-        --private-key $SSH_PRIVATE_KEY_PATH \
-        --user ubuntu \
-        --extra-vars is_genesis=false \
-        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-        nodes.yml
-    else
-      if [[ ! -f "{{node_bin_path}}" ]]; then
-        echo "The custom node binary path does not refer to an existing file."
-        exit 1
-      fi
-      echo "Using custom node binary at {{node_bin_path}}"
-      ansible-playbook --inventory inventory/.{{name}}_node_inventory_aws_ec2.yml \
-        --private-key $SSH_PRIVATE_KEY_PATH \
-        --user ubuntu \
-        --extra-vars is_genesis=false \
-        --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-        nodes.yml
-    fi
-  )
+  # Provision the genesis node
+  just run-ansible-against-nodes "{{name}}" "{{node_bin_path}}" "true"
+  # Obtain the network contacts file from the genesis node
+  just network-contacts "{{name}}"
+  # Provision the client node
+  just run-ansible "inventory/.{{name}}_client_inventory_aws_ec2.yml" "client.yml"
+  # Provision the remaining nodes
+  just run-ansible-against-nodes "{{name}}" "{{node_bin_path}}" "false"
 
 network-contacts name:
-  #!/usr/bin/env bash
-  (
-    cd ansible
-    ansible-playbook --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml \
-      --private-key $SSH_PRIVATE_KEY_PATH \
-      --user ubuntu \
-      network_contacts.yml
-  )
+  just run-ansible "inventory/.{{name}}_genesis_inventory_aws_ec2.yml" "network_contacts.yml"
 
 ssh-details name:
   @ansible-inventory --inventory ansible/inventory/.{{name}}_inventory_aws_ec2.yml --list | \
