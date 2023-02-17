@@ -108,7 +108,6 @@ function run_node() {
       "heaptrack ./sn_node " \
       "--first " \
       "--local-addr $node_ip_address:$port " \
-      "--skip-auto-port-forwarding " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \
       "$log_level" \
@@ -127,7 +126,6 @@ function run_node() {
     node_cmd=$(printf '%s' \
       "heaptrack ./sn_node " \
       "--network-contacts-file ~/.safe/network-contacts " \
-      "--skip-auto-port-forwarding " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \
       "$log_level" \
