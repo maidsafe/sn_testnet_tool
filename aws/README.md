@@ -12,6 +12,7 @@ Installations of the following tools are required on your platform:
 
 * Terraform
 * Ansible (installing with `pip` in a virtualenv is recommended)
+* The Python `boto3` library (you can try installing in the same virtualenv but may need to install system wide)
 * [Just](https://github.com/casey/just) (a modern Makefile alternative)
 * AWS CLI
 * jq
@@ -31,6 +32,10 @@ SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0ad9341d486c81e38
 ```
 
 The EC2 instances need to be launched with an SSH key pair. You can either generate a new key pair or use an existing one. In either case, set `SSH_PUBLIC_KEY_PATH` to the location of the public key. The `SSH_PRIVATE_KEY_PATH` should be set to the corresponding private key, since Ansible will use this. Similarly, set `ANSIBLE_VAULT_PASSWORD_PATH` to the location where you put the password file.
+
+Ansible requires the shell to be set to use `UTF-8` encoding, which you can do using e.g., `export LANG=en_GB.UTF-8`.
+
+Note: you may run into issues running Ansible using an NTFS file system. It's currently recommended to run from Linux or macOS.
 
 ## Create a Testnet
 
