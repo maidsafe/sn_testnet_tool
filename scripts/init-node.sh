@@ -106,8 +106,8 @@ function run_node() {
   if [[ "$is_genesis" == "true" ]]; then
     node_cmd=$(printf '%s' \
       "heaptrack ./sn_node " \
-      "--first " \
-      "--local-addr $node_ip_address:$port " \
+      "--first $node_ip_address:$port " \
+      "--local-addr 0.0.0.0:$port " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \
       "$log_level" \
