@@ -65,7 +65,7 @@ resource "digitalocean_droplet" "node_builder" {
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
             "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bin safenode --features otlp",
-            "cargo build --release --bin safe",
+            "cargo build --release --bin safe  --features=data-network",
             # "cargo -q test --release --no-run -p sn_client",
         ]
     }
