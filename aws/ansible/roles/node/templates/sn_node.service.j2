@@ -3,13 +3,13 @@ Description=Safe Node
 
 [Service]
 {% if is_genesis == "true" %}
-ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
+ExecStart=heaptrack {{ node_archive_dest_path }}/safenode \
   --first {{ instance_public_ip }}:{{ node_port }} \
   --local-addr 0.0.0.0:{{ node_port }} \
   --root-dir {{ node_data_dir_path }} \
   --log-dir {{ node_logs_dir_path }}
 {% else %}
-ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
+ExecStart=heaptrack {{ node_archive_dest_path }}/safenode \
   --network-contacts-file {{ network_contacts_path }} \
   --root-dir {{ node_data_dir_path }} \
   --log-dir {{ node_logs_dir_path }}

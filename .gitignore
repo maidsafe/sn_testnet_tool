@@ -35,6 +35,7 @@ tests/*.mp4
 
 # incase of uploading the node itself from this folder, lets keep it out of git
 *sn_node
+*safenode
 *safe
 *.log
 .DS_Store

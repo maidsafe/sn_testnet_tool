@@ -67,8 +67,8 @@
 - name: copy service file
   become: True
   template:
-    src: sn_node.service.j2
-    dest: /etc/systemd/system/sn_node.service
+    src: safenode.service.j2
+    dest: /etc/systemd/system/safenode.service
 
 - name: reload the system manager configuration
   become: True
@@ -77,5 +77,5 @@
 - name: start the node service
   become: True
   service:
-    name: sn_node
+    name: safenode
     state: started

@@ -84,7 +84,7 @@ function install_node() {
   archive_name=$(awk -F '/' '{ print $4 }' <<< $node_url)
   wget ${node_url}
   tar xf $archive_name
-  chmod +x sn_node
+  chmod +x safenode
   mkdir -p ~/node_data
   mkdir -p ~/.safe/network_contacts
   mkdir -p ~/.safe/node
@@ -98,14 +98,14 @@ function setup_network_contacts() {
 }
 
 function run_node() {
-  export RUST_LOG=sn_node=debug,sn_fault_detection=info,sn_interface=info
-  export RUST_LOG_OTLP=sn_node=debug,sn_fault_detection=info,sn_interface=info
+  export RUST_LOG=safenode=debug,sn_fault_detection=info,sn_interface=info
+  export RUST_LOG_OTLP=safenode=debug,sn_fault_detection=info,sn_interface=info
   export OTLP_SERVICE_NAME="${node_name}"
   export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
   export TOKIO_CONSOLE_BIND="${bind_ip_address}:6669",
   if [[ "$is_genesis" == "true" ]]; then
     node_cmd=$(printf '%s' \
-      "heaptrack ./sn_node " \
+      "heaptrack ./safenode " \
       "--first $node_ip_address:$port " \
       "--local-addr 0.0.0.0:$port " \
       "--root-dir ~/node_data " \
@@ -118,13 +118,13 @@ function run_node() {
     cp ~/node_data/section_tree ~/network-contacts
     (
       cd ~/logs
-      grep --extended-regexp --only-matching --no-filename ".*Genesis node started.*" sn_node.log* |
+      grep --extended-regexp --only-matching --no-filename ".*Genesis node started.*" safenode.log* |
         awk -F ':' '{ print $2 }' | xargs > ~/genesis-key
     )
     sleep 5
   else
     node_cmd=$(printf '%s' \
-      "heaptrack ./sn_node " \
+      "heaptrack ./safenode " \
       "--network-contacts-file ~/.safe/network-contacts " \
       "--root-dir ~/node_data " \
       "--log-dir ~/logs " \

@@ -64,7 +64,7 @@ resource "digitalocean_droplet" "node_builder" {
             "apt -qq install build-essential -y",
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
-            "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bin sn_node --features otlp",
+            "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bin safenode --features otlp",
             "cargo build --release --bin safe",
             # "cargo -q test --release --no-run -p sn_client",
         ]
@@ -82,6 +82,6 @@ resource "digitalocean_droplet" "node_builder" {
         command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/safe ./workspace/${terraform.workspace}/safe"
     }
     provisioner "local-exec" {
-        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/sn_node ./workspace/${terraform.workspace}/sn_node"
+        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/safenode ./workspace/${terraform.workspace}/safenode"
     }
 }

@@ -11,7 +11,7 @@ cat ${TESTNET_CHANNEL}-ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   if [ $name == $target_node ]; then 
-    rsync -P root@${ip}:~/logs/sn_node.log workspace/${TESTNET_CHANNEL}/logs/latest-sn_node_${name}.log &
+    rsync -P root@${ip}:~/logs/safenode.log workspace/${TESTNET_CHANNEL}/logs/latest-safenode_${name}.log &
   fi
 
 done
