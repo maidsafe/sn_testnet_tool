@@ -16,7 +16,7 @@ cleanup() {
 cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')  # echo "$ip"
-  mb=$(ssh root@${ip} 'process=$(pgrep sn_node -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$name: ${mb}MB" &
+  mb=$(ssh root@${ip} 'process=$(pgrep safenode -n) && xargs pmap $process | awk "/total/ { b=int(\$2/1024); printf b};"' ) && echo "$name: ${mb}MB" &
 
 done
 
@@ -25,7 +25,7 @@ cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')
   # echo "$ip"
-  pid=$(ssh root@${ip} 'pgrep sn_node' ) && echo "$name: ${pid}" 
+  pid=$(ssh root@${ip} 'pgrep safenode' ) && echo "$name: ${pid}" 
 
 done
 

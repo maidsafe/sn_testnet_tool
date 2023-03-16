@@ -15,12 +15,13 @@ cleanup() {
 rm -rf workspace/${TESTNET_CHANNEL}/pids
 mkdir -p workspace/${TESTNET_CHANNEL}/pids
 
+rg  "Membership \- d.+ L" workspace/$(terraform workspace show)/logs -u | sort > voted-off.log 
+
 # echo "pid for $TESTNET_CHANNEL nodes at ip:"
 cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
   ip=$(echo $line | awk '{print $2}')
   name=$(echo $line | awk '{print $1}')  # echo "$ip"
-  pid="remote process not found" && echo ${pid} > workspace/${TESTNET_CHANNEL}/pids/${name}__${ip}
-  pid=$(ssh root@${ip} 'pgrep safenode' ) && echo ${pid} > workspace/${TESTNET_CHANNEL}/pids/${name}__${ip} &
+  rg $ip voted-off.log
 done
 
 cleanup

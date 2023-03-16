@@ -48,18 +48,18 @@ Example using defaults:
 ./up.sh ~/.ssh/id_rsa
 ```
 
-That launches a testnet with 2 nodes, using the latest version of sn_node, and Terraform will prompt for approval.
+That launches a testnet with 2 nodes, using the latest version of safenode, and Terraform will prompt for approval.
 
-Example using a specific version of `sn_node`:
+Example using a specific version of `safenode`:
 
 ```
 ./up.sh ~/.ssh/id_rsa 2 "" "0.10.0" "-auto-approve"
 ```
 
-Example using a local `sn_node` binary:
+Example using a local `safenode` binary:
 
 ```
-./up.sh ~/.ssh/id_rsa 2 "/home/user/dev/safe_network/target/debug/sn_node" "" "-auto-approve"
+./up.sh ~/.ssh/id_rsa 2 "/home/user/dev/safe_network/target/debug/safenode" "" "-auto-approve"
 ```
 
 Note: both [node bin] and [node version] can't be set at the same time. You must use one or the other (or neither).
@@ -103,7 +103,7 @@ Will copy the current workspace network-contacts to your `~/.safe/network_contac
 
 ##  Building for profiling
 
-the `./build` script will compile a _standard_ (non musl) version of `sn_node` which can be used with `heaptrack` for memory profiling.
+the `./build` script will compile a _standard_ (non musl) version of `safenode` which can be used with `heaptrack` for memory profiling.
 
 To get the profiles the node in question will need to be stopped for the file to be written to.
 
@@ -140,7 +140,7 @@ Used during client node setup, grabs and builds code
 
 ### init-node
 
-Used during network setup to get `sn_node` runninng on nodes, with `heaptrack` and other tooling installed
+Used during network setup to get `safenode` runninng on nodes, with `heaptrack` and other tooling installed
 
 ### logs
 
@@ -148,7 +148,7 @@ rsync the `logs` dir of each machine to `workspace/<workspace>/logs/<node>`
 
 ### latest-logs
 
-rsync the latest `logs/sn_node.log` dir of each machine to `workspace/<workspace>/logs/<node>`
+rsync the latest `logs/safenode.log` dir of each machine to `workspace/<workspace>/logs/<node>`
 
 ### loop-client-tests
 
