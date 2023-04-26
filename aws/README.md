@@ -27,8 +27,8 @@ AWS_DEFAULT_REGION=eu-west-2
 ANSIBLE_VAULT_PASSWORD_PATH=<path>
 SSH_PRIVATE_KEY_PATH=<path>
 SSH_PUBLIC_KEY_PATH=<path>
-SN_TESTNET_DEV_SUBNET_ID=subnet-038968af46e82a7c9
-SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0ad9341d486c81e38
+SN_TESTNET_DEV_SUBNET_ID=subnet-018f2ab26755df7f9
+SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0d47df5b3f0d01e2a
 ```
 
 The EC2 instances need to be launched with an SSH key pair. You can either generate a new key pair or use an existing one. In either case, set `SSH_PUBLIC_KEY_PATH` to the location of the public key. The `SSH_PRIVATE_KEY_PATH` should be set to the corresponding private key, since Ansible will use this. Similarly, set `ANSIBLE_VAULT_PASSWORD_PATH` to the location where you put the password file.
@@ -62,6 +62,15 @@ There are various utility targets that can be called:
 * `just ssh-details`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node, using your private key and the `ubuntu` user.
 * `just logs alpha`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
 * `just network-contacts alpha`: will copy the network contacts file from the genesis node to the local machine.
+
+The node runs as a service, so it's possible to SSH to the instance and view its logs using `journalctl`:
+```
+journalctl -u safenode # print the log with paging
+journalctl -f -u safenode # follow the log while it's updating
+journalctl -u safenode -o cat --no-pager # print the whole log without paging
+```
+
+This can be useful for quick debugging.
 
 ## Teardown
 

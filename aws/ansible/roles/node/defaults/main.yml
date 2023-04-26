@@ -2,12 +2,12 @@
 is_genesis: False
 otlp_endpoint: http://telemetry-collector.dev-testnet-infra.local:4317
 safe_settings_path: /home/{{ ansible_user }}/.safe
-network_contacts_path: "{{ safe_settings_path }}/network-contacts"
-node_archive_filename: sn_node-latest-x86_64-unknown-linux-musl.tar.gz
+node_archive_filename: safenode-latest-x86_64-unknown-linux-musl.tar.gz
 node_archive_url: https://sn-node.s3.eu-west-2.amazonaws.com/{{ node_archive_filename }}
 node_archive_dest_path: /usr/local/bin
 node_port: 12000
+node_rpc_port: 12001
 node_data_dir_path: /home/{{ ansible_user }}/node_data
 node_logs_dir_path: /mnt/node_logs/logs
-rust_log_setting: sn_node=trace,sn_fault_detection=trace,sn_interface=trace
-rust_log_otlp_setting: sn_node=trace,sn_fault_detection=trace,sn_interface=trace
+rust_log_setting: safenode=trace
+rust_log_otlp_setting: safenode=trace

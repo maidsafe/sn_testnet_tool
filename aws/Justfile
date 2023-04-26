@@ -2,14 +2,46 @@
 set dotenv-load := true
 enable_client := "false"
 
+# Build a copy of the RCP client, which is used for obtaining the genesis peer ID.
+# If the binary is already in the current directory we will skip.
+build-rpc-client:
+  #!/usr/bin/env bash
+  if [[ ! -f ./safenode_rpc_client ]]; then
+    (
+      cd /tmp
+      git clone https://github.com/maidsafe/safe_network
+      cd safe_network
+      cargo build --release --example safenode_rpc_client
+    )
+    cp /tmp/safe_network/target/release/examples/safenode_rpc_client .
+  else
+    echo "The safenode_rpc_client binary is already present"
+  fi
+
+# Initialise the prequisites for creating the testnet:
+# * Create a workspace for Terraform
+# * Build the RCP client
+# * Generate the inventory based on the template
+# * Create an EC2 keypair based on the key at SSH_PUBLIC_KEY_PATH
+#
+# This should be an idempotent target, in that it won't produce errors if any
+# of the components already exist.
 init name:
   #!/usr/bin/env bash
-  set -e
+
   (
     cd terraform
-    echo "Creating new Terraform workspace for the testnet..."
-    terraform workspace new {{name}}
+    terraform init
+    terraform workspace list | grep -q "{{name}}"
+    if [[ $? -eq 0 ]]; then
+      echo "Workspace '{{name}}' already exists"
+    else
+      echo "Creating new Terraform workspace {{name}}"
+      terraform workspace new {{name}}
+    fi
   )
+
+  just build-rpc-client
 
   cp ansible/inventory/dev_genesis_inventory_aws_ec2.yml \
     ansible/inventory/.{{name}}_genesis_inventory_aws_ec2.yml
@@ -24,10 +56,15 @@ init name:
     ansible/inventory/.{{name}}_inventory_aws_ec2.yml
   sed "s/dev/{{name}}/g" -i ansible/inventory/.{{name}}_inventory_aws_ec2.yml
 
-  pub_key=$(cat $SSH_PUBLIC_KEY_PATH | base64 -w0 | xargs)
-  echo "Creating new key pair for the testnet..."
-  aws ec2 import-key-pair \
-    --key-name testnet-{{name}} --public-key-material $pub_key
+  key_name="testnet-{{name}}"
+  if ! aws ec2 describe-key-pairs --key-names "$key_name" > /dev/null 2>&1; then
+    pub_key=$(cat $SSH_PUBLIC_KEY_PATH | base64 -w0 | xargs)
+    echo "Creating new key pair for the testnet..."
+    aws ec2 import-key-pair \
+      --key-name testnet-{{name}} --public-key-material $pub_key
+  else
+    echo "An EC2 keypair for {{name}} already exists"
+  fi
 
 run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
   #!/usr/bin/env bash
@@ -37,9 +74,18 @@ run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
     inventory_path="inventory/.{{name}}_genesis_inventory_aws_ec2.yml"
     extra_vars="is_genesis={{is_genesis}}"
   else
+    # Construct the multiaddr for the genesis node.
+    cd ansible
+    genesis_ip=$(ansible-inventory --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml --list | \
+      jq -r '.["_meta"]["hostvars"][]["public_ip_address"]')
+    cd ..
+    peer_id=$(./safenode_rpc_client $genesis_ip:12001 info | \
+      grep "Peer Id" | awk -F ':' '{ print $2 }' | xargs)
+    multiaddr="/ip4/$genesis_ip/udp/12000/quic-v1/p2p/$peer_id"
+
     playbook="nodes.yml"
     inventory_path="inventory/.{{name}}_node_inventory_aws_ec2.yml"
-    extra_vars="is_genesis={{is_genesis}}"
+    extra_vars="{'is_genesis': '{{is_genesis}}', 'genesis_multiaddr': '$multiaddr'}"
   fi
   if [[ ! -z "{{node_bin_path}}" ]]; then
     if [[ ! -f "{{node_bin_path}}" ]]; then
@@ -47,7 +93,7 @@ run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
       exit 1
     fi
     echo "Using custom node binary at {{node_bin_path}}"
-    extra_vars="{'is_genesis': '{{is_genesis}}', 'node_bin_path': '{{node_bin_path}}'}"
+    extra_vars="{'is_genesis': '{{is_genesis}}', 'node_bin_path': '{{node_bin_path}}', 'genesis_multiaddr': '$multiaddr'}"
   fi
   just run-ansible "$inventory_path" "$playbook" "$extra_vars"
 
@@ -68,7 +114,6 @@ testnet name node_count node_bin_path="":
   #!/usr/bin/env bash
   set -e
   (
-    # Create the EC2 instances
     cd terraform
     terraform init
     terraform workspace select {{name}}
@@ -79,17 +124,12 @@ testnet name node_count node_bin_path="":
       -var vpc_security_group_id="$SN_TESTNET_DEV_SECURITY_GROUP_ID" \
       -var enable_client={{enable_client}}
   )
+
   # Provision the genesis node
   just run-ansible-against-nodes "{{name}}" "{{node_bin_path}}" "true"
-  # Obtain the network contacts file from the genesis node
-  just network-contacts "{{name}}"
-  # Provision the client node
-  just run-ansible "inventory/.{{name}}_client_inventory_aws_ec2.yml" "client.yml"
+
   # Provision the remaining nodes
   just run-ansible-against-nodes "{{name}}" "{{node_bin_path}}" "false"
-
-network-contacts name:
-  just run-ansible "inventory/.{{name}}_genesis_inventory_aws_ec2.yml" "network_contacts.yml"
 
 ssh-details name:
   @ansible-inventory --inventory ansible/inventory/.{{name}}_inventory_aws_ec2.yml --list | \
