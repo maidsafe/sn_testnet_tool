@@ -25,7 +25,7 @@
 # The `instance_public_ip` is also used in the service definition file.
 - name: get the public IP for the instance
   set_fact:
-    instance_public_ip: "{{ instance_facts.instances[0].network_interfaces[0].association.public_ip }}"
+    instance_private_ip: "{{ instance_facts.instances[0].network_interfaces[0].private_ip_address }}"
 
 - name: copy the custom node binary from the local machine
   become: True
@@ -68,7 +68,7 @@
   become: True
   template:
     src: sn_node.service.j2
-    dest: /etc/systemd/system/sn_node.service
+    dest: /etc/systemd/system/safenode.service
 
 - name: reload the system manager configuration
   become: True
@@ -77,5 +77,5 @@
 - name: start the node service
   become: True
   service:
-    name: sn_node
+    name: safenode
     state: started

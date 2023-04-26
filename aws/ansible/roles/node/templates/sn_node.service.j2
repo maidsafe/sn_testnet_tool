@@ -3,16 +3,15 @@ Description=Safe Node
 
 [Service]
 {% if is_genesis == "true" %}
-ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
-  --first {{ instance_public_ip }}:{{ node_port }} \
-  --local-addr 0.0.0.0:{{ node_port }} \
+ExecStart={{ node_archive_dest_path }}/safenode \
   --root-dir {{ node_data_dir_path }} \
-  --log-dir {{ node_logs_dir_path }}
+  --port {{ node_port }} \
+  --rpc {{ instance_private_ip }}:{{ node_rpc_port }}
 {% else %}
-ExecStart=heaptrack {{ node_archive_dest_path }}/sn_node \
-  --network-contacts-file {{ network_contacts_path }} \
+ExecStart={{ node_archive_dest_path }}/safenode \
   --root-dir {{ node_data_dir_path }} \
-  --log-dir {{ node_logs_dir_path }}
+  --port {{ node_port }} \
+  --peer {{ genesis_multiaddr }}
 {% endif %}
 Environment=RUST_LOG={{ rust_log_setting }} \
   RUST_LOG_OTLP={{ rust_log_otlp_setting }} \

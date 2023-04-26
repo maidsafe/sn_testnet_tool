@@ -1,20 +1,5 @@
 ---
-- name: copy network contacts to nodes
-  hosts: all
-  tasks:
-    - name: ensure .safe directory exists
-      ansible.builtin.file:
-        path: "/home/{{ ansible_user }}/.safe"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        state: directory
-    - name: copy network contacts to nodes
-      copy:
-        src: network-contacts
-        dest: /home/{{ ansible_user }}/.safe/network-contacts
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-- name: deploy safe node
+- name: deploy safenode to remaining nodes
   hosts: all
   become: False
   roles:
