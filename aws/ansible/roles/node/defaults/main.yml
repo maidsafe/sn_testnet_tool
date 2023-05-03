@@ -1,6 +1,6 @@
 ---
 is_genesis: False
-otlp_endpoint: http://telemetry-collector.dev-testnet-infra.local:4317
+otlp_endpoint: http://dev-testnet-infra-b913fd1863ae4271.elb.eu-west-2.amazonaws.com:4317
 safe_settings_path: /home/{{ ansible_user }}/.safe
 node_archive_filename: safenode-latest-x86_64-unknown-linux-musl.tar.gz
 node_archive_url: https://sn-node.s3.eu-west-2.amazonaws.com/{{ node_archive_filename }}
