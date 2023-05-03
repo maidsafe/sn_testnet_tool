@@ -59,9 +59,8 @@ This makes use of the additional disk since the default disk has hardly any spac
 
 There are various utility targets that can be called:
 
-* `just ssh-details`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node, using your private key and the `ubuntu` user.
-* `just logs alpha`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
-* `just network-contacts alpha`: will copy the network contacts file from the genesis node to the local machine.
+* `just ssh-details "<name>"`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node, using your private key and the `ubuntu` user.
+* `just logs "<name>"`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
 
 The node runs as a service, so it's possible to SSH to the instance and view its logs using `journalctl`:
 ```

@@ -5,11 +5,13 @@ Description=Safe Node
 {% if is_genesis == "true" %}
 ExecStart={{ node_archive_dest_path }}/safenode \
   --root-dir {{ node_data_dir_path }} \
+  --log-dir {{ node_logs_dir_path }} \
   --port {{ node_port }} \
   --rpc {{ instance_private_ip }}:{{ node_rpc_port }}
 {% else %}
 ExecStart={{ node_archive_dest_path }}/safenode \
   --root-dir {{ node_data_dir_path }} \
+  --log-dir {{ node_logs_dir_path }} \
   --port {{ node_port }} \
   --peer {{ genesis_multiaddr }}
 {% endif %}
