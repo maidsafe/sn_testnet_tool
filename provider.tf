@@ -43,7 +43,6 @@ variable "ssh_keys" {
     19315097, # Stephen Coyle
     29201567, # Josh Wilson
     29586082, # Gabriel Viganotti
-    29690776, # Edward Holst
     30643816, # Anselme Grumbach
     30113222, # Qi Ma
     30878672, # Chris O'Neil
@@ -65,7 +64,7 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-2vcpu-2gb"
+  default = "s-1vcpu-2gb"
 }
 
 variable "client-size" {
@@ -89,11 +88,11 @@ variable "commit_hash" {
 }
 
 variable "client_count" {
-  default = "1"
+  default = "0"
 }
 
 variable "node_url" {
-  default = "https://sn-node.s3.eu-west-2.amazonaws.com/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
+  default = "https://sn-node.s3.eu-west-2.amazonaws.com/safenode-latest-x86_64-unknown-linux-musl.tar.gz"
 }
 
 variable "otlp_collector_endpoint" {

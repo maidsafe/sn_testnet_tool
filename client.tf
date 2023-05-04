@@ -14,9 +14,8 @@ resource "digitalocean_droplet" "testnet_client" {
     private_key = file(var.pvt_key)
   }
 
-  depends_on = [
-    digitalocean_droplet.testnet_genesis,
-  ]
+  depends_on = [digitalocean_droplet.node1]
+
 
   # upload the genesis node network contacts
   provisioner "file" {

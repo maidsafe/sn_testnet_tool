@@ -2,7 +2,7 @@
 
 set -e
 
-SN_NODE_URL_PREFIX="https://sn-node.s3.eu-west-2.amazonaws.com"
+SAFENODE_URL_PREFIX="https://sn-node.s3.eu-west-2.amazonaws.com"
 
 SSH_KEY_PATH=${1}
 NODE_COUNT=${2:-1}
@@ -10,7 +10,7 @@ NODE_BIN_PATH=${3}
 NODE_VERSION=${4}
 CLIENT_COUNT=${5}
 AUTO_APPROVE=${6}
-OTLP_COLLECTOR_ENDPOINT=${7}
+OTLP_COLLECTOR_ENDPOINT=${7:-"http://dev-testnet-infra-543e2a753f964a15.elb.eu-west-2.amazonaws.com:4317"}
 
 testnet_channel=$(terraform workspace show)
 client_data_exists_file=workspace/${testnet_channel}/client-data-exists
@@ -48,35 +48,39 @@ function check_dependencies() {
     echo "Please use one or the other."
     exit 1
   fi
+
+  # setup a file used in startup
+  mkdir -p workspace/${testnet_channel}
+  touch workspace/${testnet_channel}/node-1 || true
 }
 
 function run_terraform_apply() {
-  local node_url="${SN_NODE_URL_PREFIX}/sn_node-latest-x86_64-unknown-linux-musl.tar.gz"
+  local node_url="${SAFENODE_URL_PREFIX}/safenode-latest-x86_64-unknown-linux-musl.tar.gz"
   if [[ ! -z "${NODE_VERSION}" ]]; then
-    node_url="${SN_NODE_URL_PREFIX}/sn_node-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+    node_url="${SAFENODE_URL_PREFIX}/safenode-${NODE_VERSION}-x86_64-unknown-linux-musl.tar.gz"
   elif [[ ! -z "${NODE_BIN_PATH}" ]]; then
     if [[ -d "${NODE_BIN_PATH}" ]]; then
       echo "The node bin path must be a file"
       exit 1
     fi
     local path=$(dirname "${NODE_BIN_PATH}")
-  elif [[ -f "./workspace/${testnet_channel}/sn_node" ]]; then
-    local path=$(dirname "./workspace/${testnet_channel}/sn_node")
+  elif [[ -f "./workspace/${testnet_channel}/safenode" ]]; then
+    local path=$(dirname "./workspace/${testnet_channel}/safenode")
   fi
 
   if [[ ! -z "${path}" ]]; then
     echo "Using node from $path"
     # The term 'custom' is used here rather than 'musl' because a locally built binary may not
     # be a musl build.
-    archive_name="sn_node-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
+    archive_name="safenode-${testnet_channel}-x86_64-unknown-linux-custom.tar.gz"
     archive_path="/tmp/$archive_name"
-    node_url="${SN_NODE_URL_PREFIX}/$archive_name"
+    node_url="${SAFENODE_URL_PREFIX}/$archive_name"
 
     if test -f "$client_data_exists_file"; then
-        echo "Using preexisting bing from AWS for $testnet_channel."
+        echo "Using preexisting bin from AWS for $testnet_channel."
     else 
       echo "Creating $archive_path..."
-      tar -C $path -zcvf $archive_path sn_node
+      tar -C $path -zcvf $archive_path safenode
       echo "Uploading $archive_path to S3..."
       aws s3 cp $archive_path s3://sn-node --acl public-read
     fi
@@ -98,25 +102,9 @@ function copy_ips_to_s3() {
     "./workspace/$testnet_channel/ip-list" \
     "s3://sn-node/testnet_tool/$testnet_channel-ip-list" \
     --acl public-read
-  aws s3 cp \
-    "./workspace/$testnet_channel/genesis-ip" \
-    "s3://sn-node/testnet_tool/$testnet_channel-genesis-ip" \
-    --acl public-read
-}
-
-function pull_network_contacts_and_copy_to_s3() {
-  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
-  local network_contacts_path="./workspace/$testnet_channel/network-contacts"
-  echo "Pulling network contacts file from Genesis node"
-  rsync root@"$genesis_ip":~/network-contacts "$network_contacts_path"
-  aws s3 cp \
-    "$network_contacts_path" \
-    "s3://sn-node/testnet_tool/$testnet_channel/network-contacts" \
-    --acl public-read
 }
 
 function pull_genesis_dbc_and_copy_to_s3() {
-  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
   local genesis_dbc_path="./workspace/$testnet_channel/genesis-dbc"
   echo "Pulling Genesis DBC from Genesis node"
   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
@@ -127,7 +115,6 @@ function pull_genesis_dbc_and_copy_to_s3() {
 }
 
 function pull_genesis_key_and_copy_to_s3() {
-  local genesis_ip=$(cat "./workspace/$testnet_channel/genesis-ip")
   local genesis_key_path="./workspace/$testnet_channel/genesis-key"
   echo "Pulling Genesis key from Genesis node"
   rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
@@ -159,7 +146,7 @@ function kick_off_client() {
 check_dependencies
 run_terraform_apply
 copy_ips_to_s3
-pull_network_contacts_and_copy_to_s3
+# pull_network_contacts_and_copy_to_s3
 pull_genesis_dbc_and_copy_to_s3
 pull_genesis_key_and_copy_to_s3
-kick_off_client
+# kick_off_client

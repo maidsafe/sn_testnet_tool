@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# https://betterdev.blog/minimal-safe-bash-script-template/
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+TESTNET_CHANNEL=$(terraform workspace show)
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+}
+
+mkdir -p workspace/${TESTNET_CHANNEL}/logs
+
+target_port=12001
+
+echo "churning ${TESTNET_CHANNEL}"
+echo "==========================="
+cat workspace/${TESTNET_CHANNEL}/ip-list | while read line; do
+  name=$(echo $line | awk '{print $1}')
+  ip=$(echo $line | awk '{print $2}')
+  echo "Restarting $name logs from $ip:$target_port"
+  # rsync -rz root@${ip}:~/logs workspace/${TESTNET_CHANNEL}/logs/${name}___${ip} &
+  # cargo run --release --example safenode_rpc_client -- "$ip:$target_port" restart 1
+  cd ../stableset_net && cargo run --release --example safenode_rpc_client $ip:12001 info
+  cd -
+done
+wait
+
+echo "Logs updated"
+
+cleanup
