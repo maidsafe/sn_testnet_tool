@@ -37,6 +37,8 @@ Ansible requires the shell to be set to use `UTF-8` encoding, which you can do u
 
 Note: you may run into issues running Ansible using an NTFS file system. It's currently recommended to run from Linux or macOS.
 
+Before starting you will need to run `terraform init` inside `aws/terraform`.
+
 ## Create a Testnet
 
 Run `just init <name>`, where `name` will be the name of the testnet. The name should be a short word, e.g., "alpha" or "beta", or your first name (though the name "dev" cannot be used, because that's the main workspace that cannot be deleted). This will create a Terraform workspace, a key pair on EC2, and Ansible inventory files.
