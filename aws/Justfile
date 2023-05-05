@@ -2,21 +2,9 @@
 set dotenv-load := true
 enable_client := "false"
 
-# Build a copy of the RCP client, which is used for obtaining the genesis peer ID.
-# If the binary is already in the current directory we will skip.
-build-rpc-client:
-  #!/usr/bin/env bash
-  if [[ ! -f ./safenode_rpc_client ]]; then
-    (
-      cd /tmp
-      git clone https://github.com/maidsafe/safe_network
-      cd safe_network
-      cargo build --release --example safenode_rpc_client
-    )
-    cp /tmp/safe_network/target/release/examples/safenode_rpc_client .
-  else
-    echo "The safenode_rpc_client binary is already present"
-  fi
+# =============================================
+# Public targets intended to be called by users
+# =============================================
 
 # Initialise the prequisites for creating the testnet:
 # * Create a workspace for Terraform
@@ -31,7 +19,9 @@ init name:
 
   (
     cd terraform
-    terraform init
+    terraform init \
+      -backend-config="bucket=$TERRAFORM_STATE_BUCKET_NAME" \
+      -backend-config="region=$AWS_DEFAULT_REGION"
     terraform workspace list | grep -q "{{name}}"
     if [[ $? -eq 0 ]]; then
       echo "Workspace '{{name}}' already exists"
@@ -65,50 +55,6 @@ init name:
   else
     echo "An EC2 keypair for {{name}} already exists"
   fi
-
-run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
-  #!/usr/bin/env bash
-  set -e
-  if [[ "{{is_genesis}}" == "true" ]]; then
-    playbook="genesis_node.yml"
-    inventory_path="inventory/.{{name}}_genesis_inventory_aws_ec2.yml"
-    extra_vars="is_genesis={{is_genesis}}"
-  else
-    # Construct the multiaddr for the genesis node.
-    cd ansible
-    genesis_ip=$(ansible-inventory --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml --list | \
-      jq -r '.["_meta"]["hostvars"][]["public_ip_address"]')
-    cd ..
-    peer_id=$(./safenode_rpc_client $genesis_ip:12001 info | \
-      grep "Peer Id" | awk -F ':' '{ print $2 }' | xargs)
-    multiaddr="/ip4/$genesis_ip/udp/12000/quic-v1/p2p/$peer_id"
-
-    playbook="nodes.yml"
-    inventory_path="inventory/.{{name}}_node_inventory_aws_ec2.yml"
-    extra_vars="{'is_genesis': '{{is_genesis}}', 'genesis_multiaddr': '$multiaddr'}"
-  fi
-  if [[ ! -z "{{node_bin_path}}" ]]; then
-    if [[ ! -f "{{node_bin_path}}" ]]; then
-      echo "The custom node binary path does not refer to an existing file."
-      exit 1
-    fi
-    echo "Using custom node binary at {{node_bin_path}}"
-    extra_vars="{'is_genesis': '{{is_genesis}}', 'node_bin_path': '{{node_bin_path}}', 'genesis_multiaddr': '$multiaddr'}"
-  fi
-  just run-ansible "$inventory_path" "$playbook" "$extra_vars"
-
-run-ansible inventory_path="" playbook="" extra_vars="{}":
-  #!/usr/bin/env bash
-  set -e
-  (
-    cd ansible
-    ansible-playbook --inventory {{inventory_path}} \
-      --private-key $SSH_PRIVATE_KEY_PATH \
-      --user ubuntu \
-      --extra-vars "{{extra_vars}}" \
-      --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
-      {{playbook}}
-  )
 
 testnet name node_count node_bin_path="":
   #!/usr/bin/env bash
@@ -191,3 +137,67 @@ clean name:
   rm -f ansible/inventory/.{{name}}_genesis_inventory_aws_ec2.yml
   rm -f ansible/inventory/.{{name}}_node_inventory_aws_ec2.yml
   rm -f ansible/inventory/.{{name}}_inventory_aws_ec2.yml
+
+# =============================================================
+# Private helper utility targets intended to reduce duplication
+# =============================================================
+
+# Build a copy of the RCP client, which is used for obtaining the genesis peer ID.
+# If the binary is already in the current directory we will skip.
+build-rpc-client:
+  #!/usr/bin/env bash
+  if [[ ! -f ./safenode_rpc_client ]]; then
+    (
+      cd /tmp
+      git clone https://github.com/maidsafe/safe_network
+      cd safe_network
+      cargo build --release --example safenode_rpc_client
+    )
+    cp /tmp/safe_network/target/release/examples/safenode_rpc_client .
+  else
+    echo "The safenode_rpc_client binary is already present"
+  fi
+
+run-ansible-against-nodes name="" node_bin_path="" is_genesis="":
+  #!/usr/bin/env bash
+  set -e
+  if [[ "{{is_genesis}}" == "true" ]]; then
+    playbook="genesis_node.yml"
+    inventory_path="inventory/.{{name}}_genesis_inventory_aws_ec2.yml"
+    extra_vars="is_genesis={{is_genesis}}"
+  else
+    # Construct the multiaddr for the genesis node.
+    cd ansible
+    genesis_ip=$(ansible-inventory --inventory inventory/.{{name}}_genesis_inventory_aws_ec2.yml --list | \
+      jq -r '.["_meta"]["hostvars"][]["public_ip_address"]')
+    cd ..
+    peer_id=$(./safenode_rpc_client $genesis_ip:12001 info | \
+      grep "Peer Id" | awk -F ':' '{ print $2 }' | xargs)
+    multiaddr="/ip4/$genesis_ip/udp/12000/quic-v1/p2p/$peer_id"
+
+    playbook="nodes.yml"
+    inventory_path="inventory/.{{name}}_node_inventory_aws_ec2.yml"
+    extra_vars="{'is_genesis': '{{is_genesis}}', 'genesis_multiaddr': '$multiaddr'}"
+  fi
+  if [[ ! -z "{{node_bin_path}}" ]]; then
+    if [[ ! -f "{{node_bin_path}}" ]]; then
+      echo "The custom node binary path does not refer to an existing file."
+      exit 1
+    fi
+    echo "Using custom node binary at {{node_bin_path}}"
+    extra_vars="{'is_genesis': '{{is_genesis}}', 'node_bin_path': '{{node_bin_path}}', 'genesis_multiaddr': '$multiaddr'}"
+  fi
+  just run-ansible "$inventory_path" "$playbook" "$extra_vars"
+
+run-ansible inventory_path="" playbook="" extra_vars="{}":
+  #!/usr/bin/env bash
+  set -e
+  (
+    cd ansible
+    ansible-playbook --inventory {{inventory_path}} \
+      --private-key $SSH_PRIVATE_KEY_PATH \
+      --user ubuntu \
+      --extra-vars "{{extra_vars}}" \
+      --vault-password-file $ANSIBLE_VAULT_PASSWORD_PATH \
+      {{playbook}}
+  )
