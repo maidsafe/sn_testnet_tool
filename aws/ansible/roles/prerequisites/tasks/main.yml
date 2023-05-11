@@ -17,3 +17,8 @@
   ansible.builtin.pip:
     name: boto3
     state: present
+
+- name: user for running node
+  ansible.builtin.user:
+    name: safe
+    shell: /bin/bash

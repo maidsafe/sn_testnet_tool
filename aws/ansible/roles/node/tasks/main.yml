@@ -7,6 +7,7 @@
 - name: get current instance id
   shell: wget -q -O - http://169.254.169.254/latest/meta-data/instance-id
   register: instance_id_cmd
+  when: provider == "aws"
 
 - name: get ec2 instance facts
   ec2_instance_info:
@@ -16,30 +17,41 @@
     instance_ids:
       - "{{ instance_id_cmd.stdout }}"
   register: instance_facts
+  when: provider == "aws"
 
 # The `instance_name` is then used in the service definition file.
 - name: get the name tag value
   set_fact:
     instance_name: "{{ instance_facts.instances[0].tags['Name'] }}"
+  when: provider == "aws"
 
-# The `instance_public_ip` is also used in the service definition file.
-- name: get the public IP for the instance
+# The `instance_private_ip` is also used in the service definition file.
+- name: get the private IP for the instance
   set_fact:
-    instance_private_ip: "{{ instance_facts.instances[0].network_interfaces[0].private_ip_address }}"
+    node_rpc_ip: "{{ instance_facts.instances[0].network_interfaces[0].private_ip_address }}"
+  when: provider == "aws"
 
-- name: copy the custom node binary from the local machine
-  become: True
-  ansible.builtin.copy:
-    src: "{{ node_bin_path }}"
-    dest: "{{ node_archive_dest_path }}"
-    mode: 0755
-  when: node_bin_path is defined and node_bin_path != ""
+- name: get hostname
+  command: hostname
+  register: host_output
+  when: provider == "digital-ocean"
+
+# The `instance_name` is then used in the service definition file.
+- name: use the hostname as the instance name
+  set_fact:
+    instance_name: "{{ host_output.stdout }}"
+  when: provider == "digital-ocean"
+
+# The `node_rpc_ip` is also used in the service definition file.
+- name: use the public IP as the RPC address on DO
+  set_fact:
+    node_rpc_ip: "{{ ansible_host }}"
+  when: provider == "digital-ocean"
 
 - name: get the latest version of the node
   ansible.builtin.get_url:
     url: "{{ node_archive_url }}"
     dest: /tmp/{{ node_archive_filename }}
-  when: node_bin_path is not defined or node_bin_path == ""
 
 - name: extract the node binary to /usr/local/bin
   become: True
@@ -47,21 +59,21 @@
     src: "/tmp/{{ node_archive_filename }}"
     dest: "{{ node_archive_dest_path }}"
     remote_src: True
-  when: node_bin_path is not defined or node_bin_path == ""
 
 - name: create the data directory
+  become: True
   ansible.builtin.file:
     path: "{{ node_data_dir_path }}"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "safe"
+    group: "safe"
     state: directory
 
 - name: create the logs directory
   become: True
   ansible.builtin.file:
     path: "{{ node_logs_dir_path }}"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "safe"
+    group: "safe"
     state: directory
 
 - name: copy service file

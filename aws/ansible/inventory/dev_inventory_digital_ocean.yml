@@ -1,0 +1,18 @@
+---
+plugin: community.digitalocean.digitalocean
+strict: True
+attributes:
+  - id
+  - name
+  - networks
+  - tags
+keyed_groups:
+  - key: do_tags | lower
+    prefix: ''
+    separator: ''
+compose:
+  ansible_host: do_networks.v4 | selectattr('type','eq','public')
+    | map(attribute='ip_address') | first
+filters:
+  - '"environment:env_value" in do_tags'
+  - '"type:type_value" in do_tags'

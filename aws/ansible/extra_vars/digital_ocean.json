@@ -1,0 +1,7 @@
+{
+	"genesis_multiaddr": "__MULTIADDR__",
+	"node_archive_url": "__NODE_URL__",
+	"node_data_dir_path": "/home/safe/.local/share/safe/node/data",
+	"node_logs_dir_path": "/home/safe/.local/share/safe/node/logs",
+	"provider": "digital-ocean"
+}

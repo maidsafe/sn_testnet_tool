@@ -1,0 +1,9 @@
+{
+	"block_device": "/dev/xvdb",
+	"genesis_multiaddr": "__MULTIADDR__",
+	"node_archive_url": "__NODE_URL__",
+	"node_data_dir_path": "/mnt/node/data",
+	"node_data_mount_path": "/mnt/node",
+	"node_logs_dir_path": "/mnt/node/logs",
+	"provider": "aws"
+}
