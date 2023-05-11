@@ -1,187 +1,83 @@
-# SAFE Network Testnet Automation tool
+# Safe Network Testnet Tool
 
-This tool creates Digital Ocean droplets and deploys nodes to them starting a testnet.
-Adults nodes are killed and restarted at random intervals creating network churn.
+We support creating testnets on either AWS or Digital Ocean. This tool is intended to automate the creation of these testnets.
 
-## Instructions
+# Testnets on AWS
 
-Install terraform: https://learn.hashicorp.com/tutorials/terraform/install-cli
+A testnet can be launched on AWS, where each node will run on an EC2 instance in a VPC.
 
-Get latest state:
+The VPC and other infrastructure should have been setup in advance, using our [testnet-infra repo](https://github.com/maidsafe/terraform-testnet-infra). This process will use a basic Terraform configuration to launch the EC2 instances on the VPC, then use Ansible to provision them with the node setup.
 
+## Setup
+
+The process for spinning up a testnet requires the use of quite a few tools, so for this reason, we've provided a container from which the process can run.
+
+So the first step is to get an installation of [Docker](https://www.docker.com/). There is a good chance it will be available in the package manager for your platform.
+
+After your Docker setup is running, build the container by issuing `docker build --tag sn_testnet_tool:latest .` from this directory. It may take a few minutes to build.
+
+Obtain the AWS access and secret access keys for the `testnet_runner` account, and also the password for the Ansible vault. Put the Ansible password in a file located at `~/.ansible/vault-password`.
+
+Now create a .env at the same level where this directory is, and fill it with the following, replacing each value as appropriate:
 ```
-export DO_PAT=<digital-oceaon-personal-access-token>
-export AWS_ACCESS_KEY_ID=<access-key>
-export AWS_SECRET_ACCESS_KEY=<secret-key>
-export AWS_DEFAULT_REGION=<region, e.g. eu-west-2>
-terraform init
-terraform state pull
-```
-
-## Testnet Channels
-
-We can create separate testnets using terraform workspaces. All commands/scripts will operate on the selected workspace.
-
-To see your current workspace:
-
-```
-terraform workspace show
-```
-
-We generally use `alpha`, `beta` and `public` testnets. To switch to one
-
-```
-terraform workspace select alpha
+AWS_ACCESS_KEY_ID=<value>
+AWS_SECRET_ACCESS_KEY=<value>
+AWS_DEFAULT_REGION=eu-west-2
+DIGITALOCEAN_TOKEN=<value>
+DO_API_TOKEN=<value>
+SSH_KEY_NAME=id_rsa
+SN_TESTNET_DEV_SUBNET_ID=subnet-018f2ab26755df7f9
+SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0d47df5b3f0d01e2a
+TERRAFORM_STATE_BUCKET_NAME=maidsafe-org-infra-tfstate
 ```
 
-### Creating a testnet
+The EC2 instances need to be launched with an SSH key pair and Ansible will also use the same key for its SSH access. You can either generate a new key pair or use an existing one. In either case, set `SSH_KEY_NAME` to the name of a key pair in your `~/.ssh` directory. It should have both private and public key files. So for example, if you set it to `id_rsa`, we expect there will be two files, `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`. The `.pub` extension is necessary.
 
-Once you have a workspace chosen you can create a test network:
+## Create a Testnet
 
+Launch the runner container and navigate to the `sn_testnet_tool` directory:
 ```
-./up.sh <path-to-your-DO-registered-ssh-key> [number of nodes] [local node bin path] [node version] [client count] [-auto-approve]
-```
-
-Example using defaults:
-
-```
-./up.sh ~/.ssh/id_rsa
+./runner.sh
+runner@538cec9f8bdf:~$ cd sn_testnet_tool
+runner@538cec9f8bdf:~/sn_testnet_tool$
 ```
 
-That launches a testnet with 2 nodes, using the latest version of sn_node, and Terraform will prompt for approval.
+The `runner.sh` script wraps all the tedious arguments required to launch the container. You will then find yourself at a Bash prompt inside the container, similar to the one above.
 
-Example using a specific version of `sn_node`:
-
+From here, you can create a testnet like so:
 ```
-./up.sh ~/.ssh/id_rsa 2 "" "0.10.0" "-auto-approve"
-```
-
-Example using a local `sn_node` binary:
-
-```
-./up.sh ~/.ssh/id_rsa 2 "/home/user/dev/safe_network/target/debug/sn_node" "" "-auto-approve"
+runner@538cec9f8bdf:~/sn_testnet_tool$ just init "beta" "digital-ocean"
 ```
 
-Note: both [node bin] and [node version] can't be set at the same time. You must use one or the other (or neither).
-Note 2: the absolute path to the node binary must be supplied.
+Here "beta" is the name of the testnet. The name should be a short word, e.g., "alpha" or "beta", or your first name (though the name "dev" cannot be used, because that's the main workspace that cannot be deleted). This will create a Terraform workspace, a key pair on EC2, and Ansible inventory files.
 
-There's also a utility Makefile, so you can launch a testnet with `make alpha` or `make beta` using a set of defaults. Set any of `SN_TESTNET_SSH_KEY_PATH`, `SN_TESTNET_NODE_COUNT`, `SN_TESTNET_NODE_BIN_PATH` or `SN_TESTNET_NODE_VERSION` to use custom versions of any of these. This launches the testnet with 20 nodes by default (to support file put/get), and also copies the connection information to `~/.safe/network_contacts/{channel}-network-contacts`.
-
-Bring down a network:
-
+Now create the testnet:
 ```
-./down <path-to-your-DO-registered-ssh-key>
+runner@538cec9f8bdf:~/sn_testnet_tool$ just testnet "beta" "digital-ocean" 10
 ```
 
-This can also be done using `make clean-alpha` or `make clean-beta`.
+Terraform will run to create the instances then Ansible will be used to provision them.
 
-Get ips from aws for your workspace:
+You can do the same on AWS by replacing "digital-ocean" with "aws".
 
+## Working with a Testnet
+
+On each EC2 instance or droplet, the node is running as a service, as the `safe` user.
+
+There are various utility targets that can be called:
+
+* `just ssh-details "beta" "digital-ocean"`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node.
+* `just logs "beta" "digital-ocean"`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
+
+The node runs as a service, so it's possible to SSH to the instance and view its logs using `journalctl`:
 ```
-./scripts/get-ips
-```
-
-Get logfiles (requires a populated ip file):
-
-```
-./scripts/logs
-```
-
-See continual network status:
-
-```
-./scripts/status
-```
-
-## Using the network
-
-```
-./scripts/use-network
+journalctl -u safenode # print the log with paging
+journalctl -f -u safenode # follow the log while it's updating
+journalctl -u safenode -o cat --no-pager # print the whole log without paging
 ```
 
-Will copy the current workspace network-contacts to your `~/.safe/network_contacts/{testnet-channel}-network-contacts`
+This can be useful for quick debugging.
 
-##  Building for profiling
+## Teardown
 
-the `./build` script will compile a _standard_ (non musl) version of `sn_node` which can be used with `heaptrack` for memory profiling.
-
-To get the profiles the node in question will need to be stopped for the file to be written to.
-
-
-## Scripts
-
-### Check client progress
-
-Ssh into client node and `rg` for `passed;` , display the output of the `sn_client` test runs. 
-
-### Dl Files
-
-Attempt to download files in `tests/index` using the `safe` bin.
-
-### Do delete droplets
-
-Should use digital ocean api to remove droplets matching a `name`. _Does not work on mac_
-
-### get-all-mem-profile-data
-
-ssh into each machine and grab the heaptrack data. Stores it in `workspace/<workspace>/memory-profiling`
-
-### get-node-mem-profile-data
-
-ssh into a specific machine and grab the heaptrack data. Stores it in `workspace/<workspace>/memory-profiling`
-
-### get-ips
-
-Grabs <workspace> genesis/nodes/client ip info from `aws`, and then `register_keys`
-
-### init-client-node
-
-Used during client node setup, grabs and builds code
-
-### init-node
-
-Used during network setup to get `sn_node` runninng on nodes, with `heaptrack` and other tooling installed
-
-### logs
-
-rsync the `logs` dir of each machine to `workspace/<workspace>/logs/<node>`
-
-### latest-logs
-
-rsync the latest `logs/sn_node.log` dir of each machine to `workspace/<workspace>/logs/<node>`
-
-### loop-client-tests
-
-Copied to the client node during init. Can be run on that machine to... loop client tests. Best run as `nohup ./loop_client_tests.sh &`.
-
-### mem-usage
-
-get mem usage using `pgrep` and print to console
-
-### register-keys
-
-a pre run of `ssh-keyscan` so other scripts can run more smoothly. Adds `workspace/<workspace>/ip-list`
-
-### get-pids
-
-ssh into each machine and store the PID in `workspace/<workspace>/pids`. A follow up of `show-broken-nodes` to see droplets where a process could not be found.
-
-### show-broken-nodes
-
-checks `workspace/<workspace>/pids` for "not found"` text, indicating a process is not running there
-
-### stored-data-size-per-node
-
-ssh in and checks the size of `node_data` folder
-
-### ssh-into-node <node number>
-
-eg `./scripts/ssh-into-node.sh 5` will ssh into the node 5 for you (using the `workspace/<workspace>/ip-list`)
-
-### update-network-contacts
-
-gets latest network contacts file from genesis (useful if there's beena split), stores it at `workspace/<workspace>/network-contacts`
-
-### use-network
-
-Sets your local `network-contacts` to be that of `workspace/<workspace>/network-contacts`
+When you're finished with the testnet, run `just clean <name>`. This will destroy the EC2 instances, delete the Terraform workspace, remove the key pair on EC2 and delete the Ansible inventory files.
