@@ -17,10 +17,10 @@ data/*
 *.zip
 files/*
 addresses/*
-aws/ansible/network-contacts
-aws/ansible/inventory/.*
-aws/.env
-aws/safenode_rpc_client
+ansible/network-contacts
+ansible/inventory/.*
+.env
+safenode_rpc_client
 
 # IDE
 .idea/
