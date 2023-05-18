@@ -1,6 +1,8 @@
 # Safe Network Testnet Tool
 
-We support creating testnets on either AWS or Digital Ocean. This tool is intended to automate the creation of these testnets.
+We support creating testnets on either AWS or Digital Ocean.
+
+This tool can be used to automate their creation.
 
 # Testnets on AWS
 
@@ -81,3 +83,31 @@ This can be useful for quick debugging.
 ## Teardown
 
 When you're finished with the testnet, run `just clean <name>`. This will destroy the EC2 instances, delete the Terraform workspace, remove the key pair on EC2 and delete the Ansible inventory files.
+
+## Development
+
+This section provides information and guidelines on making contributions.
+
+The automation is implemented using these tools:
+
+* A Justfile with targets written in Bash
+* Terraform
+* Ansible
+
+Terraform is used to create the infrastructure and Ansible is used to provision it. Terraform has some basic provisioning capability, but it's clunky to use; we therefore opt for Ansible for provisioning, since it was designed for that purpose.
+
+The `Justfile` targets coordinate the use of both the tools.
+
+### Terraform
+
+The Terraform setup is really simple. We use two different modules: one for AWS and one for Digital Ocean. The modules follow the [standard module structure](https://cloud.google.com/docs/terraform/best-practices-for-terraform#module-structure), with a `main.tf` and a `variables.tf`.
+
+We define the EC2 instances/droplets in `main.tf` and things like the sizes of VMs in `variables.tf`. For AWS, the EC2 instances are intended to be deployed to an existing VPC. For that reason, we need to provide a subnet ID and a security group ID. This infrastructure is defined elsewhere, because in this repository we only want to deal with the creation of a testnet.
+
+### Ansible
+
+To provide an extremely brief introduction to Ansible, it is a mature tool whose purpose is to provision and manage groups of servers. It uses an SSH connection to apply what it calls a 'playbook' to a list of hosts. A playbook is a list of tasks or roles, where a role is also just a list of tasks. Roles are somewhat analogous to classes in object oriented programming: they can be defined once and re-used in multiple playbooks. Tasks are things like installing packages, creating directories, copying files and so on. They are implemented as Python modules. Playbooks, roles and tasks are defined in YAML. The servers that playbooks are applied to are provided using inventory. The inventory can be a static list of IPs/DNS names, or it can be generated dynamically by examining things like the tags applied to the EC2 instaces or droplets.
+
+In our case, we have two main playbooks: one for the genesis node and the other for the remaining nodes. They are almost identical, but differ in that the genesis and remaining nodes need slightly different setups. Both playbooks use the `node` role, which uses a Jinja template to define a service definition for running `safenode`.
+
+There are some other utility playbooks for things like retrieving logs from the servers.
