@@ -50,6 +50,8 @@ testnet env provider node_count node_bin_path="":
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
 
+  just wait-for-ssh "{{env}}" "{{provider}}"
+
   # Provision the genesis node
   just run-ansible-against-nodes "{{env}}" "{{provider}}" "true"
 
@@ -190,6 +192,38 @@ set-genesis-multiaddr env provider:
   multiaddr="/ip4/$genesis_ip/udp/12000/quic-v1/p2p/$peer_id"
   echo "Multiaddr for genesis node is $multiaddr"
   sed "s|__MULTIADDR__|$multiaddr|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+
+wait-for-ssh env provider:
+  #!/usr/bin/env bash
+  if [[ "{{provider}}" == "aws" ]]; then
+    inventory_path="inventory/.{{env}}_genesis_inventory_aws_ec2.yml"
+    cd ansible
+    genesis_ip=$(ansible-inventory --inventory $inventory_path --list | \
+      jq -r '.["_meta"]["hostvars"][]["public_ip_address"]')
+    cd ..
+    user="ubuntu"
+  elif [[ "{{provider}}" == "digital-ocean" ]]; then
+    inventory_path="inventory/.{{env}}_genesis_inventory_digital_ocean.yml"
+    cd ansible
+    genesis_ip=$(ansible-inventory --inventory $inventory_path --list | \
+      jq -r '.["_meta"]["hostvars"][]["ansible_host"]')
+    cd ..
+    user="root"
+  fi
+
+  max_retries=10
+  count=0
+  until ssh -q -oBatchMode=yes -oConnectTimeout=5 -oStrictHostKeyChecking=no $user@$genesis_ip "bash --version"; do
+    sleep 5
+    count=$((count + 1))
+    if [[ $counter -gt $max_retries ]]; then
+      echo "SSH command failed after $count attempts. Exiting."
+      exit 1
+    fi
+    echo "SSH still not available. Attempt $count of $max_retries. Retrying in 5 seconds..."
+  done
+
+  echo "SSH connection now available"
 
 # Build a copy of the RCP client, which is used for obtaining the genesis peer ID.
 # If the binary is already in the current directory we will skip.
