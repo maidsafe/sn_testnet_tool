@@ -35,7 +35,7 @@ init env provider:
   just create-{{provider}}-inventory {{env}}
   just create-{{provider}}-keypair {{env}}
 
-testnet env provider node_count node_bin_path="":
+testnet env provider node_count:
   #!/usr/bin/env bash
   set -e
   (
@@ -44,8 +44,9 @@ testnet env provider node_count node_bin_path="":
   )
   just terraform-apply-{{provider}} "{{env}}" {{node_count}} false
 
-  if [[ ! -z "{{node_bin_path}}" ]]; then
-    just upload-custom-node-bin "{{env}}" "{{provider}}" "{{node_bin_path}}"
+  if [[ -f "bin/safenode" ]]; then
+    echo "Custom safenode binary will be used"
+    just upload-custom-node-bin "{{env}}" "{{provider}}" "bin/safenode"
   else
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
@@ -222,7 +223,6 @@ wait-for-ssh env provider:
     fi
     echo "SSH still not available. Attempt $count of $max_retries. Retrying in 5 seconds..."
   done
-
   echo "SSH connection now available"
 
 # Build a copy of the RCP client, which is used for obtaining the genesis peer ID.
