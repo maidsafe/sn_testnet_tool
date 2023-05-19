@@ -19,6 +19,7 @@ files/*
 addresses/*
 ansible/network-contacts
 ansible/inventory/.*
+ansible/extra_vars/.*
 .env
 safenode_rpc_client
 
