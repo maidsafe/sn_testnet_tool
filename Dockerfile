@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 python:3.11.3-bullseye
 
+COPY entrypoint.sh /entrypoint.sh
 RUN apt-get update -y && \
     apt-get install -y bsdmainutils curl jq less unzip && \
     adduser --disabled-password --gecos '' runner && \
@@ -17,13 +18,16 @@ RUN apt-get update -y && \
 
 USER runner
 WORKDIR /home/runner
-# Set the environment variable to reload the bash source
-# ENV BASH_ENV=/home/runner/.bashrc
-RUN pip install --user ansible boto3 
-RUN curl -L -O https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init 
-RUN chmod +x rustup-init 
-RUN ./rustup-init --default-toolchain nightly --no-modify-path -y
-RUN . ${HOME}/.cargo/env && cargo +nightly install just -Z sparse-registry
-RUN echo "source $HOME/.cargo/env" >> /home/runner/.bashrc
+RUN pip install --user ansible boto3 && \
+  curl -L -O https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init && \
+  chmod +x rustup-init && \
+  ./rustup-init --default-toolchain nightly --no-modify-path -y && \
+  . ${HOME}/.cargo/env && \
+  cargo +nightly install just -Z sparse-registry
 
-CMD ["/bin/bash", "-l"]
+# For reasons unclear, the PATH environment variable does not get modified by
+# the .bashrc when using the entrypoint script. Tried lots of different things.
+# Therefore, we manually apply the paths we need.
+ENV PATH=$PATH:/home/runner/.local/bin:/home/runner/.cargo/bin
+WORKDIR /home/runner/sn_testnet_tool
+ENTRYPOINT ["/entrypoint.sh"]

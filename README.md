@@ -4,7 +4,7 @@ We support creating testnets on either AWS or Digital Ocean.
 
 This tool can be used to automate their creation.
 
-# Testnets on AWS
+## Testnets on AWS
 
 A testnet can be launched on AWS, where each node will run on an EC2 instance in a VPC.
 
@@ -12,9 +12,9 @@ The VPC and other infrastructure should have been setup in advance, using our [t
 
 ## Setup
 
-The process for spinning up a testnet requires the use of quite a few tools, so for this reason, we've provided a container from which the process can run.
+The process for spinning up a testnet requires the use of quite a few tools, so for this reason, we've provided a container from which the process can run. However, if preferred, rather than use the container, it's also possible to setup the tools directly on the host. You can inspect the `Dockerfile` to see which tools are required. Most of the instructions in this document will be oriented to the container setup.
 
-So the first step is to get an installation of [Docker](https://www.docker.com/). There is a good chance it will be available in the package manager for your platform.
+The first step is to get an installation of [Docker](https://www.docker.com/). There's a good chance it will be available in the package manager for your platform.
 
 After your Docker setup is running, build the container by issuing `docker build --tag sn_testnet_tool:latest .` from this directory. It may take a few minutes to build.
 
@@ -37,30 +37,18 @@ The EC2 instances need to be launched with an SSH key pair and Ansible will also
 
 ## Create a Testnet
 
-Launch the runner container and navigate to the `sn_testnet_tool` directory:
-```
-./runner.sh
-runner@538cec9f8bdf:~$ cd sn_testnet_tool
-runner@538cec9f8bdf:~/sn_testnet_tool$
-```
+The container requires a lot of arguments to run properly, so there are some utility scripts to wrap its use.
 
-The `runner.sh` script wraps all the tedious arguments required to launch the container. You will then find yourself at a Bash prompt inside the container, similar to the one above.
-
-From here, you can create a testnet like so:
+To create a testnet on AWS, you can use:
 ```
-runner@538cec9f8bdf:~/sn_testnet_tool$ just init "beta" "digital-ocean"
+./up.sh "<name>" "aws" 10
 ```
 
-Here "beta" is the name of the testnet. The name should be a short word, e.g., "alpha" or "beta", or your first name (though the name "dev" cannot be used, because that's the main workspace that cannot be deleted). This will create a Terraform workspace, a key pair on EC2, and Ansible inventory files.
+The `name` should be a short, lowercase value without any spaces. Examples would be your first name, or something like "alpha" or "beta". The name "dev" is reserved for administration purposes.
 
-Now create the testnet:
-```
-runner@538cec9f8bdf:~/sn_testnet_tool$ just testnet "beta" "digital-ocean" 10
-```
+Terraform will run to create the instances, then Ansible will be used to provision them.
 
-Terraform will run to create the instances then Ansible will be used to provision them.
-
-You can do the same on AWS by replacing "digital-ocean" with "aws".
+We can use Digital Ocean by replacing "aws" with "digital-ocean".
 
 ## Working with a Testnet
 
@@ -68,8 +56,8 @@ On each EC2 instance or droplet, the node is running as a service, as the `safe`
 
 There are various utility targets that can be called:
 
-* `just ssh-details "beta" "digital-ocean"`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node.
-* `just logs "beta" "digital-ocean"`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
+* `./run.sh just ssh-details "beta" "digital-ocean"`: will print out a list of all the nodes and their public IP addresses, which you can then use to SSH to any node.
+* `./run.sh just logs "beta" "digital-ocean"`: will get the logs from all the machines in the testnet and make them available in a `logs` directory locally.
 
 The node runs as a service, so it's possible to SSH to the instance and view its logs using `journalctl`:
 ```
@@ -82,7 +70,7 @@ This can be useful for quick debugging.
 
 ## Teardown
 
-When you're finished with the testnet, run `just clean <name>`. This will destroy the EC2 instances, delete the Terraform workspace, remove the key pair on EC2 and delete the Ansible inventory files.
+When you're finished with the testnet, run `./down.sh "beta" "aws"`. This will destroy the EC2 instances, delete the Terraform workspace, remove the key pair on EC2 and delete the Ansible inventory files.
 
 ## Development
 
