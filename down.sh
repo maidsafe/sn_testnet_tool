@@ -18,8 +18,8 @@ export $(cat .env | sed 's/#.*//g' | xargs)
 
 docker run --rm --interactive --tty \
   --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_DEFAULT_REGION \
-  --env SSH_KEY_NAME --env DIGITALOCEAN_TOKEN --env DO_API_TOKEN \
-  --env SN_TESTNET_DEV_SUBNET_ID --env SN_TESTNET_DEV_SECURITY_GROUP_ID \
+  --env SSH_KEY_NAME --env DO_PAT --env SN_TESTNET_DEV_SUBNET_ID \
+  --env SN_TESTNET_DEV_SECURITY_GROUP_ID \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \

@@ -25,8 +25,7 @@ Now create a .env at the same level where this directory is, and fill it with th
 AWS_ACCESS_KEY_ID=<value>
 AWS_SECRET_ACCESS_KEY=<value>
 AWS_DEFAULT_REGION=eu-west-2
-DIGITALOCEAN_TOKEN=<value>
-DO_API_TOKEN=<value>
+DO_PAT=<value>
 SSH_KEY_NAME=id_rsa
 SN_TESTNET_DEV_SUBNET_ID=subnet-018f2ab26755df7f9
 SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0d47df5b3f0d01e2a
