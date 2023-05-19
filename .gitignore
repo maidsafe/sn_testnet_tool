@@ -12,6 +12,7 @@ adults-ip-list
 doctl*
 *logs/*
 *connection-infos/*
+bin/*
 data/*
 *-network-contacts
 *.zip

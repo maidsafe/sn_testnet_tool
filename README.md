@@ -48,6 +48,11 @@ The `name` should be a short, lowercase value without any spaces. Examples would
 
 Terraform will run to create the instances, then Ansible will be used to provision them.
 
+A custom, locally built `safenode` binary can be supplied by using an additional argument:
+```
+./up.sh "<name>" "aws" 10 "<path>"
+```
+
 We can use Digital Ocean by replacing "aws" with "digital-ocean".
 
 ## Working with a Testnet

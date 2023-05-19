@@ -20,6 +20,15 @@ if [[ -z "$node_count" ]]; then
   exit 1
 fi
 
+custom_bin_path="$4"
+if [[ ! -z "$custom_bin_path" ]]; then
+  [[ ! -d "bin" ]] && mkdir bin
+  cp $custom_bin_path bin/safenode
+else
+  # If this run hasn't supplied a custom binary, clear out anything leftover from a previous run.
+  rm -f bin/safenode
+fi
+
 export $(cat .env | sed 's/#.*//g' | xargs)
 
 docker run --rm --interactive --tty \
