@@ -104,6 +104,7 @@ logs env provider:
       --private-key $HOME/.ssh/$SSH_KEY_NAME \
       --extra-vars "@extra_vars/.{{env}}_{{provider}}.json" \
       --user $user \
+      --forks 30 \
       logs.yml
   )
   (
