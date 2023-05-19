@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.11.3-bullseye
+FROM arm64v8/python:3.11.3-bullseye
 
 COPY entrypoint.sh /entrypoint.sh
 RUN apt-get update -y && \
