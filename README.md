@@ -16,7 +16,7 @@ The process for spinning up a testnet requires the use of quite a few tools, so 
 
 The first step is to get an installation of [Docker](https://www.docker.com/). There's a good chance it will be available in the package manager for your platform.
 
-After your Docker setup is running, build the container by issuing `docker build --tag sn_testnet_tool:latest .` from this directory. It may take a few minutes to build.
+After your Docker setup is running, you can build the container using the `build-container.sh` script from this directory. It may take five minutes or so to build.
 
 Obtain the AWS access and secret access keys for the `testnet_runner` account, and also the password for the Ansible vault. Put the Ansible password in a file located at `~/.ansible/vault-password`.
 
