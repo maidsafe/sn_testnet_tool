@@ -215,10 +215,11 @@ wait-for-ssh env provider:
 
   max_retries=10
   count=0
-  until ssh -q -oBatchMode=yes -oConnectTimeout=5 -oStrictHostKeyChecking=no $user@$genesis_ip "bash --version"; do
+  until ssh -i "${HOME}/.ssh/${SSH_KEY_NAME}" \
+    -q -oBatchMode=yes -oConnectTimeout=5 -oStrictHostKeyChecking=no $user@$genesis_ip "bash --version"; do
     sleep 5
     count=$((count + 1))
-    if [[ $counter -gt $max_retries ]]; then
+    if [[ $count -gt $max_retries ]]; then
       echo "SSH command failed after $count attempts. Exiting."
       exit 1
     fi
