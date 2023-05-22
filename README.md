@@ -1,16 +1,12 @@
 # Safe Network Testnet Tool
 
-We support creating testnets on either AWS or Digital Ocean.
-
-This tool can be used to automate their creation.
-
-## Testnets on AWS
-
-A testnet can be launched on AWS, where each node will run on an EC2 instance in a VPC.
-
-The VPC and other infrastructure should have been setup in advance, using our [testnet-infra repo](https://github.com/maidsafe/terraform-testnet-infra). This process will use a basic Terraform configuration to launch the EC2 instances on the VPC, then use Ansible to provision them with the node setup.
+This tool can be used to automate the creation of testnets on AWS or Digital Ocean.
 
 ## Setup
+
+We have a container that greatly simplifies most of the setup, but there are also additional steps.
+
+### Docker
 
 The process for spinning up a testnet requires the use of quite a few tools, so for this reason, we've provided a container from which the process can run. However, if preferred, rather than use the container, it's also possible to setup the tools directly on the host. You can inspect the `Dockerfile` to see which tools are required. Most of the instructions in this document will be oriented to the container setup.
 
@@ -18,9 +14,35 @@ The first step is to get an installation of [Docker](https://www.docker.com/). T
 
 After your Docker setup is running, you can build the container using the `build-container.sh` script from this directory. It may take five minutes or so to build.
 
-Obtain the AWS access and secret access keys for the `testnet_runner` account, and also the password for the Ansible vault. Put the Ansible password in a file located at `~/.ansible/vault-password`.
+### AWS
 
-Now create a .env at the same level where this directory is, and fill it with the following, replacing each value as appropriate:
+On AWS, each node will run on an EC2 instance in a VPC.
+
+The VPC and other infrastructure should have been setup in advance, using our [testnet-infra repo](https://github.com/maidsafe/terraform-testnet-infra).
+
+A subnet and security group from this VPC will need to be obtained and set as `SN_TESTNET_DEV_SUBNET_ID` and `SN_TESTNET_DEV_SECURITY_GROUP_ID`.
+
+You need access keys that have permissions to create EC2 instances and upload to some S3 buckets.
+
+### Digital Ocean
+
+On Digital Ocean we don't require any other infrastructure to be created in advance.
+
+You only need to have a user account with a personal access token.
+
+### Ansible
+
+Our setup uses Ansible's vault feature to encrypt AWS access keys that are used for querying information about EC2 instances. Therefore, the vault password needs to be obtained from someone else in the team. Once you have it, put in a file located at `~/.ansible/vault-password`.
+
+### SSH Access
+
+The EC2 instances need to be launched with an SSH key pair and Ansible will also use the same key for its SSH access. You can either generate a new key pair or use an existing one. In either case, set `SSH_KEY_NAME` to the name of a key pair in your `~/.ssh` directory. It should have both private and public key files. So for example, if you set it to `id_rsa`, we expect there will be two files, `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`. The `.pub` extension is necessary.
+
+For Digital Ocean your public key needs to be uploaded to your user account.
+
+### Environment Variables
+
+Now create a `.env` file at the same level where this directory is, and fill it with the following, replacing each value as appropriate:
 ```
 AWS_ACCESS_KEY_ID=<value>
 AWS_SECRET_ACCESS_KEY=<value>
@@ -31,8 +53,6 @@ SN_TESTNET_DEV_SUBNET_ID=subnet-018f2ab26755df7f9
 SN_TESTNET_DEV_SECURITY_GROUP_ID=sg-0d47df5b3f0d01e2a
 TERRAFORM_STATE_BUCKET_NAME=maidsafe-org-infra-tfstate
 ```
-
-The EC2 instances need to be launched with an SSH key pair and Ansible will also use the same key for its SSH access. You can either generate a new key pair or use an existing one. In either case, set `SSH_KEY_NAME` to the name of a key pair in your `~/.ssh` directory. It should have both private and public key files. So for example, if you set it to `id_rsa`, we expect there will be two files, `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub`. The `.pub` extension is necessary.
 
 ## Create a Testnet
 
