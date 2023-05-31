@@ -2,7 +2,7 @@
 NODE=${1}
 TESTNET_CHANNEL=$(terraform workspace show)
 
-target_node="node-$NODE"
+target_node="droplet-$NODE"
 
 echo "Trying to ssh into $target_node"
 

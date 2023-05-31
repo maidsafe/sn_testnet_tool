@@ -43,7 +43,10 @@ if [[ -z "$peers" ]]; then
   echo "No peer supplied, this must be the first node"
 fi
 
-
+nodes_to_run_on_this_machine="$6"
+if [[ -z "$nodes_to_run_on_this_machine" ]]; then
+  echo "No nodes count supplied"
+fi
 
 
 # otlp_collector_endpoint="$8"
@@ -125,17 +128,19 @@ function install_node() {
   chmod +x safenode
   mkdir -p ~/node_data
   mkdir -p ~/.safe/node
-  mkdir -p ~/logs
 }
 
 
 function run_node() {
-  export RUST_LOG=safenode=trace
+  export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"
   # export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
   # export TOKIO_CONSOLE_BIND="${bind_ip_address}:6669",
-  
+  i=${1:-1} 
+
+  port=$((12000 + i))
+
   # peers exists and has length > 0
   if [[ -n "$peers" ]]; then
     echo "supplied peers var is $peers"
@@ -143,27 +148,50 @@ function run_node() {
      node_cmd=$(printf '%s' \
       "./safenode " \
       "--peer $peers " \
-      "--root-dir ~/node_data " \
-      "--log-dir ~/logs " \
+      "--root-dir ~/node_data-$i " \
+      "--log-dir ~/logs-$i " \
       "$log_level" \
       "--rpc " \
-      "$node_ip_address:12001 "
+      "$node_ip_address:$port "
     )
+
+
+  # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
       "./safenode " \
-      "--root-dir ~/node_data " \
-      "--log-dir ~/logs " \
+      "--root-dir ~/node_data-$i " \
+      "--log-dir ~/logs-$i " \
       "$log_level" \
+      "--rpc " \
+      "$node_ip_address:$port "
     )
   fi
-    echo "Launching node with: $node_cmd"
-    nohup sh -c "$node_cmd" &
-    sleep 5
+  
+  echo "Launching node with: $node_cmd"
+  nohup sh -c "$node_cmd" &
+  sleep 1
   
 }
 
 install_ripgrep
 install_node
 # setup_network_contacts
-run_node
+
+# Check if the environment variable is set
+if [[ -n "$nodes_to_run_on_this_machine" ]]; then
+  nodes_to_run=$nodes_to_run_on_this_machine
+else
+  nodes_to_run=20
+fi
+
+if [[ -n "$peers" ]]; then
+
+  for ((i=1; i <= nodes_to_run; i++))
+  do
+    run_node $i
+  done
+
+else
+  run_node
+fi

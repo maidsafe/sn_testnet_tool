@@ -16,8 +16,12 @@ variable "do_token" {}
 
 variable "pvt_key" {}
 
-variable "number_of_nodes" {
+variable "number_of_droplets" {
   default = "5"
+}
+
+variable "number_of_nodes_per_machine" {
+  default = "20"
 }
 
 variable "testnet_channel" {
@@ -62,11 +66,8 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-1vcpu-1gb"
-}
-
-variable "client-size" {
-  default = "s-4vcpu-8gb" # bigger for faster builds
+  default = "s-2vcpu-2gb-amd"
+  # default = "s-1vcpu-1gb"
 }
 
 provider "digitalocean" {
@@ -85,9 +86,6 @@ variable "commit_hash" {
   default = "."
 }
 
-variable "client_count" {
-  default = "0"
-}
 
 variable "node_url" {
   default = "https://sn-node.s3.eu-west-2.amazonaws.com/safenode-latest-x86_64-unknown-linux-musl.tar.gz"

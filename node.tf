@@ -1,6 +1,6 @@
-resource "digitalocean_droplet" "node1" {
+resource "digitalocean_droplet" "node1-client" {
   image    = "ubuntu-22-04-x64"
-  name     = "${terraform.workspace}-safe-node1"
+  name     = "${terraform.workspace}-safe-node1-and-client"
   region   = var.region
   size     = var.node-size
   ssh_keys = var.ssh_keys
@@ -19,6 +19,24 @@ resource "digitalocean_droplet" "node1" {
   }
 
   provisioner "file" {
+    source      = "./workspace/${terraform.workspace}/safe"
+    destination = "safe"
+  }
+
+
+  provisioner "remote-exec" {
+    inline = [
+     " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
+      "apt install wget unzip -y",
+      "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
+      "unzip ./the-test-data.zip",
+      "chmod +x ./safe",
+      "cp ./safe /usr/local/bin/safe",
+    ]
+  }
+  
+
+  provisioner "file" {
     source       = "workspace/${terraform.workspace}/node-1"
     destination  = "/contact-node-peer-id"
   }
@@ -28,7 +46,7 @@ resource "digitalocean_droplet" "node1" {
     command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
-      echo "node-1 ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
+      echo "droplet-1 ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }
@@ -41,8 +59,9 @@ resource "digitalocean_droplet" "node1" {
     inline = [
       "sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep -y > /dev/null 2>&1",
       "chmod +x /tmp/init-node.sh",
+      "echo \"nodes per.... ${var.number_of_nodes_per_machine}\"",
       "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-1\" ${self.ipv4_address}",
-      "rg \"listening on \".+\"\" > /tmp/output.txt",
+      "rg \"node is listening on \".+\"\" > /tmp/output.txt",
     ]
   }
 
@@ -59,13 +78,13 @@ resource "digitalocean_droplet" "node1" {
 }
 
 resource "digitalocean_droplet" "node" {
-  count    = var.number_of_nodes - 1
+  count    = var.number_of_droplets - 1
   image    = "ubuntu-22-04-x64"
   name     = "${terraform.workspace}-safe-node-${count.index + 2}" // 2 because 0 index + initial node1
   region   = var.region
   size     = var.node-size
   ssh_keys = var.ssh_keys
-  depends_on = [digitalocean_droplet.node1]
+  depends_on = [digitalocean_droplet.node1-client]
   
   connection {
     host        = self.ipv4_address
@@ -96,7 +115,7 @@ resource "digitalocean_droplet" "node" {
     command = <<EOH
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
-      echo "node-${count.index + 2} ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
+      echo "droplet-${count.index + 2} ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }
@@ -107,7 +126,7 @@ resource "digitalocean_droplet" "node" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/init-node.sh",
-      "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-${count.index + 2}\" ${self.ipv4_address} \"/ip4/$(cat /contact-node-peer-id)\"",
+      "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-${count.index + 2}\" ${self.ipv4_address} \"/ip4/$(cat /contact-node-peer-id)\" ${var.number_of_nodes_per_machine}",
     ]
   }
 

@@ -8,12 +8,21 @@ SSH_KEY_PATH=${1}
 NODE_COUNT=${2:-1}
 NODE_BIN_PATH=${3}
 NODE_VERSION=${4}
-CLIENT_COUNT=${5}
-AUTO_APPROVE=${6}
-OTLP_COLLECTOR_ENDPOINT=${7:-"http://dev-testnet-infra-543e2a753f964a15.elb.eu-west-2.amazonaws.com:4317"}
+AUTO_APPROVE=${5}
+OTLP_COLLECTOR_ENDPOINT=${6:-"http://dev-testnet-infra-543e2a753f964a15.elb.eu-west-2.amazonaws.com:4317"}
+SKIP_UPLOAD=${7:-false}
 
+
+ if [[ -n "$NODES_PER_MACHINE" ]]; then
+    nodes_per_droplet=$NODES_PER_MACHINE
+  else
+    nodes_per_droplet=20
+  fi
+
+NODES_PER_MACHINE=$nodes_per_droplet
+  
 testnet_channel=$(terraform workspace show)
-client_data_exists_file=workspace/${testnet_channel}/client-data-exists
+ip_list_file=workspace/${testnet_channel}/ip-list
 
 function check_dependencies() {
   set +e
@@ -76,22 +85,26 @@ function run_terraform_apply() {
     archive_path="/tmp/$archive_name"
     node_url="${SAFENODE_URL_PREFIX}/$archive_name"
 
-    if test -f "$client_data_exists_file"; then
+    if test -f "$ip_list_file"; then
         echo "Using preexisting bin from AWS for $testnet_channel."
     else 
-      echo "Creating $archive_path..."
-      tar -C $path -zcvf $archive_path safenode
-      echo "Uploading $archive_path to S3..."
-      aws s3 cp $archive_path s3://sn-node --acl public-read
+      if [[ "$SKIP_UPLOAD" != "true" ]]; then
+        echo "Creating $archive_path..."
+        tar -C $path -zcvf $archive_path safenode
+        echo "Uploading $archive_path to S3..."
+        aws s3 cp $archive_path s3://sn-node --acl public-read
+      else 
+        echo "Skipping upload of $archive_path to S3..."
+      fi
     fi
   fi
 
   terraform apply \
     -var "do_token=${DO_PAT}" \
     -var "pvt_key=${SSH_KEY_PATH}" \
-    -var "number_of_nodes=${NODE_COUNT}" \
+    -var "number_of_droplets=${DROPLET_COUNT}" \
+    -var "number_of_nodes_per_machine=${NODES_PER_MACHINE}" \
     -var "node_url=${node_url}" \
-    -var "client_count=${CLIENT_COUNT}" \
     -var "otlp_collector_endpoint=${OTLP_COLLECTOR_ENDPOINT}" \
     --parallelism 15 ${AUTO_APPROVE}
 }
@@ -130,7 +143,7 @@ function kick_off_client() {
   echo "Safe cli version is:"
   ssh root@${ip} 'safe -V'
 
-  if test -f "$client_data_exists_file"; then
+  if test -f "$ip_list_file"; then
       echo "Client data has already been put onto $testnet_channel."
   else 
     ssh root@${ip} 'safe files put loop_client_tests.sh'
@@ -143,7 +156,24 @@ function kick_off_client() {
 
 }
 
+
+function calculate_droplet_count() {
+  DROPLET_COUNT=$((NODE_COUNT / NODES_PER_MACHINE))
+
+  
+  if [[ $DROPLET_COUNT -lt 2 ]]; then
+    DROPLET_COUNT=2
+  fi
+  
+  echo "Running $DROPLET_COUNT droplets to get $NODE_COUNT nodes"
+  echo "min count of nodes per machine is 20, unless you set NODES_PER_MACHINE env var"
+  echo "(node-1 always runs on its own droplet)" # this is just for simplicity when setting up other nodes
+}
+
+
+
 check_dependencies
+calculate_droplet_count
 run_terraform_apply
 copy_ips_to_s3
 # pull_network_contacts_and_copy_to_s3

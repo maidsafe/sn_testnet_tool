@@ -15,5 +15,4 @@ terraform destroy \
   -var "pvt_key=${1}" \
   --parallelism 15 ${AUTO_APPROVE}
 
-rm workspace/${TESTNET_CHANNEL}/client-data-exists || true
 rm workspace/${TESTNET_CHANNEL}/ip-list || true
