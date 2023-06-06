@@ -117,25 +117,25 @@ function copy_ips_to_s3() {
     --acl public-read
 }
 
-function pull_genesis_dbc_and_copy_to_s3() {
-  local genesis_dbc_path="./workspace/$testnet_channel/genesis-dbc"
-  echo "Pulling Genesis DBC from Genesis node"
-  rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
-  aws s3 cp \
-    "$genesis_dbc_path" \
-    "s3://sn-node/testnet_tool/$testnet_channel/genesis-dbc" \
-    --acl public-read
-}
+# function pull_genesis_dbc_and_copy_to_s3() {
+#   local genesis_dbc_path="./workspace/$testnet_channel/genesis-dbc"
+#   echo "Pulling Genesis DBC from Genesis node"
+#   rsync root@"$genesis_ip":~/node_data/genesis_dbc "$genesis_dbc_path"
+#   aws s3 cp \
+#     "$genesis_dbc_path" \
+#     "s3://sn-node/testnet_tool/$testnet_channel/genesis-dbc" \
+#     --acl public-read
+# }
 
-function pull_genesis_key_and_copy_to_s3() {
-  local genesis_key_path="./workspace/$testnet_channel/genesis-key"
-  echo "Pulling Genesis key from Genesis node"
-  rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
-  aws s3 cp \
-    "$genesis_key_path" \
-    "s3://sn-node/testnet_tool/$testnet_channel-genesis-key" \
-    --acl public-read
-}
+# function pull_genesis_key_and_copy_to_s3() {
+#   local genesis_key_path="./workspace/$testnet_channel/genesis-key"
+#   echo "Pulling Genesis key from Genesis node"
+#   rsync root@"$genesis_ip":~/genesis-key "$genesis_key_path"
+#   aws s3 cp \
+#     "$genesis_key_path" \
+#     "s3://sn-node/testnet_tool/$testnet_channel-genesis-key" \
+#     --acl public-read
+# }
 
 function kick_off_client() {
   echo "Kicking off client tests..."
@@ -177,6 +177,13 @@ calculate_droplet_count
 run_terraform_apply
 copy_ips_to_s3
 # pull_network_contacts_and_copy_to_s3
-pull_genesis_dbc_and_copy_to_s3
-pull_genesis_key_and_copy_to_s3
+# pull_genesis_dbc_and_copy_to_s3
+# pull_genesis_key_and_copy_to_s3
 # kick_off_client
+
+
+./scripts/upload-test-data.sh
+./scripts/download-test-data.sh
+
+
+# trigger dls in the background

@@ -12,51 +12,37 @@ cleanup() {
   # script cleanup here
 }
 
-print_records=false
-print_memcpu=false
-
-# Parse command-line arguments
-while [[ $# -gt 0 ]]; do
-    key="$1"
-    case $key in
-        -r|--records)
-        print_records=true
-        shift
-        ;;
-        -m|--memcpu)
-        print_memcpu=true
-        shift
-        ;;
-        *)
-        echo "Unknown option: $key"
-        exit 1
-        ;;
-    esac
-done
-
 echo "$TESTNET_CHANNEL information:"
 echo ""
 
 total=0
-droplets_accessed=0
+export TESTNET_CHANNEL
+export TZ=GMT
 
-args=""
-if [[ "$print_records" == true ]]; then
-  args+=" -r"
-fi
-if [[ "$print_memcpu" == true ]]; then
-  args+=" -m"
-fi
+# Define a function to run on each host
+do_work() {
+    ip="$1"
+    machine_name=$(ssh root@"$ip" hostname)
+    dir_name="${machine_name}__${ip}"
+    mkdir -p "workspace/${TESTNET_CHANNEL}/resources/${dir_name}"
+    timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+    
+    echo "$timestamp" >> "workspace/${TESTNET_CHANNEL}/resources/${dir_name}/resource.log"
+    record=$(ssh root@"$ip" "bash -s" < ./scripts/resource-usage-on-machine.sh)
+    echo "$record" >> "workspace/${TESTNET_CHANNEL}/resources/${dir_name}/resource.log"
+    echo "$record"
+    
+    echo "Checked $ip" >&2
+}
 
-while read -r line; do
-  echo "$line"
-  if [[ $line == "Total safenode processes: "* ]]; then
-    count=${line#"Total safenode processes: "}
-    total=$((total + count))
-    droplets_accessed=$((droplets_accessed + 1))
-  fi
-      # ssh root@"$ip" "bash -s" -- $args < /dev/null ./scripts/resource-usage-on-machine.sh
-done < <(cat workspace/${TESTNET_CHANNEL}/ip-list | parallel --colsep ' ' -j0 "ssh root@{2} "bash -s" -- $args < ./scripts/resource-usage-on-machine.sh")
+# Export the function so that it's available to GNU Parallel
+export -f do_work
+
+# Use GNU Parallel to run the function on each IP in parallel and get total
+total=$(cat workspace/${TESTNET_CHANNEL}/ip-list | awk '{print $2}' | parallel --jobs 0 do_work | awk '{sum += $1} END {print sum}')
+
+droplets_accessed=$(wc -l < workspace/${TESTNET_CHANNEL}/ip-list)
+
 echo "$droplets_accessed droplets accessed in check."
 echo "Grand total safenode processes: $total"
 

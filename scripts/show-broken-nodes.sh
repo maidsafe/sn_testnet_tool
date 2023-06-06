@@ -3,6 +3,9 @@
 
 TESTNET_CHANNEL=$(terraform workspace show)
 
-echo "to be run after \"get-pids\" script..."
+#!/bin/bash
 
-rg "not found" workspace/$TESTNET_CHANNEL/pids -u -c
+# Concatenate and display killed.log files
+rg -u "Killed" ./workspace/${TESTNET_CHANNEL}/logs/**/killed.log;
+
+
