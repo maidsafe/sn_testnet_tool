@@ -4,7 +4,7 @@ variable "ami_id" {
 }
 
 variable "instance_type" {
-  default = "t2.small"
+  default = "t2.nano"
   description = "Type of the EC2 instances for the nodes"
 }
 
