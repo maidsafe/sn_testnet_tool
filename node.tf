@@ -27,7 +27,7 @@ resource "digitalocean_droplet" "node1-client" {
   provisioner "remote-exec" {
     inline = [
      " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
-      "apt install wget parallel unzip -y",
+      "DEBIAN_FRONTEND=noninteractive apt install wget parallel unzip -y",
       "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
       "unzip ./the-test-data.zip",
       "chmod +x ./safe",
