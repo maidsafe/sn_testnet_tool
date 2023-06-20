@@ -9,7 +9,6 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 mkdir -p workspace/${TESTNET_CHANNEL}/logs
 
 export TESTNET_CHANNEL
-export -f cleanup
 
 parallel -a workspace/${TESTNET_CHANNEL}/ip-list --colsep ' ' --jobs 10 'name={1}; ip={2}; if [[ -z $name || -z $ip ]]; then echo "$name $ip - Skipping line due to empty name or IP"; else echo "Getting $name logs from $ip"; \
 rsync -arz --include "logs**/safenode.log" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}; fi'
