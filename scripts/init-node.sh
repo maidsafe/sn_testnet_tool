@@ -87,40 +87,6 @@ function install_heaptrack() {
   fi
 }
 
-
-function install_ripgrep() {
-  # This is the first package we attempt to install. There are issues with apt
-  # when the machine is initially used. Sometimes it is still running in the
-  # background, in which case there will be an error about a file being locked.
-  # Other times, the ripgrep package won't be available because it seems to
-  # be some kind of timing issue: if you run the install command too quickly
-  # after the update command, apt will complain it can't find the package.
-  sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
-  retry_count=1
-  ripgrep_installed="false"
-  while [[ $retry_count -le 20 ]]; do
-    echo "Attempting to install ripgrep..."
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep -y > /dev/null 2>&1
-    local exit_code=$?
-    if [[ $exit_code -eq 0 ]]; then
-        echo "ripgrep installed successfully"
-        ripgrep_installed="true"
-        break
-    fi
-    echo "Failed to install ripgrep."
-    # echo "Failed to install ripgrep."
-    echo "Attempted $retry_count times. Will retry up to 20 times. Sleeping for 10 seconds."
-    ((retry_count++))
-    sleep 10
-    # Without running this again there are times when it will just fail on every retry.
-    sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
-  done
-  if [[ "$ripgrep_installed" == "false" ]]; then
-    echo "Failed to install ripgrep"
-    exit 1
-  fi
-}
-
 function install_node() {
   archive_name=$(awk -F '/' '{ print $4 }' <<< $node_url)
   wget ${node_url}
@@ -147,7 +113,7 @@ function run_node() {
     echo "supplied peers var is $peers"
 
      node_cmd=$(printf '%s' \
-      "./safenode " \
+      "heaptrack ./safenode " \
       "--peer $peers " \
       "--root-dir ~/node_data-$i " \
       "--log-dir ~/logs-$i " \
@@ -160,7 +126,7 @@ function run_node() {
   # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
-      "./safenode " \
+      "heaptrack ./safenode " \
       "--root-dir ~/node_data-$i " \
       "--log-dir ~/logs-$i " \
       "$log_level" \
@@ -175,7 +141,7 @@ function run_node() {
   
 }
 
-install_ripgrep
+install_heaptrack
 install_node
 # setup_network_contacts
 
