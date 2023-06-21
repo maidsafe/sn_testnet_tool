@@ -132,7 +132,8 @@ function install_node() {
 
 
 function run_node() {
-  export SN_LOG=all
+  export RUST_LOG=sn_node,safenode=debug,sn_networking=info
+  # export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"
   # export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
