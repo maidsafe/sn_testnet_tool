@@ -28,5 +28,5 @@ echo "Nohup files updated"
 
 
 # Concatenate and display killed.log files
-rg -u "Killed" ./workspace/${TESTNET_CHANNEL}/logs/**/killed.log;
+rg -u "Killed.+safe" ./workspace/${TESTNET_CHANNEL}/logs/**/killed.log;
 
