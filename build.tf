@@ -65,6 +65,7 @@ resource "digitalocean_droplet" "node_builder" {
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
             "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bins",
+            "cargo build --release --example safenode_rpc_client",
         ]
     }
 
@@ -81,5 +82,8 @@ resource "digitalocean_droplet" "node_builder" {
     }
     provisioner "local-exec" {
         command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/safenode ./workspace/${terraform.workspace}/safenode"
+    }
+    provisioner "local-exec" {
+        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/examples/safenode_rpc_client ./workspace/${terraform.workspace}/safenode_rpc_client"
     }
 }

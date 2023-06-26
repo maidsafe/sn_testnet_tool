@@ -98,8 +98,8 @@ function install_node() {
 
 
 function run_node() {
-  # export RUST_LOG=sn_node,safenode=debug,sn_networking=info,libp2p=debug
-  export SN_LOG=all
+  export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=info
+  # export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"
   # export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"

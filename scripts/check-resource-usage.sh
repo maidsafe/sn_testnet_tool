@@ -32,14 +32,14 @@ do_work() {
     echo "$record" >> "workspace/${TESTNET_CHANNEL}/resources/${dir_name}/resource.log"
     echo "$record"
     
-    echo "Checked $ip" >&2
+    echo "workspace/${TESTNET_CHANNEL}/resources/${dir_name}/resource.log updated" >&2
 }
 
 # Export the function so that it's available to GNU Parallel
 export -f do_work
 
 # Use GNU Parallel to run the function on each IP in parallel and get total
-total=$(cat workspace/${TESTNET_CHANNEL}/ip-list | awk '{print $2}' | parallel --jobs 0 do_work | awk '{sum += $1} END {print sum}')
+total=$(cat workspace/${TESTNET_CHANNEL}/ip-list | awk '{print $2}' | parallel --timeout 30 --jobs 10 do_work | awk '{sum += $1} END {print sum}')
 
 droplets_accessed=$(wc -l < workspace/${TESTNET_CHANNEL}/ip-list)
 
