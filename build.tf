@@ -82,7 +82,4 @@ resource "digitalocean_droplet" "node_builder" {
     provisioner "local-exec" {
         command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/safenode ./workspace/${terraform.workspace}/safenode"
     }
-    provisioner "local-exec" {
-        command = "rsync -z root@${self.ipv4_address}:/root/safe_network/target/release/examples/safenode_rpc_client ./workspace/${terraform.workspace}/safenode_rpc_client"
-    }
 }
