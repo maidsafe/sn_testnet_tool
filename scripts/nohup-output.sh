@@ -3,7 +3,7 @@
 TESTNET_CHANNEL=$(terraform workspace show)
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
-mkdir -p workspace/${TESTNET_CHANNEL}/logs
+mkdir -p workspace/${TESTNET_CHANNEL}/droplets
 export TESTNET_CHANNEL
 
 process_logs() {
@@ -14,8 +14,8 @@ process_logs() {
   else
     # echo "Getting $name nohup file from $ip"
     # rsync -arz --include "./nohup.out" --exclude "*" root@${ip}:~/ "workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}"
-    if grep -q "Killed" "workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}/nohup.out"; then
-      ssh root@${ip} 'dmesg | rg "Killed"' >> "workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}/killed.log"
+    if grep -q "Killed" "workspace/${TESTNET_CHANNEL}/droplets/${name}___${ip}/nohup.out"; then
+      ssh root@${ip} 'dmesg | rg "Killed"' >> "workspace/${TESTNET_CHANNEL}/droplets/${name}___${ip}/killed.log"
     fi
   fi
 }

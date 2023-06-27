@@ -6,11 +6,11 @@ TESTNET_CHANNEL=$(terraform workspace show)
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
-mkdir -p workspace/${TESTNET_CHANNEL}/logs
+mkdir -p workspace/${TESTNET_CHANNEL}/droplets
 
 export TESTNET_CHANNEL
 
 parallel --timeout 30 -a workspace/${TESTNET_CHANNEL}/ip-list --colsep ' ' --jobs 10 'name={1}; ip={2}; if [[ -z $name || -z $ip ]]; then echo "$name $ip - Skipping line due to empty name or IP"; else echo "Getting $name logs from $ip"; \
-rsync -arz --include "logs**/safenode.log" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/logs/${name}___${ip}; fi'
+rsync -arz --include "logs**/safenode.log" --include "nohup.out" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}; fi'
 
-echo "Logs updated"
+echo "Latest Logs updated"
