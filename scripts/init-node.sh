@@ -55,7 +55,7 @@ fi
 #   exit 1
 # fi
 
-function install_heaptrack() {
+function install_deps() {
   # This is the first package we attempt to install. There are issues with apt
   # when the machine is initially used. Sometimes it is still running in the
   # background, in which case there will be an error about a file being locked.
@@ -98,8 +98,8 @@ function install_node() {
 
 
 function run_node() {
-  # export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=info
-  export SN_LOG=all
+  export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=info
+  # export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"
   # export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
@@ -113,7 +113,7 @@ function run_node() {
     echo "supplied peers var is $peers"
 
      node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--peer $peers " \
       "--root-dir ~/node_data-$i " \
       "--log-dir ~/logs-$i " \
@@ -126,7 +126,7 @@ function run_node() {
   # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--root-dir ~/node_data-$i " \
       "--log-dir ~/logs-$i " \
       "$log_level" \
@@ -141,7 +141,7 @@ function run_node() {
   
 }
 
-install_heaptrack
+install_deps
 install_node
 # setup_network_contacts
 

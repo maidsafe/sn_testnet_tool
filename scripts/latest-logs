@@ -13,4 +13,7 @@ export TESTNET_CHANNEL
 parallel --timeout 30 -a workspace/${TESTNET_CHANNEL}/ip-list --colsep ' ' --jobs 10 'name={1}; ip={2}; if [[ -z $name || -z $ip ]]; then echo "$name $ip - Skipping line due to empty name or IP"; else echo "Getting $name logs from $ip"; \
 rsync -arzm --include="*/" --include "safenode.log" --exclude "*/*" --include "nohup.out" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}; fi'
 
+./scripts/nohup-output.sh
+
+
 echo "Latest Logs updated"
