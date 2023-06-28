@@ -21,7 +21,7 @@ variable "droplet_size" {
 }
 
 variable "droplet_image" {
-  default = "ubuntu-22-04-x64"
+  default = "ubuntu-22-10-x64"
 }
 
 variable "region" {
