@@ -12,4 +12,4 @@ docker run --rm --interactive --tty \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \
-  sn_testnet_tool:latest $@
+  jacderida/sn_testnet_tool:latest $@
