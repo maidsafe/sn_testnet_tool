@@ -1,6 +1,7 @@
 variable "droplet_ssh_keys" {
   type    = list(number)
   default = [
+    38393104, # Angus Maciver
     37243057, # Benno Zeeman
     38313409, # Roland Sherwin
     36971688, # David Irvine
