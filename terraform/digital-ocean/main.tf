@@ -28,3 +28,13 @@ resource "digitalocean_droplet" "node" {
   ssh_keys = var.droplet_ssh_keys
   tags     = ["environment:${terraform.workspace}", "type:node"]
 }
+
+resource "digitalocean_droplet" "build" {
+  count    = var.custom_bin ? 1 : 0
+  image    = var.droplet_image
+  name     = "${terraform.workspace}-build"
+  region   = var.region
+  size     = var.build_machine_size
+  ssh_keys = var.droplet_ssh_keys
+  tags     = ["environment:${terraform.workspace}", "type:build"]
+}

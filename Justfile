@@ -35,14 +35,21 @@ init env provider:
   just create-{{provider}}-inventory {{env}}
   just create-{{provider}}-keypair {{env}}
 
-testnet env provider node_count:
+testnet env provider node_count custom_bin org="" branch="":
   #!/usr/bin/env bash
   set -e
   (
     cd terraform/{{provider}}
     terraform workspace select {{env}}
   )
+
+  if [[ {{custom_bin}} == true ]]; then
+  cd terraform/digital-ocean
+  terraform apply -auto-approve -var custom_bin={{custom_bin}}
+  just terraform-apply-{{provider}} "{{env}}" {{node_count}} true
+  else
   just terraform-apply-{{provider}} "{{env}}" {{node_count}} false
+  fi
 
   if [[ -f "bin/safenode" ]]; then
     echo "Custom safenode binary will be used"

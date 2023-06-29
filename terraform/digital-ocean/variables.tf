@@ -21,6 +21,10 @@ variable "droplet_size" {
   default = "s-2vcpu-2gb"
 }
 
+variable "build_machine_size" {
+  default = "s-4vcpu-8gb"
+}
+
 variable "droplet_image" {
   default = "ubuntu-22-10-x64"
 }
@@ -32,4 +36,20 @@ variable "region" {
 variable "node_count" {
   default = 30
   description = "The number of droplets to launch for the nodes"
+}
+
+variable "custom_bin" {
+  type = bool
+  default = false
+  description = "A boolean to enable use of a custom bin"
+}
+
+variable "org" {
+  default = "maidsafe"
+  description = "The github organisation for the custom bin"
+}
+
+variable "branch" {
+  default = "main"
+  description = "The github branch for the custom bin"
 }
