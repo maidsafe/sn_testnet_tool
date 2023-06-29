@@ -61,10 +61,10 @@ function run_terraform_apply() {
          -var "repo_owner=${REPO_OWNER}" \
          -var "commit_hash=${COMMIT_HASH}" \
          -target=digitalocean_droplet.node_builder
-    terraform destroy \
-         -var "do_token=${DO_PAT}" \
-         -var "pvt_key=${SSH_KEY_PATH}" -auto-approve \
-         -target=digitalocean_droplet.node_builder
+    # terraform destroy \
+    #      -var "do_token=${DO_PAT}" \
+    #      -var "pvt_key=${SSH_KEY_PATH}" -auto-approve \
+    #      -target=digitalocean_droplet.node_builder
 }
 
 check_dependencies
