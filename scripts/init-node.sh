@@ -67,7 +67,7 @@ function install_deps() {
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "heaptrack installed successfully"
@@ -98,7 +98,7 @@ function install_node() {
 
 
 function run_node() {
-  export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=info
+  export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=debug
   # export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"

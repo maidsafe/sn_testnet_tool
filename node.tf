@@ -27,7 +27,6 @@ resource "digitalocean_droplet" "node1-client" {
   provisioner "remote-exec" {
     inline = [
      " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
-      "DEBIAN_FRONTEND=noninteractive apt install wget parallel unzip -y",
       "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
       "unzip ./the-test-data.zip",
       "chmod +x ./safe",
@@ -57,7 +56,6 @@ resource "digitalocean_droplet" "node1-client" {
   # It looks a bit awkward because you have to escape the double quotes.
   provisioner "remote-exec" {
     inline = [
-      "sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep -y > /dev/null 2>&1",
       "chmod +x /tmp/init-node.sh",
       "echo \"nodes per.... ${var.number_of_nodes_per_machine}\"",
       "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-1\" ${self.ipv4_address}",
