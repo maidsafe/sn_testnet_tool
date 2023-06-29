@@ -20,14 +20,9 @@ if [[ -z "$node_count" ]]; then
   exit 1
 fi
 
-custom_bin_path="$4"
-if [[ ! -z "$custom_bin_path" ]]; then
-  [[ ! -d "bin" ]] && mkdir bin
-  cp $custom_bin_path bin/safenode
-else
-  # If this run hasn't supplied a custom binary, clear out anything leftover from a previous run.
-  rm -f bin/safenode
-fi
+custom_bin="$4"
+org="$5"
+branch="$6"
 
 export $(cat .env | sed 's/#.*//g' | xargs)
 
@@ -46,4 +41,4 @@ docker run --rm --tty \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \
-  jacderida/sn_testnet_tool:latest just testnet $env $provider $node_count
+  jacderida/sn_testnet_tool:latest just testnet $env $provider $node_count $custom_bin $org $branch
