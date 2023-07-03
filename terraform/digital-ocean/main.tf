@@ -30,7 +30,7 @@ resource "digitalocean_droplet" "node" {
 }
 
 resource "digitalocean_droplet" "build" {
-  count    = var.custom_bin ? 1 : 0
+  count    = var.use_custom_bin ? 1 : 0
   image    = var.droplet_image
   name     = "${terraform.workspace}-build"
   region   = var.region

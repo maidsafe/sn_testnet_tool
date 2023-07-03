@@ -48,7 +48,7 @@
     node_rpc_ip: "{{ ansible_host }}"
   when: provider == "digital-ocean"
 
-- name: get the latest version of the node
+- name: get the latest version or a custom build of the node
   ansible.builtin.get_url:
     url: "{{ node_archive_url }}"
     dest: /tmp/{{ node_archive_filename }}

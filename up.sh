@@ -21,15 +21,26 @@ if [[ -z "$node_count" ]]; then
 fi
 
 custom_bin="$4"
+
 org="$5"
+if [[ "$custom_bin" = true && -z "$org" ]]; then
+  echo "If using a custom binary the Github organisation or user must be provided"
+  exit 1
+fi
+
 branch="$6"
+if [[ "$custom_bin" = true && -z "$branch" ]]; then
+  echo "If using a custom binary the Github branch must be provided"
+  exit 1
+fi
 
 export $(cat .env | sed 's/#.*//g' | xargs)
 
 docker run --rm \
   --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_DEFAULT_REGION \
   --env SSH_KEY_NAME --env DO_PAT --env SN_TESTNET_DEV_SUBNET_ID \
-  --env SN_TESTNET_DEV_SECURITY_GROUP_ID \
+  --env SN_TESTNET_DEV_SECURITY_GROUP_ID --env TERRAFORM_STATE_BUCKET_NAME \
+  --env DIGITALOCEAN_TOKEN --env DO_API_TOKEN \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \
@@ -37,7 +48,8 @@ docker run --rm \
 docker run --rm --tty \
   --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_DEFAULT_REGION \
   --env SSH_KEY_NAME --env DO_PAT --env SN_TESTNET_DEV_SUBNET_ID \
-  --env SN_TESTNET_DEV_SECURITY_GROUP_ID \
+  --env SN_TESTNET_DEV_SECURITY_GROUP_ID --env TERRAFORM_STATE_BUCKET_NAME \
+  --env DIGITALOCEAN_TOKEN --env DO_API_TOKEN \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \

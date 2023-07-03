@@ -1,0 +1,17 @@
+---
+- name: install build-essential and musl
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - musl
+    - musl-tools
+
+- name: install rustup and musl target
+  ansible.builtin.shell: |
+    #!/bin/bash
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh  -s -- --default-toolchain stable -y
+    . ${HOME}/.cargo/env
+    sed -i '1s/^/export PATH="$HOME\/.cargo\/bin:$PATH"\n/' ~/.bashrc
+    rustup target add x86_64-unknown-linux-musl
