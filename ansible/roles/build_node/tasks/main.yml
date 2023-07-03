@@ -1,0 +1,35 @@
+---
+- name: store s3_deploy secret access key
+  set_fact:
+    aws_secret_key: "{{ lookup('file', 'files/s3_deploy_secret_access_key') }}"
+
+- name: clone safe_network repo branch
+  ansible.builtin.git:
+    repo: https://github.com/{{ org }}/safe_network
+    refspec: "+refs/heads/{{ branch }}:refs/remotes/origin/{{ branch }}"
+    dest: /home/{{ ansible_user }}/safe_network
+
+- name: build custom_bin
+  ansible.builtin.command:
+    chdir: /home/{{ ansible_user }}/safe_network
+    cmd: cargo build --target x86_64-unknown-linux-musl --release --bin safenode
+
+- name: copy safenode binary to tmp directory
+  ansible.builtin.command:
+    chdir: /home/{{ ansible_user }}/safe_network/target/x86_64-unknown-linux-musl/release
+    cmd: cp safenode /tmp/
+
+- name: archive safenode binary into tar.gz file
+  ansible.builtin.command:
+    chdir: /tmp/
+    cmd: tar -zcvf {{ node_archive_filename }} safenode
+
+- name: upload custom_bin archive to S3
+  amazon.aws.s3_object:
+    access_key: AKIAVVODCRMSELAPBQHK
+    secret_key: "{{ aws_secret_key }}"
+    bucket: sn-node
+    object: /{{ org }}/{{ branch }}/{{ node_archive_filename }}
+    src: /tmp/{{ node_archive_filename }}
+    mode: put
+    permission: public-read

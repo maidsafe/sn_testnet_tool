@@ -1,0 +1,9 @@
+---
+- name: build a custom node binary
+  hosts: all
+  become: False
+  roles:
+    - role: prerequisites
+      become: True
+    - role: rust
+    - role: build_node

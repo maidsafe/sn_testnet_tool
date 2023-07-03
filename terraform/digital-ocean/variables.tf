@@ -38,18 +38,8 @@ variable "node_count" {
   description = "The number of droplets to launch for the nodes"
 }
 
-variable "custom_bin" {
+variable "use_custom_bin" {
   type = bool
   default = false
   description = "A boolean to enable use of a custom bin"
-}
-
-variable "org" {
-  default = "maidsafe"
-  description = "The github organisation for the custom bin"
-}
-
-variable "branch" {
-  default = "main"
-  description = "The github branch for the custom bin"
 }

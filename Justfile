@@ -2,6 +2,8 @@
 set dotenv-load := true
 enable_client := "false"
 default_node_url := "https://sn-node.s3.eu-west-2.amazonaws.com/safenode-latest-x86_64-unknown-linux-musl.tar.gz"
+default_node_archive_filename := "safenode-latest-x86_64-unknown-linux-musl.tar.gz"
+custom_bin_archive_filename := "safenode-custom-x86_64-unknown-linux-musl.tar.gz"
 
 # =============================================
 # Public targets intended to be called by users
@@ -43,22 +45,24 @@ testnet env provider node_count custom_bin org="" branch="":
     terraform workspace select {{env}}
   )
 
-  if [[ {{custom_bin}} == true ]]; then
-  cd terraform/digital-ocean
-  terraform apply -auto-approve -var custom_bin={{custom_bin}}
-  just terraform-apply-{{provider}} "{{env}}" {{node_count}} true
-  else
-  just terraform-apply-{{provider}} "{{env}}" {{node_count}} false
-  fi
+  just terraform-apply-{{provider}} "{{env}}" {{node_count}} false {{use_custom_bin}}
 
-  if [[ -f "bin/safenode" ]]; then
+  if [[ {{use_custom_bin}} == true ]]; then
     echo "Custom safenode binary will be used"
-    just upload-custom-node-bin "{{env}}" "{{provider}}" "bin/safenode"
+    sed "s|__ORG__|{{org}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__BRANCH__|{{branch}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__NODE_ARCHIVE__|{{custom_bin_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    url="https://sn-node.s3.eu-west-2.amazonaws.com/{{org}}/{{branch}}/{{custom_bin_archive_filename}}"
+    sed "s|__NODE_URL__|$url|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   else
+    sed "s|__NODE_ARCHIVE__|{{default_node_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
 
   just wait-for-ssh "{{env}}" "{{provider}}"
+
+  # Provision the build node
+  just run-ansible-against-build-machine "{{env}}" "{{provider}}"
 
   # Provision the genesis node
   just run-ansible-against-nodes "{{env}}" "{{provider}}" "true"
@@ -198,7 +202,7 @@ set-genesis-multiaddr env provider:
 
   peer_id=$(./safenode_rpc_client $genesis_ip:12001 info | \
     grep "Peer Id" | awk -F ':' '{ print $2 }' | xargs)
-  multiaddr="/ip4/$genesis_ip/udp/12000/quic-v1/p2p/$peer_id"
+  multiaddr="/ip4/$genesis_ip/tcp/12000/p2p/$peer_id"
   echo "Multiaddr for genesis node is $multiaddr"
   sed "s|__MULTIADDR__|$multiaddr|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
 
@@ -249,6 +253,26 @@ build-rpc-client:
   else
     echo "The safenode_rpc_client binary is already present"
   fi
+
+run-ansible-against-build-machine env="" provider="":
+  #!/usr/bin/env bash
+  user="root"
+  inventory_path="inventory/.{{env}}_build_inventory"
+  playbook="build.yml"
+  extra_vars_path="extra_vars/.{{env}}_{{provider}}.json"
+
+  if [[ "{{provider}}" == "aws" ]]; then
+    user="ubuntu"
+    inventory_path="${inventory_path}_aws_ec2.yml"
+  elif [[ "{{provider}}" == "digital-ocean" ]]; then
+    user="root"
+    inventory_path="${inventory_path}_digital_ocean.yml"
+  else
+    echo "Provider {{provider}} is not supported"
+    exit 1
+  fi
+
+  just run-ansible "$user" "$inventory_path" "$playbook" "$extra_vars_path"
 
 run-ansible-against-nodes env="" provider="" is_genesis="":
   #!/usr/bin/env bash
@@ -364,6 +388,11 @@ create-digital-ocean-keypair env:
 
 create-digital-ocean-inventory env:
   cp ansible/inventory/dev_inventory_digital_ocean.yml \
+    ansible/inventory/.{{env}}_build_inventory_digital_ocean.yml
+  sed "s/env_value/{{env}}/g" -i ansible/inventory/.{{env}}_build_inventory_digital_ocean.yml
+  sed "s/type_value/build/g" -i ansible/inventory/.{{env}}_build_inventory_digital_ocean.yml
+
+  cp ansible/inventory/dev_inventory_digital_ocean.yml \
     ansible/inventory/.{{env}}_genesis_inventory_digital_ocean.yml
   sed "s/env_value/{{env}}/g" -i ansible/inventory/.{{env}}_genesis_inventory_digital_ocean.yml
   sed "s/type_value/genesis/g" -i ansible/inventory/.{{env}}_genesis_inventory_digital_ocean.yml
@@ -380,10 +409,10 @@ create-digital-ocean-inventory env:
 
   cp ansible/extra_vars/digital_ocean.json ansible/extra_vars/.{{env}}_digital-ocean.json
 
-terraform-apply-digital-ocean env node_count enable_client:
+terraform-apply-digital-ocean env node_count enable_client use_custom_bin:
   #!/usr/bin/env bash
   cd terraform/digital-ocean
-  terraform apply -auto-approve -var node_count={{node_count}}
+  terraform apply -auto-approve -var node_count={{node_count}} -var use_custom_bin={{use_custom_bin}}
 
 terraform-destroy-digital-ocean env:
   #!/usr/bin/env bash
