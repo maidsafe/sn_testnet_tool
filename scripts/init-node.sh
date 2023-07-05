@@ -67,14 +67,15 @@ function install_deps() {
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
+    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
-        echo "heaptrack installed successfully"
+        echo "deps installed successfully"
         heaptrack_installed="true"
         break
     fi
-    echo "Failed to install heaptrack."
+    echo "Failed to install deps."
     echo "Attempted $retry_count times. Will retry up to 20 times. Sleeping for 3 seconds."
     ((retry_count++))
     sleep 3
@@ -82,7 +83,7 @@ function install_deps() {
     sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
   done
   if [[ "$heaptrack_installed" == "false" ]]; then
-    echo "Failed to install heaptrack"
+    echo "Failed to install deps"
     exit 1
   fi
 }

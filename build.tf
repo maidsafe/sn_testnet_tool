@@ -1,6 +1,6 @@
 resource "digitalocean_droplet" "node_builder" {
     count = var.builder_count
-    image = "ubuntu-22-04-x64"
+    image = "135559022" #safenode-builder, id from `doctl compute snapshot list`
     name = "${terraform.workspace}-safenode-builder"
     region = "lon1"
     size = var.build-size
@@ -18,50 +18,64 @@ resource "digitalocean_droplet" "node_builder" {
     # lets checkout the given commit first so we can fail fast if there's an issue
     provisioner "remote-exec" {
         inline = [
-            "git clone https://github.com/${var.repo_owner}/safe_network -q",
+            # "git clone https://github.com/maidsafe/safe_network -q",
             "cd safe_network",
-            "git checkout ${var.commit_hash}",
+            "git remote add ${var.repo_owner} https://github.com/${var.repo_owner}/safe_network",
+        ]
+    }
+    # lets checkout the given commit first so we can fail fast if there's an issue
+    provisioner "remote-exec" {
+        inline = [
+            "cd safe_network",
+            "git fetch ${var.repo_owner} -qf",
+        ]
+    }
+  
+    provisioner "remote-exec" {
+        inline = [
+            "cd safe_network",
+            "git checkout ${var.repo_owner}/${var.commit_hash}"
         ]
     }
 
-    provisioner "remote-exec" {
-        inline = [
-            "export DEBIAN_FRONTEND=noninteractive",
-           "apt-get update",
-            # don't add apt-install steps here. move them down before `cargo build` to prevent file locks
-            # "bash",
-            <<-EOT
-                while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                while sudo fuser /var/lib/apt/lists/ >/dev/null 2>&1 ; do
-                    sleep 1
-                done
-                if [ -f /var/log/unattended-upgrades/unattended-upgrades.log ]; then
-                    while sudo fuser /var/log/unattended-upgrades/unattended-upgrades.log >/dev/null 2>&1 ; do
-                    sleep 1
-                    done
-                fi
-            EOT
-        ]
-    }
+    # provisioner "remote-exec" {
+    #     inline = [
+    #         "export DEBIAN_FRONTEND=noninteractive",
+    #        "apt-get update",
+    #         # don't add apt-install steps here. move them down before `cargo build` to prevent file locks
+    #         # "bash",
+    #         <<-EOT
+    #             while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+    #                 sleep 1
+    #             done
+    #             while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
+    #                 sleep 1
+    #             done
+    #             while sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1 ; do
+    #                 sleep 1
+    #             done
+    #             while sudo fuser /var/lib/apt/lists/ >/dev/null 2>&1 ; do
+    #                 sleep 1
+    #             done
+    #             if [ -f /var/log/unattended-upgrades/unattended-upgrades.log ]; then
+    #                 while sudo fuser /var/log/unattended-upgrades/unattended-upgrades.log >/dev/null 2>&1 ; do
+    #                 sleep 1
+    #                 done
+    #             fi
+    #         EOT
+    #     ]
+    # }
 
     provisioner "remote-exec" {
         inline = [
             # avoid modals for kernel upgrades hanging setup
-            "export DEBIAN_FRONTEND=noninteractive",
+            # "export DEBIAN_FRONTEND=noninteractive",
             "cd safe_network",
             "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q --default-host x86_64-unknown-linux-gnu --default-toolchain stable -y",
             ". $HOME/.cargo/env",
             "apt update",
             # "apt -qq install musl-tools build-essential -y",
-            "apt -qq install build-essential -y",
+            # "apt -qq install build-essential -y",
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
             "cargo build --release --bins",

@@ -83,7 +83,7 @@ variable "repo_owner" {
 }
 
 variable "commit_hash" {
-  default = "."
+  default = "main"
 }
 
 
