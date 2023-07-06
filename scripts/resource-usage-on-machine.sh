@@ -1,11 +1,10 @@
 #!/bin/bash
 
 echo "Checking $(hostname) on $(hostname -I | awk '{print $1}')"
-
-node_data_folders=~/node_data-*/
-printf "%-15s %-8s %-10s %-10s %s\n" "Node" "PID" "Memory (MB)" "CPU (%)" "Record Count"
+NODES_DIR=~/.local/share/safe/node
+printf "%-65s %-8s %-10s %-10s %s\n" "Node PeerId" "PID" "Memory (MB)" "CPU (%)" "Record Count"
 running_process_count=0
-for folder in $node_data_folders; do
+find "$NODES_DIR" -mindepth 1 -maxdepth 1 -type d | while read -r folder; do
     node=$(basename "$folder")
     pid=$(cat "$folder/safenode.pid")
     if [ -z "$pid" ]; then
@@ -19,7 +18,7 @@ for folder in $node_data_folders; do
     rss=$(ps -p $pid -o rss=)
     cpu=$(top -b -n1 -p $pid | awk 'NR>7 {print $9}')
     count=$(find "$folder" -name '*' -not -name '*.pid' -type f | wc -l)
-    printf "%-15s %-8s %-10s %-10s %s\n" "$node" "$pid" "$(awk "BEGIN {print $rss/1024}")" "$cpu" "$count"
+    printf "%-65s %-8s %-10s %-10s %s\n" "$node" "$pid" "$(awk "BEGIN {print $rss/1024}")" "$cpu" "$count"
     running_process_count=$((running_process_count + 1))
 done
 

@@ -10,7 +10,8 @@ mkdir -p workspace/${TESTNET_CHANNEL}/droplets
 export TESTNET_CHANNEL
 
 parallel --timeout 60 -a workspace/${TESTNET_CHANNEL}/ip-list --colsep ' ' --jobs 5 'name={1}; ip={2}; if [[ -z $name || -z $ip ]]; then echo "$name $ip - Skipping line due to empty name or IP"; else echo "Getting $name logs from $ip"; \
-rsync -arz --include "logs**" --include "nohup.out" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} ; fi'
+rsync -arz --include "nohup.out" --exclude "*" root@${ip}:~/ workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} && \
+rsync -arz --include "logs" --include "safenode.pid" --exclude "record_store" root@${ip}:~/.local/share/safe/node/* workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} ; fi'
 
 ./scripts/nohup-output.sh
 

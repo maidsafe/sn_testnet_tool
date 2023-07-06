@@ -67,8 +67,8 @@ function install_deps() {
   heaptrack_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
-    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
+    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "deps installed successfully"
@@ -93,8 +93,8 @@ function install_node() {
   wget ${node_url}
   tar xf $archive_name
   chmod +x safenode
-  mkdir -p ~/node_data
-  mkdir -p ~/.safe/node
+  # mkdir -p ~/node_data
+  # mkdir -p ~/.safe/node
 }
 
 
@@ -114,11 +114,9 @@ function run_node() {
     echo "supplied peers var is $peers"
 
      node_cmd=$(printf '%s' \
-      "./safenode " \
+      "heaptrack ./safenode " \
       "--peer $peers " \
-      "--root-dir ~/node_data-$i " \
-      "--log-dir ~/logs-$i " \
-      "$log_level" \
+      "--log-output-dest data-dir " \
       "--rpc " \
       "$node_ip_address:$port "
     )
@@ -127,10 +125,8 @@ function run_node() {
   # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
-      "./safenode " \
-      "--root-dir ~/node_data-$i " \
-      "--log-dir ~/logs-$i " \
-      "$log_level" \
+      "heaptrack ./safenode " \
+      "--log-output-dest data-dir " \
       "--rpc " \
       "$node_ip_address:$port "
     )

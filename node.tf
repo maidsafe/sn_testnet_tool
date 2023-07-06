@@ -28,6 +28,7 @@ resource "digitalocean_droplet" "node1-client" {
     inline = [
      " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
       "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
+      "bash",
       "unzip ./the-test-data.zip",
       "chmod +x ./safe",
       "cp ./safe /usr/local/bin/safe",
@@ -59,7 +60,7 @@ resource "digitalocean_droplet" "node1-client" {
       "chmod +x /tmp/init-node.sh",
       "echo \"nodes per.... ${var.number_of_nodes_per_machine}\"",
       "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-1\" ${self.ipv4_address}",
-      "rg \"node is listening on \".+\"\" > /tmp/output.txt",
+      "rg \"node is listening on \".+\"\"  ~/.local/share/safe/node/ > /tmp/output.txt",
     ]
   }
 

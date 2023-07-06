@@ -166,7 +166,7 @@ function calculate_droplet_count() {
   fi
   
   echo "Running $DROPLET_COUNT droplets to get $NODE_COUNT nodes"
-  echo "min count of nodes per machine is 20, unless you set NODES_PER_MACHINE env var"
+  echo "min count of nodes per machine is 20, unless you set NODES_PER_MACHINE env var, which is currently $NODES_PER_MACHINE"
   echo "(node-1 always runs on its own droplet)" # this is just for simplicity when setting up other nodes
 }
 
