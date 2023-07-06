@@ -66,7 +66,7 @@ variable "build-size" {
 }
 
 variable "node-size" {
-  default = "s-2vcpu-2gb-amd"
+  default = "s-2vcpu-4gb-amd"
   # default = "s-1vcpu-1gb"
 }
 
