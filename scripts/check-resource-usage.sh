@@ -27,13 +27,17 @@ do_work() {
     dir_name="${name}__${ip}"
     mkdir -p "workspace/${TESTNET_CHANNEL}/droplets/${dir_name}"
     timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-    
+
     echo "$timestamp" >> "workspace/${TESTNET_CHANNEL}/droplets/${dir_name}/resource.log"
     record=$(ssh root@"$ip" "bash -s" < ./scripts/resource-usage-on-machine.sh)
     echo "$record" >> "workspace/${TESTNET_CHANNEL}/droplets/${dir_name}/resource.log"
-    echo "$record"
-    
-    echo "workspace/${TESTNET_CHANNEL}/droplets/${dir_name}/resource.log updated" >&2
+
+    last_line=$(echo "$record" | tail -n 1)
+
+    # This will be printed to the console
+    echo "workspace/${TESTNET_CHANNEL}/droplets/${dir_name}/resource.log updated with PID count: $last_line" >&2
+
+    echo $last_line  # This line will be piped to awk
 }
 
 # Export the function so that it's available to GNU Parallel
