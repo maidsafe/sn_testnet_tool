@@ -64,15 +64,15 @@ function install_deps() {
   # after the update command, apt will complain it can't find the package.
   sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
   retry_count=1
-  heaptrack_installed="false"
+  deps_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
+    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "deps installed successfully"
-        heaptrack_installed="true"
+        deps_installed="true"
         break
     fi
     echo "Failed to install deps."
@@ -82,7 +82,7 @@ function install_deps() {
     # Without running this again there are times when it will just fail on every retry.
     sudo DEBIAN_FRONTEND=noninteractive apt update > /dev/null 2>&1
   done
-  if [[ "$heaptrack_installed" == "false" ]]; then
+  if [[ "$deps_installed" == "false" ]]; then
     echo "Failed to install deps"
     exit 1
   fi
@@ -114,7 +114,7 @@ function run_node() {
     echo "supplied peers var is $peers"
 
      node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--peer $peers " \
       "--log-output-dest data-dir " \
       "--rpc " \
@@ -125,7 +125,7 @@ function run_node() {
   # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--log-output-dest data-dir " \
       "--rpc " \
       "$node_ip_address:$port "

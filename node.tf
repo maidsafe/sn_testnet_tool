@@ -28,8 +28,8 @@ resource "digitalocean_droplet" "node1-client" {
     inline = [
      " echo \"Downloading test-data from s3://safe-test-data to test-data\"",
       "wget https://sn-node.s3.eu-west-2.amazonaws.com/the-test-data.zip",
-      "bash",
-      "unzip ./the-test-data.zip",
+      # "bash",
+      # "unzip ./the-test-data.zip",
       "chmod +x ./safe",
       "cp ./safe /usr/local/bin/safe",
     ]

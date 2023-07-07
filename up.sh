@@ -137,28 +137,28 @@ function copy_ips_to_s3() {
 #     --acl public-read
 # }
 
-function kick_off_client() {
-  echo "Kicking off client tests..."
-  ip=$(cat workspace/${testnet_channel}/client-ip)
-  echo "Safe cli version is:"
-  ssh root@${ip} 'safe -V'
+# function kick_off_client() {
+#   echo "Kicking off client tests..."
+#   ip=$(cat workspace/${testnet_channel}/client-ip)
+#   echo "Safe cli version is:"
+#   ssh root@${ip} 'safe -V'
 
-  if test -f "$ip_list_file"; then
-      echo "Client data has already been put onto $testnet_channel."
-  else 
-    ssh root@${ip} 'safe files put loop_client_tests.sh'
-    # ssh root@${ip} 'bash -ic "nohup ./loop_client_tests.sh &; bash"'
-    # echo "Client tests should now be building/looping"
-    ssh root@${ip} 'time safe files put -r test-data'
-    echo "Test data should now exist"
-    echo "data exists" > workspace/${testnet_channel}/client-data-exists
-  fi
+#   if test -f "$ip_list_file"; then
+#       echo "Client data has already been put onto $testnet_channel."
+#   else 
+#     ssh root@${ip} 'safe files put loop_client_tests.sh'
+#     # ssh root@${ip} 'bash -ic "nohup ./loop_client_tests.sh &; bash"'
+#     # echo "Client tests should now be building/looping"
+#     ssh root@${ip} 'time safe files put -r test-data'
+#     echo "Test data should now exist"
+#     echo "data exists" > workspace/${testnet_channel}/client-data-exists
+#   fi
 
-}
+# }
 
 
 function calculate_droplet_count() {
-  DROPLET_COUNT=$((NODE_COUNT / NODES_PER_MACHINE))
+  DROPLET_COUNT=$(((NODE_COUNT / NODES_PER_MACHINE) + 1))
 
   
   if [[ $DROPLET_COUNT -lt 2 ]]; then
@@ -181,6 +181,8 @@ copy_ips_to_s3
 # pull_genesis_key_and_copy_to_s3
 # kick_off_client
 
+
+# ssh root@${ip} 'safe -V'
 
 ./scripts/upload-test-data.sh
 ./scripts/download-test-data.sh
