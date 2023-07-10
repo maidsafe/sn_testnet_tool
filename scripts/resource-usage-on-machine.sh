@@ -17,7 +17,8 @@ while read -r folder; do
     fi
     rss=$(ps -p $pid -o rss=)
     cpu=$(top -b -n1 -p $pid | awk 'NR>7 {print $9}')
-    count=$(find "$folder" -name '*' -not -name '*.pid' -type f | wc -l)
+    pwd
+    count=$(find "${folder}/record_store" -name '*' -not -name '*.pid' -type f | wc -l)
     printf "%-55s %-8s %-15s %-10s %s\n" "$node" "$pid" "$(awk "BEGIN {print $rss/1024}")" "$cpu" "$count"
     running_process_count=$((running_process_count + 1))
 done < <(find "$NODES_DIR" -mindepth 1 -maxdepth 1 -type d)
