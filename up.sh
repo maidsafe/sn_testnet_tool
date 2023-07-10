@@ -182,10 +182,10 @@ copy_ips_to_s3
 # kick_off_client
 
 
-# ssh root@${ip} 'safe -V'
+ssh root@$(cat workspace/$testnet_channel/node1-client ) 'unzip the-test-data.zip' -o
 
-./scripts/upload-test-data.sh
-./scripts/download-test-data.sh
+# ./scripts/upload-test-data.sh
+# ./scripts/download-test-data.sh
 
 
 # trigger dls in the background

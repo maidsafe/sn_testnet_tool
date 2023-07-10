@@ -13,6 +13,15 @@ resource "digitalocean_droplet" "node1-client" {
     private_key = file(var.pvt_key)
   }
 
+   provisioner "remote-exec" {
+    inline = [
+      "echo 'ClientAliveInterval 300' >> /etc/ssh/sshd_config",
+      "echo 'ClientAliveCountMax 5' >> /etc/ssh/sshd_config",
+      "systemctl restart sshd",
+    ]
+  }
+
+
   provisioner "file" {
     source       = "scripts/init-node.sh"
     destination  = "/tmp/init-node.sh"
@@ -47,6 +56,7 @@ resource "digitalocean_droplet" "node1-client" {
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       echo "droplet-1 ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
+      echo "${self.ipv4_address}" > workspace/${terraform.workspace}/node1-client
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }
@@ -91,6 +101,15 @@ resource "digitalocean_droplet" "node_cluster" {
     type        = "ssh"
     timeout     = "5m"
     private_key = file(var.pvt_key)
+
+  }
+
+ provisioner "remote-exec" {
+    inline = [
+      "echo 'ClientAliveInterval 300' >> /etc/ssh/sshd_config",
+      "echo 'ClientAliveCountMax 5' >> /etc/ssh/sshd_config",
+      "systemctl restart sshd",
+    ]
   }
 
   provisioner "file" {
