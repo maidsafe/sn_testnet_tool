@@ -80,6 +80,7 @@ resource "digitalocean_droplet" "node_builder" {
             # "cargo -q build --release --target=x86_64-unknown-linux",
             # "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bins",
             "cargo build --release --bins",
+            "git status"
         ]
     }
 
