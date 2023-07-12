@@ -15,10 +15,18 @@ resource "digitalocean_droplet" "node_builder" {
         private_key = file(var.pvt_key)
     }
 
+    provisioner "remote-exec" {
+        inline = [
+        "echo 'ClientAliveInterval 300' >> /etc/ssh/sshd_config",
+        "echo 'ClientAliveCountMax 5' >> /etc/ssh/sshd_config",
+        "systemctl restart sshd",
+        ]
+    }
+
+
     # lets checkout the given commit first so we can fail fast if there's an issue
     provisioner "remote-exec" {
         inline = [
-            # "git clone https://github.com/maidsafe/safe_network -q",
             "cd safe_network",
             "git remote add ${var.repo_owner} https://github.com/${var.repo_owner}/safe_network",
         ]
@@ -27,6 +35,7 @@ resource "digitalocean_droplet" "node_builder" {
     provisioner "remote-exec" {
         inline = [
             "cd safe_network",
+            "git branch -D ${var.commit_hash} || true", # delete local branch if it exists
             "git fetch ${var.repo_owner} -qf",
         ]
     }
@@ -78,9 +87,9 @@ resource "digitalocean_droplet" "node_builder" {
             # "apt -qq install build-essential -y",
             # "rustup target add x86_64-unknown-linux-musl",
             # "cargo -q build --release --target=x86_64-unknown-linux",
-            # "RUSTFLAGS=\"-C debuginfo=1\" cargo build --release --bins",
-            "cargo build --release --bins",
-            "git status"
+            "RUSTFLAGS=\"-C debuginfo=2\" cargo build --release --bins",
+            # "cargo build --release --bins",
+            "git log -1"
         ]
     }
 
