@@ -7,16 +7,20 @@
   ansible.builtin.git:
     repo: https://github.com/{{ org }}/safe_network
     refspec: "+refs/heads/{{ branch }}:refs/remotes/origin/{{ branch }}"
-    dest: /home/{{ ansible_user }}/safe_network
+    dest: "{{ ansible_env.HOME }}/safe_network"
 
 - name: build custom_bin
-  ansible.builtin.command:
-    chdir: /home/{{ ansible_user }}/safe_network
-    cmd: cargo build --target x86_64-unknown-linux-musl --release --bin safenode
+  ansible.builtin.shell: |
+    source $HOME/.cargo/env
+    cargo build --target x86_64-unknown-linux-musl --release --bin safenode
+  args:
+    chdir: "{{ ansible_env.HOME }}/safe_network"
+    creates: "{{ ansible_env.HOME }}/safe_network/target/x86_64-unknown-linux-musl/release/safenode"
+    executable: /bin/bash
 
 - name: copy safenode binary to tmp directory
   ansible.builtin.command:
-    chdir: /home/{{ ansible_user }}/safe_network/target/x86_64-unknown-linux-musl/release
+    chdir: "{{ ansible_env.HOME }}/safe_network/target/x86_64-unknown-linux-musl/release"
     cmd: cp safenode /tmp/
 
 - name: archive safenode binary into tar.gz file
