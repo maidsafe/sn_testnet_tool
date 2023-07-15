@@ -27,17 +27,15 @@ if [[ -z "$node_instance_count" ]]; then
   exit 1
 fi
 
-custom_bin="$5"
-
-org="$6"
-if [[ "$custom_bin" = true && -z "$org" ]]; then
-  echo "If using a custom binary the Github organisation or user must be provided"
-  exit 1
+custom_bin="false"
+org="$5"
+if [[ ! -z "$org" ]]; then
+  custom_bin="true"
 fi
 
-branch="$7"
+branch="$6"
 if [[ "$custom_bin" = true && -z "$branch" ]]; then
-  echo "If using a custom binary the Github branch must be provided"
+  echo "If you wish to use a custom binary you must supply the repo org and branch as arguments."
   exit 1
 fi
 
