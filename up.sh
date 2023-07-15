@@ -20,15 +20,22 @@ if [[ -z "$node_count" ]]; then
   exit 1
 fi
 
-custom_bin="$4"
+node_instance_count="$4"
+if [[ -z "$node_instance_count" ]]; then
+  echo "The number of node service instances must be provided."
+  echo "This is the number of node services that run on each VM."
+  exit 1
+fi
 
-org="$5"
+custom_bin="$5"
+
+org="$6"
 if [[ "$custom_bin" = true && -z "$org" ]]; then
   echo "If using a custom binary the Github organisation or user must be provided"
   exit 1
 fi
 
-branch="$6"
+branch="$7"
 if [[ "$custom_bin" = true && -z "$branch" ]]; then
   echo "If using a custom binary the Github branch must be provided"
   exit 1
@@ -53,4 +60,5 @@ docker run --rm --tty \
   --volume $HOME/.ansible:/home/runner/.ansible \
   --volume $HOME/.ssh:/home/runner/.ssh \
   --volume $(pwd):/home/runner/sn_testnet_tool \
-  jacderida/sn_testnet_tool:latest just testnet $env $provider $node_count $custom_bin $org $branch
+  jacderida/sn_testnet_tool:latest just testnet \
+    $env $provider $node_count $node_instance_count $custom_bin $org $branch

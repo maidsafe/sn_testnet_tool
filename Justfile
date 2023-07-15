@@ -37,7 +37,7 @@ init env provider:
   just create-{{provider}}-inventory {{env}}
   just create-{{provider}}-keypair {{env}}
 
-testnet env provider node_count custom_bin org="" branch="":
+testnet env provider node_count node_instance_count="10" use_custom_bin="false" org="" branch="":
   #!/usr/bin/env bash
   set -e
   (
@@ -54,9 +54,11 @@ testnet env provider node_count custom_bin org="" branch="":
     sed "s|__NODE_ARCHIVE__|{{custom_bin_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     url="https://sn-node.s3.eu-west-2.amazonaws.com/{{org}}/{{branch}}/{{custom_bin_archive_filename}}"
     sed "s|__NODE_URL__|$url|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   else
     sed "s|__NODE_ARCHIVE__|{{default_node_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
 
   just wait-for-ssh "{{env}}" "{{provider}}"
