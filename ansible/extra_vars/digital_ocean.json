@@ -4,6 +4,7 @@
 	"node_archive_url": "__NODE_URL__",
 	"node_data_dir_path": "/home/safe/.local/share/safe/node/data",
 	"node_logs_dir_path": "/home/safe/.local/share/safe/node/logs",
+	"node_instance_count": "__NODE_INSTANCE_COUNT__",
 	"provider": "digital-ocean",
 	"org": "__ORG__",
 	"branch": "__BRANCH__"

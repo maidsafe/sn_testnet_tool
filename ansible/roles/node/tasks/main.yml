@@ -60,34 +60,30 @@
     dest: "{{ node_archive_dest_path }}"
     remote_src: True
 
-- name: create the data directory
-  become: True
-  ansible.builtin.file:
-    path: "{{ node_data_dir_path }}"
-    owner: "safe"
-    group: "safe"
-    state: directory
-
-- name: create the logs directory
-  become: True
-  ansible.builtin.file:
-    path: "{{ node_logs_dir_path }}"
-    owner: "safe"
-    group: "safe"
-    state: directory
-
 - name: copy service file
   become: True
   template:
     src: sn_node.service.j2
-    dest: /etc/systemd/system/safenode.service
+    dest: /etc/systemd/system/safenode@.service
+  register: service_template_created
 
 - name: reload the system manager configuration
   become: True
   command: systemctl daemon-reload
+  when: service_template_created.changed
 
-- name: start the node service
+- name: start the node services
   become: True
-  service:
-    name: safenode
+  systemd:
+    name: safenode@{{ item }}
     state: started
+  loop: "{{ range(1, (node_instance_count | int) + 1)|list }}"
+  when: not is_genesis
+
+- name: start the genesis node service
+  become: True
+  systemd:
+    name: safenode@1
+    state: started
+    enabled: yes
+  when: is_genesis

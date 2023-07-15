@@ -8,6 +8,10 @@
     - build-essential
     - musl
     - musl-tools
+  register: result
+  until: result is succeeded
+  retries: 3
+  delay: 5
 
 - name: install rustup and musl target
   ansible.builtin.shell: |
