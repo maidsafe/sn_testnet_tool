@@ -1,4 +1,5 @@
 ---
+# The retries are for random lock failures.
 - name: install build-essential and musl
   become: True
   ansible.builtin.package:

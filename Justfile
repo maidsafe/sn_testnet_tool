@@ -55,22 +55,17 @@ testnet env provider node_count node_instance_count="10" use_custom_bin="false" 
     url="https://sn-node.s3.eu-west-2.amazonaws.com/{{org}}/{{branch}}/{{custom_bin_archive_filename}}"
     sed "s|__NODE_URL__|$url|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    just wait-for-ssh "{{env}}" "{{provider}}" "build"
+    just run-ansible-against-build-machine "{{env}}" "{{provider}}"
   else
     sed "s|__NODE_ARCHIVE__|{{default_node_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
 
-  just wait-for-ssh "{{env}}" "{{provider}}"
-
-  # Provision the build node
-  just run-ansible-against-build-machine "{{env}}" "{{provider}}"
-
-  # Provision the genesis node
-  just run-ansible-against-nodes "{{env}}" "{{provider}}" "true"
-
-  # Provision the remaining nodes
-  just run-ansible-against-nodes "{{env}}" "{{provider}}" "false"
+  just wait-for-ssh "{{env}}" "{{provider}}" "genesis"
+  just run-ansible-against-nodes "{{env}}" "{{provider}}" "true" # genesis
+  just run-ansible-against-nodes "{{env}}" "{{provider}}" "false" # remaining nodes
 
 # List the name and IP address of each node in the testnet, which can be used for SSH access.
 ssh-details env provider:
@@ -208,17 +203,17 @@ set-genesis-multiaddr env provider:
   echo "Multiaddr for genesis node is $multiaddr"
   sed "s|__MULTIADDR__|$multiaddr|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
 
-wait-for-ssh env provider:
+wait-for-ssh env provider type:
   #!/usr/bin/env bash
   if [[ "{{provider}}" == "aws" ]]; then
-    inventory_path="inventory/.{{env}}_genesis_inventory_aws_ec2.yml"
+    inventory_path="inventory/.{{env}}_{{type}}_inventory_aws_ec2.yml"
     cd ansible
     genesis_ip=$(ansible-inventory --inventory $inventory_path --list | \
       jq -r '.["_meta"]["hostvars"][]["public_ip_address"]')
     cd ..
     user="ubuntu"
   elif [[ "{{provider}}" == "digital-ocean" ]]; then
-    inventory_path="inventory/.{{env}}_genesis_inventory_digital_ocean.yml"
+    inventory_path="inventory/.{{env}}_{{type}}_inventory_digital_ocean.yml"
     cd ansible
     genesis_ip=$(ansible-inventory --inventory $inventory_path --list | \
       jq -r '.["_meta"]["hostvars"][]["ansible_host"]')
