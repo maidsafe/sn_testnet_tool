@@ -3,6 +3,7 @@
   apt:
     update_cache: yes
 
+# The retries are for random lock failures.
 - name: install packages
   ansible.builtin.package:
     name: "{{ item }}"
@@ -12,6 +13,10 @@
     - python3
     - python3-pip
     - zip
+  register: result
+  until: result is succeeded
+  retries: 3
+  delay: 5
 
 - name: install boto3
   ansible.builtin.pip:
