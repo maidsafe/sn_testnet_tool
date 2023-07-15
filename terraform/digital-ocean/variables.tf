@@ -22,7 +22,7 @@ variable "droplet_size" {
 }
 
 variable "build_machine_size" {
-  default = "s-4vcpu-8gb"
+  default = "s-8vcpu-16gb"
 }
 
 variable "droplet_image" {
