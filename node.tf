@@ -1,6 +1,6 @@
-resource "digitalocean_droplet" "node1-client" {
+resource "digitalocean_droplet" "node1-client-faucet" {
   image    = "ubuntu-22-04-x64"
-  name     = "${terraform.workspace}-safe-node1-and-client"
+  name     = "${terraform.workspace}-safe-node1-faucet-and-client"
   region   = var.region
   size     = var.node-size
   ssh_keys = var.ssh_keys
@@ -22,15 +22,26 @@ resource "digitalocean_droplet" "node1-client" {
   }
 
 
-  provisioner "file" {
-    source       = "scripts/init-node.sh"
-    destination  = "/tmp/init-node.sh"
-  }
 
   provisioner "file" {
     source      = "./workspace/${terraform.workspace}/safe"
     destination = "safe"
   }
+  provisioner "file" {
+    source      = "./workspace/${terraform.workspace}/safenode"
+    destination = "safenode"
+  }
+
+  provisioner "file" {
+    source      = "./workspace/${terraform.workspace}/faucet"
+    destination = "faucet"
+  }
+
+  provisioner "file" {
+    source       = "scripts/init-node.sh"
+    destination  = "/tmp/init-node.sh"
+  }
+
 
 
   provisioner "remote-exec" {
@@ -56,7 +67,7 @@ resource "digitalocean_droplet" "node1-client" {
       mkdir -p ~/.ssh/
       touch ~/.ssh/known_hosts
       echo "droplet-1 ${self.ipv4_address}" >> workspace/${terraform.workspace}/ip-list
-      echo "${self.ipv4_address}" > workspace/${terraform.workspace}/node1-client
+      echo "${self.ipv4_address}" > workspace/${terraform.workspace}/node1-client-faucet
       ssh-keyscan -H ${self.ipv4_address} >> ~/.ssh/known_hosts
     EOH
   }
@@ -69,7 +80,7 @@ resource "digitalocean_droplet" "node1-client" {
     inline = [
       "chmod +x /tmp/init-node.sh",
       "echo \"nodes per.... ${var.number_of_nodes_per_machine}\"",
-      "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-1\" ${self.ipv4_address}",
+      "/tmp/init-node.sh \"${var.port}\" \"${terraform.workspace}-safe-node-1\" ${self.ipv4_address}",
       "rg \"node is listening on \".+\"\"  ~/.local/share/safe/node/ > /tmp/output.txt",
     ]
   }
@@ -80,10 +91,37 @@ resource "digitalocean_droplet" "node1-client" {
        
     }
 
+
+
     # this file is missing /ip4/ at the beginning of the multiaddr line, so we add it later
-  provisioner "local-exec" {
+    provisioner "local-exec" {
          command = "rg --pcre2 -i '\\b((?!10\\.|172\\.(1[6-9]|2\\d|3[01])\\.|192\\.168\\.|169\\.254\\.|127\\.0\\.0\\.1)[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+).+' workspace/${terraform.workspace}/node-1-listeners -o | sed 's/.$//' > ./workspace/${terraform.workspace}/contact-node"
     }
+
+    # this file is missing /ip4/ at the beginning of the multiaddr line, so we add it later
+    provisioner "local-exec" {
+         command = "echo \"/ip4/$(cat ./workspace/${terraform.workspace}/contact-node)\" > ./workspace/${terraform.workspace}/contact-node-peer-id"
+    }
+
+    provisioner "local-exec" {
+         command = "cat ./workspace/${terraform.workspace}/contact-node-peer-id"
+    }
+
+  provisioner "file" {
+    source      = "./workspace/${terraform.workspace}/contact-node-peer-id"
+    destination = "contact-node-peer-id"
+  }
+
+    provisioner "remote-exec" {
+     inline = [
+      "cat contact-node-peer-id",
+      "chmod +x ./faucet",
+      "export SAFE_PEERS=\"$(cat contact-node-peer-id)\"",
+      # "./faucet claim-genesis",
+    ]
+  }
+
+
 }
 
 resource "digitalocean_droplet" "node_cluster" {
@@ -93,7 +131,7 @@ resource "digitalocean_droplet" "node_cluster" {
   region   = var.region
   size     = var.node-size
   ssh_keys = var.ssh_keys
-  depends_on = [digitalocean_droplet.node1-client]
+  depends_on = [digitalocean_droplet.node1-client-faucet]
   
   connection {
     host        = self.ipv4_address
@@ -111,7 +149,10 @@ resource "digitalocean_droplet" "node_cluster" {
       "systemctl restart sshd",
     ]
   }
-
+  provisioner "file" {
+    source      = "./workspace/${terraform.workspace}/safenode"
+    destination = "safenode"
+  }
   provisioner "file" {
     source       = "scripts/init-node.sh"
     destination  = "/tmp/init-node.sh"
@@ -144,7 +185,7 @@ resource "digitalocean_droplet" "node_cluster" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/init-node.sh",
-      "/tmp/init-node.sh \"${var.node_url}\" \"${var.port}\" \"${terraform.workspace}-safe-node-${count.index + 2}\" ${self.ipv4_address} \"/ip4/$(cat /contact-node-peer-id)\" ${var.number_of_nodes_per_machine}",
+      "/tmp/init-node.sh \"${var.port}\" \"${terraform.workspace}-safe-node-${count.index + 2}\" ${self.ipv4_address} \"/ip4/$(cat /contact-node-peer-id)\" ${var.number_of_nodes_per_machine}",
     ]
   }
 

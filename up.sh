@@ -85,18 +85,18 @@ function run_terraform_apply() {
     archive_path="/tmp/$archive_name"
     node_url="${SAFENODE_URL_PREFIX}/$archive_name"
 
-    if test -f "$ip_list_file"; then
-        echo "Using preexisting bin from AWS for $testnet_channel."
-    else 
-      if [[ "$SKIP_UPLOAD" != "true" ]]; then
-        echo "Creating $archive_path..."
-        tar -C $path -zcvf $archive_path safenode
-        echo "Uploading $archive_path to S3..."
-        aws s3 cp $archive_path s3://sn-node --acl public-read
-      else 
-        echo "Skipping upload of $archive_path to S3..."
-      fi
-    fi
+    # if test -f "$ip_list_file"; then
+    #     echo "Using preexisting bin from AWS for $testnet_channel."
+    # else 
+    #   if [[ "$SKIP_UPLOAD" != "true" ]]; then
+    #     # echo "Creating $archive_path..."
+    #     # tar -C $path -zcvf $archive_path safenode
+    #     # echo "Uploading $archive_path to S3..."
+    #     # aws s3 cp $archive_path s3://sn-node --acl public-read
+    #   else 
+    #     echo "Skipping upload of $archive_path to S3..."
+    #   fi
+    # fi
   fi
 
   terraform apply \
@@ -104,7 +104,7 @@ function run_terraform_apply() {
     -var "pvt_key=${SSH_KEY_PATH}" \
     -var "number_of_droplets=${DROPLET_COUNT}" \
     -var "number_of_nodes_per_machine=${NODES_PER_MACHINE}" \
-    -var "node_url=${node_url}" \
+    # -var "node_url=${node_url}" \
     -var "otlp_collector_endpoint=${OTLP_COLLECTOR_ENDPOINT}" \
     --parallelism 15 ${AUTO_APPROVE}
 }

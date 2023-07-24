@@ -9,7 +9,9 @@ mkdir -p workspace/${TESTNET_CHANNEL}/droplets
 
 export TESTNET_CHANNEL
 
+# ssh root@${ip} "killall safenode || true" && \
 parallel --timeout 180 -a workspace/${TESTNET_CHANNEL}/ip-list --colsep ' ' --jobs 10 'name={1}; ip={2}; if [[ -z $name || -z $ip ]]; then echo "$name $ip - Skipping line due to empty name or IP"; else echo "Getting $name logs from $ip"; \
+mkdir -p workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} && \
 rsync -arz root@${ip}:~/nohup.out workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} && \
 rsync -arz --include "logs" --include "safenode.pid" --exclude "record_store" root@${ip}:~/.local/share/safe/node/* workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} ; fi'
 

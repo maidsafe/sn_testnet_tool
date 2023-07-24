@@ -1,10 +1,10 @@
 #!/bin/bash
 
-node_url="$1"
-if [[ -z "$node_url" ]]; then
-  echo "A URL for the node binary must be passed to initialise the node."
-  exit 1
-fi
+# node_url="$1"
+# if [[ -z "$node_url" ]]; then
+#   echo "A URL for the node binary must be passed to initialise the node."
+#   exit 1
+# fi
 
 # bind_ip_address="$3"
 # if [[ -z "$bind_ip_address" ]]; then
@@ -13,7 +13,7 @@ fi
 # fi
 
 
-port="$2"
+port="$1"
 if [[ -z "$port" ]]; then
   echo "A port must be passed to initialise the node."
   exit 1
@@ -26,24 +26,24 @@ fi
 #   exit 1
 # fi
 
-node_name="$3"
+node_name="$2"
 if [[ -z "$node_name" ]]; then
   echo "The node name must be passed to initialize the node."
   exit 1
 fi
 
-node_ip_address="$4"
+node_ip_address="$3"
 if [[ -z "$node_ip_address" ]]; then
   echo "A node ip address must be passed to initialise the node RPC."
   exit 1
 fi
 
-peers="$5"
+peers="$4"
 if [[ -z "$peers" ]]; then
   echo "No peer supplied, this must be the first node"
 fi
 
-nodes_to_run_on_this_machine="$6"
+nodes_to_run_on_this_machine="$5"
 if [[ -z "$nodes_to_run_on_this_machine" ]]; then
   echo "No nodes count supplied"
 fi
@@ -67,8 +67,8 @@ function install_deps() {
   deps_installed="false"
   while [[ $retry_count -le 20 ]]; do
     echo "Attempting to install heaptrack..."
-    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
-    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
+    sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep wget parallel unzip -y > /dev/null 2>&1
+    # sudo DEBIAN_FRONTEND=noninteractive apt install ripgrep heaptrack wget parallel unzip -y > /dev/null 2>&1
     local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         echo "deps installed successfully"
@@ -89,18 +89,18 @@ function install_deps() {
 }
 
 function install_node() {
-  archive_name=$(awk -F '/' '{ print $4 }' <<< $node_url)
-  wget ${node_url}
-  tar xf $archive_name
+  # archive_name=$(awk -F '/' '{ print $4 }' <<< $node_url)
+  # wget ${node_url}
+  # tar xf $archive_name
   chmod +x safenode
   # mkdir -p ~/node_data
-  # mkdir -p ~/.safe/node
+  mkdir -p ~/.local/share/safe/node
 }
 
 
 function run_node() {
-  # export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=debug
-  export SN_LOG=all
+  export SN_LOG=sn_node=debug,safenode=debug,sn_logging=debug,sn_networking=trace
+  # export SN_LOG=all
   export RUST_LOG_OTLP=safenode=debug
   # export OTLP_SERVICE_NAME="${node_name}"
   # export OTEL_EXPORTER_OTLP_ENDPOINT="${otlp_collector_endpoint}"
@@ -114,7 +114,7 @@ function run_node() {
     echo "supplied peers var is $peers"
 
      node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--peer $peers " \
       "--log-output-dest data-dir " \
       "--rpc " \
@@ -125,7 +125,7 @@ function run_node() {
   # Otherwise, we're genesis, and we'll start only one node
   else
     node_cmd=$(printf '%s' \
-      "heaptrack ./safenode " \
+      "./safenode " \
       "--log-output-dest data-dir " \
       "--rpc " \
       "$node_ip_address:$port "
