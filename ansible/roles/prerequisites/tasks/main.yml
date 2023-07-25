@@ -27,3 +27,22 @@
   ansible.builtin.user:
     name: safe
     shell: /bin/bash
+
+# This is a bit of a hack, but it allows the `safe` user to have SSH access using the same
+# authorized_keys, which is useful for running utility scripts.
+- name: create .ssh directory for safe user
+  ansible.builtin.file:
+    path: /home/safe/.ssh
+    state: directory
+    mode: '0755'
+  when: provider == "digital-ocean"
+
+- name: copy authorized_keys to safe user
+  ansible.builtin.copy:
+    src: /root/.ssh/authorized_keys
+    dest: /home/safe/.ssh/authorized_keys
+    owner: safe
+    group: safe
+    remote_src: true
+    mode: '0600'
+  when: provider == "digital-ocean"
