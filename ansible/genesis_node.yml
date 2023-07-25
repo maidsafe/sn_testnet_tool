@@ -16,3 +16,5 @@
         when: provider == "aws"
       }
     - node
+    - role: resource_usage
+      become: True

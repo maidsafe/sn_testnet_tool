@@ -67,22 +67,6 @@ testnet env provider node_count node_instance_count="10" use_custom_bin="false" 
   just run-ansible-against-nodes "{{env}}" "{{provider}}" "true" # genesis
   just run-ansible-against-nodes "{{env}}" "{{provider}}" "false" # remaining nodes
 
-resource-usage env provider:
-  #!/usr/bin/env bash
-  if [[ {{provider}} == "digital-ocean" ]]; then
-    inventory_file="inventory/.{{env}}_inventory_digital_ocean.yml"
-  else
-    inventory_file="inventory/.{{env}}_inventory_aws_ec2.yml"
-  fi
-  cd ansible
-  ansible all \
-    --inventory $inventory_file \
-    --user safe \
-    --module-name script \
-    --args ../scripts/resource-usage.sh --one-line | \
-    sed 's/.*{/ {/' | \
-    jq -r '.stdout'
-
 # List the name and IP address of each node in the testnet, which can be used for SSH access.
 ssh-details env provider:
   #!/usr/bin/env bash
