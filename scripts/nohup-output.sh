@@ -13,7 +13,7 @@ process_logs() {
     echo "$name $ip - Skipping line due to empty name or IP"
   else
     # echo "Getting $name nohup file from $ip"
-    # rsync -arz --include "./nohup.out" --exclude "*" root@${ip}:~/ "workspace/${TESTNET_CHANNEL}/logs/${name}__${ip}"
+    rsync -arz root@${ip}:~/nohup.out workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip} 
     if grep -q "Killed" "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/nohup.out"; then
       ssh root@${ip} 'dmesg | rg "Killed"' > "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/killed.log"
     fi

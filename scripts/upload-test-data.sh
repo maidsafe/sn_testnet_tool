@@ -19,6 +19,7 @@ done <<< "$(echo -e "$ips")"
 NODE1=$(echo "/ip4/$(cat ./workspace/$TESTNET_CHANNEL/contact-node)")
 
 echo "trying to upload via $OUR_NODE_IP to $NODE1"
+ssh root@$OUR_NODE_IP "time safe --peer $NODE1 wallet get-faucet ${OUR_NODE_IP}:8000 "
 ssh root@$OUR_NODE_IP "time safe --peer $NODE1 files  upload test-data/ "
 
 # time safe files upload test-data/
