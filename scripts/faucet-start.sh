@@ -20,8 +20,8 @@ NODE1=$(echo "/ip4/$(cat ./workspace/$TESTNET_CHANNEL/contact-node)")
 
 echo "trying to claim genesis for faucet on $NODE1"
 # ssh root@$OUR_NODE_IP "./faucet --peer /ip4/178.62.79.112/tcp/46803/p2p/12D3KooWJnPhTVEnv7rx9ZCZZZRgTxrts33m33sKWfDdFH4jBcGo claim-genesis"
-# ssh root@$OUR_NODE_IP "./faucet --peer $NODE1 claim-genesis"
-# echo "genesis claimed"
+ssh root@$OUR_NODE_IP "./faucet --peer $NODE1 claim-genesis"
+echo "genesis claimed"
 ssh root@$OUR_NODE_IP "nohup ./faucet --peer $NODE1 server > fnohup.out 2>&1 &"
 # ssh root@$OUR_NODE_IP "nohup ./faucet --peer $NODE1 server &"
 

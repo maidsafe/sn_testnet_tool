@@ -57,6 +57,12 @@ variable "region" {
   default = "lon1"
 }
 
+variable "regions" {
+  type    = list(string)
+  default = ["nyc3", "ams3", "sgp1", "blr1", "sfo3"]
+}
+
+
 # droplet size and config, NOT node related
 variable "build-size" {
   # default = "s-1vcpu-1gb"

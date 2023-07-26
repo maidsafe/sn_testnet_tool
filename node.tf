@@ -124,11 +124,21 @@ resource "digitalocean_droplet" "node1-client-faucet" {
 
 }
 
+
+
+
+# ALL OTHER NODES
+# setup droplets per region
+locals {
+  droplets_per_region = floor(var.number_of_droplets / length(var.regions))
+  remaining_droplets  = var.number_of_droplets % length(var.regions)
+}
+
 resource "digitalocean_droplet" "node_cluster" {
   count    = var.number_of_droplets - 1
   image    = "ubuntu-22-04-x64"
-  name     = "${terraform.workspace}-safe-node-${count.index + 2}" // 2 because 0 index + initial node1
-  region   = var.region
+  name     = "${terraform.workspace}-safe-node-${count.index + 2}"
+  region   = element(var.regions, count.index % length(var.regions))
   size     = var.node-size
   ssh_keys = var.ssh_keys
   depends_on = [digitalocean_droplet.node1-client-faucet]
