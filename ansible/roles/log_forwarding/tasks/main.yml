@@ -1,0 +1,48 @@
+---
+- name: install dependencies
+  apt: 
+    name: apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: import gpg key for logstash
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present
+
+- name: add logstash repository
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/8.x/apt stable main"
+    state: present
+
+- name: install logstash
+  apt: 
+    name: logstash
+    state: latest
+    update_cache: yes
+
+- name: check if aws integration plugin is installed
+  command: /usr/share/logstash/bin/logstash-plugin list
+  register: plugin_list
+  changed_when: false  # this command does not change the state
+
+- name: install aws integration plugin
+  command: /usr/share/logstash/bin/logstash-plugin install logstash-integration-aws
+  when: "'logstash-integration-aws' not in plugin_list.stdout_lines"
+
+- name: include aws keys
+  include_vars: secrets.yml
+  no_log: true
+
+- name: deploy logstash configuration
+  template:
+    src: logstash.conf.j2
+    dest: /etc/logstash/conf.d/logstash.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: restart logstash
+  ansible.builtin.systemd_service:
+    name: logstash
+    state: restarted
