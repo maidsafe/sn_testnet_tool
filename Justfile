@@ -19,6 +19,16 @@ custom_bin_archive_filename := "safenode-custom-x86_64-unknown-linux-musl.tar.gz
 # of the components already exist.
 init env provider:
   #!/usr/bin/env bash
+  
+  echo "Checking for logs from previous testnet with name '{{env}}'..."
+  aws s3 ls s3://sn-testnet/testnet-logs/{{ env }}/
+  if [[ $? -eq 0 ]]; then
+    echo "The logs from a previous testnet run with the same name still exist."
+    echo "Please remove these logs if you don't need them, or retrieve them, then remove them."
+    exit 1
+  fi
+  echo "No logs exist. Continuing."
+
   (
     cd terraform/{{provider}}
     terraform init \
@@ -55,12 +65,14 @@ testnet env provider node_count node_instance_count="10" use_custom_bin="false" 
     url="https://sn-node.s3.eu-west-2.amazonaws.com/{{org}}/{{branch}}/{{custom_bin_archive_filename}}"
     sed "s|__NODE_URL__|$url|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__TESTNET_NAME__|{{env}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     just wait-for-ssh "{{env}}" "{{provider}}" "build"
     just run-ansible-against-build-machine "{{env}}" "{{provider}}"
   else
     sed "s|__NODE_ARCHIVE__|{{default_node_archive_filename}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_URL__|{{default_node_url}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
     sed "s|__NODE_INSTANCE_COUNT__|{{node_instance_count}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
+    sed "s|__TESTNET_NAME__|{{env}}|g" -i ansible/extra_vars/.{{env}}_{{provider}}.json
   fi
 
   just wait-for-ssh "{{env}}" "{{provider}}" "genesis"
@@ -88,46 +100,8 @@ ssh-details env provider:
     exit 1
   fi
 
-# Retrieve the logs for each node in the testnet.
-logs env provider:
-  #!/usr/bin/env bash
-  set -e
-
-  (
-    if [[ "{{provider}}" == "aws" ]]; then
-      user="ubuntu"
-      inventory_path="inventory/.{{env}}_inventory_aws_ec2.yml"
-    elif [[ "{{provider}}" == "digital-ocean" ]]; then
-      user="root"
-      inventory_path="inventory/.{{env}}_inventory_digital_ocean.yml"
-    else
-      echo "Provider {{provider}} is not supported"
-      exit 1
-    fi
-
-    cd ansible
-    rm -rf logs
-    mkdir logs
-    ansible-playbook --inventory $inventory_path \
-      --private-key $HOME/.ssh/$SSH_KEY_NAME \
-      --extra-vars "@extra_vars/.{{env}}_{{provider}}.json" \
-      --user $user \
-      --forks 30 \
-      logs.yml
-  )
-  (
-    cd ansible/logs
-    for tar_file in *.tar.gz
-    do
-      dir_name="${tar_file%.tar.*}"
-      mkdir $dir_name
-      tar xvf $tar_file -C $dir_name
-      rm $tar_file
-    done
-    find . -type d -name "logs" -depth -exec rm -rf "{}" \;
-  )
-  rm -rf logs
-  mv ansible/logs .
+clean-logs env:
+  aws s3 rm s3://sn-testnet/testnet-logs/{{env}}/ --recursive
 
 # Tear down all the EC2 instances or droplets in the testnet and delete the Terraform workspace.
 clean env provider:

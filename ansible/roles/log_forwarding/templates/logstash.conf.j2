@@ -37,7 +37,7 @@ output {
       canned_acl => "public-read"
       time_file => 10
       rotation_strategy => "time"
-      prefix => "testnet-runs/logs/%{[host][name]}/%{filename}"
+      prefix => "testnet-logs/{{ testnet_name }}/%{[host][name]}/%{filename}"
       codec => plain
     }
   }
@@ -50,7 +50,7 @@ output {
       canned_acl => "public-read"
       time_file => 10
       rotation_strategy => "time"
-      prefix => "testnet-runs/logs/%{[host][name]}/%{filename}"
+      prefix => "testnet-logs/{{ testnet_name }}/%{[host][name]}/%{filename}"
       codec => plain
     }
   }
