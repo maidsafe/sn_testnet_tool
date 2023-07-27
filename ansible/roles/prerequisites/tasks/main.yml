@@ -28,11 +28,28 @@
     name: safe
     shell: /bin/bash
 
+- name: create .ssh directory for safe user
+  ansible.builtin.file:
+    path: /home/safe/.ssh
+    owner: safe
+    group: safe
+    state: directory
+    mode: '0755'
+
+# This is necessary for the logstash service, which runs as the logstash user, to
+# read the log files under /home/safe/.local/share/safe/node.
+- name: make home directory accessible for logstash user
+  ansible.builtin.file:
+    path: /home/safe
+    mode: '0755'
+
 # This is a bit of a hack, but it allows the `safe` user to have SSH access using the same
 # authorized_keys, which is useful for running utility scripts.
 - name: create .ssh directory for safe user
   ansible.builtin.file:
     path: /home/safe/.ssh
+    owner: safe
+    group: safe
     state: directory
     mode: '0755'
   when: provider == "digital-ocean"

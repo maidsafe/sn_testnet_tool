@@ -18,3 +18,5 @@
     - node
     - role: resource_usage
       become: True
+    - role: log_forwarding
+      become: True

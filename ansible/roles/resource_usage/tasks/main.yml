@@ -1,6 +1,6 @@
 ---
 # Run this whole role with `become: True`.
-- name: Copy resource-usage.sh to remote
+- name: copy resource-usage.sh to remote
   ansible.builtin.copy:
     src: ../scripts/resource-usage.sh
     dest: /home/safe/resource-usage.sh
@@ -8,7 +8,7 @@
     group: safe
     mode: '0744'
 
-- name: Ensure the logging directory exists
+- name: ensure the logging directory exists
   ansible.builtin.file:
     path: /home/safe/.local/share/safe/node
     state: directory
@@ -16,12 +16,12 @@
     group: safe
     mode: '0755'
 
-- name: Create systemd service for resource-usage
+- name: create systemd service for resource-usage
   ansible.builtin.template:
     src: resource-usage.service.j2
     dest: /etc/systemd/system/resource-usage.service
 
-- name: Enable and start resource-usage service
+- name: enable and start resource-usage service
   ansible.builtin.systemd_service:
     name: resource-usage
     state: started
