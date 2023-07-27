@@ -4,6 +4,6 @@
 	"node_archive_url": "__NODE_URL__",
 	"node_data_dir_path": "/mnt/node/data",
 	"node_data_mount_path": "/mnt/node",
-	"node_logs_dir_path": "/mnt/node/logs",
-	"provider": "aws"
+	"provider": "aws",
+	"testnet_name": "__TESTNET_NAME__"
 }
