@@ -15,8 +15,8 @@
     - zip
   register: result
   until: result is succeeded
-  retries: 3
-  delay: 5
+  retries: 5
+  delay: 10
 
 - name: install boto3
   ansible.builtin.pip:
