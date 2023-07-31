@@ -6,7 +6,7 @@
 - name: clone safe_network repo branch
   ansible.builtin.git:
     repo: https://github.com/{{ org }}/safe_network
-    refspec: "+refs/heads/{{ branch }}:refs/remotes/origin/{{ branch }}"
+    version: "{{ branch }}"
     dest: "{{ ansible_env.HOME }}/safe_network"
 
 - name: build custom_bin
