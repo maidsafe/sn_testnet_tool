@@ -25,12 +25,16 @@ perform_ripgrep_and_sync() {
   fi
 
   echo "Performing ripgrep for '$search_string' on $name ($ip)"
-  ssh "root@$ip" "rg -lu '$search_string' ~/.local/share/safe/node/*" 
+  ssh "root@$ip" "rg -lu '$search_string' ~/.local/share/safe/node/*" > /tmp/matching_files_${name}_${ip}.txt 
 
-  if [[ -s /tmp/matching_files.txt ]]; then
+  if [[ -s /tmp/matching_files_${name}_${ip}.txt ]]; then
     echo "Syncing matching files from $name ($ip)"
-    mkdir -p "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}"
-    rsync -arz --files-from=/tmp/matching_files.txt --exclude"*" root@${ip}:~/ "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/"
+    # cat /tmp/matching_files_${name}_${ip}.txt
+    mkdir -p "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/rg-logs"
+    rsync -arz --files-from=/tmp/matching_files_${name}_${ip}.txt --no-relative root@${ip}:/ "workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/rg-logs"
+    cat /tmp/matching_files_${name}_${ip}.txt
+    rm /tmp/matching_files_${name}_${ip}.txt
+    echo "files synced to workspace/${TESTNET_CHANNEL}/droplets/${name}__${ip}/rg-logs"
   fi
 }
 
@@ -42,6 +46,6 @@ echo "$input_data" | parallel --timeout 180 --colsep ' ' --jobs 10 \
   "perform_ripgrep_and_sync() {
     $(declare -f perform_ripgrep_and_sync)
     perform_ripgrep_and_sync \"\$@\"
-  }; perform_ripgrep_and_sync {1} {2}"
+  }; perform_ripgrep_and_sync {1} {2} $search_string"
 
 echo "Logs updated"
