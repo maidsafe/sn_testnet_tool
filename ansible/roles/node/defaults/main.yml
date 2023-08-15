@@ -9,5 +9,5 @@ node_rpc_port: 12001
 node_instance_count: 10
 node_data_dir_path: /home/safe/.local/share/safe/node/data
 node_logs_dir_path: /home/safe/.local/share/safe/node/logs
-rust_log_setting: safenode=trace
-rust_log_otlp_setting: safenode=trace
+rust_log_setting: safenode,sn_node=debug,sn_networking=info
+rust_log_otlp_setting: safenode=debug

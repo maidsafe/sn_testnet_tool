@@ -23,7 +23,7 @@ ansible/inventory/.*
 ansible/extra_vars/.*
 .env
 safenode_rpc_client
-
+*.log*
 # IDE
 .idea/
 .vscode/
