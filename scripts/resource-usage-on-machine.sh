@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Checking $(hostname) on $(hostname -I | awk '{print $1}')"
-NODES_DIR=~/.local/share/safe/node
+NODES_DIR=/home/safe/.local/share/safe/node
 printf "%-55s %-8s %-15s %-10s %s\n" "Node PeerId" "PID" "Memory (MB)" "CPU (%)" "Record Count"
 running_process_count=0
 while read -r folder; do
